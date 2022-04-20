@@ -1,8 +1,8 @@
 ---
-title: 鹿佳莼的第二天
+title: 鹿佳莼的第一天
 categories:
 - 日记
-feature\_image: "https://picsum.photos/2560/600?image=873”
+feature\_image: "https://picsum.photos/2560/600?image=873"
 ---
 
 小李早上玩了色弱测试，结果我们小李是狗哈哈哈。
