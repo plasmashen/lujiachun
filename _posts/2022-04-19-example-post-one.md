@@ -12,7 +12,7 @@ feature\_image: "https://picsum.photos/2560/600?image=872"
 和小李一起去万象城，还带了用完的咖啡胶囊。
 
 ![][2]
-买了venchi冰淇淋，小李的最爱，草莓脆片！
+买了venchi冰淇淋，小李的最爱，草莓碎片！
 
 ![][3]
 鼎泰丰的抄手，很香很好吃
@@ -23,8 +23,8 @@ feature\_image: "https://picsum.photos/2560/600?image=872"
 ![][5]
 蟹黄小笼包，还可以
 
-[1]:	https://lujiachun.top/assets/img/20220419_1.jpeg
-[2]:	https://lujiachun.top/assets/img/20220419_2.jpeg
-[3]:	https://lujiachun.top/assets/img/20220419_3.jpeg
-[4]:	https://lujiachun.top/assets/img/20220419_4.jpeg
-[5]:	https://lujiachun.top/assets/img/20220419_5.jpeg
+[1]:	https://lujiachun.top/assets/img/20220419_1.jpg
+[2]:	https://lujiachun.top/assets/img/20220419_2.jpg
+[3]:	https://lujiachun.top/assets/img/20220419_3.jpg
+[4]:	https://lujiachun.top/assets/img/20220419_4.jpg
+[5]:	https://lujiachun.top/assets/img/20220419_5.jpg
