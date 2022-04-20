@@ -96,6 +96,7 @@ lang: en-GB # Set the site language
 title: "鹿佳莼" # Site name or title, also used in jekyll-seo-tag
 logo: "/lujiachun/assets/logos/lujiachun.png" # Site logo, also used in jekyll-seo-tag
 description: "" # Site description and default description, also used in jekyll-seo-tag
+root: "/lujiachun"
 url: "https://plasmashen.github.io/lujiachun/" # Site url, also used in jekyll-seo-tag
 baseurl: ""
 repo: "https://github.com/daviddarnes/alembic"
