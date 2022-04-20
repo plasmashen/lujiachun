@@ -2,9 +2,29 @@
 title: 鹿佳莼的第一天
 categories:
 - 日记
-feature_image: "https://picsum.photos/2560/600?image=872"
+feature\_image: "https://picsum.photos/2560/600?image=872"
 ---
 
 
 小李今天上午突然很想吃冰淇淋venchi，但是鉴于小李这两天快要来姨妈了，就不准小李吃。正好大师兄来问一会一不一起吃午饭，和小李一说，小李绷不住了，说“一整个哭了”。然后和我讲了很多关于最近表现多好多好的事情，乖乖喝水，乖乖吃食堂，把孩子给可怜的。那这说的我心里也一软，当场就说带宝贝小李去吃venchi冰淇淋了。
 
+![][1]
+和小李一起去万象城，还带了用完的咖啡胶囊。
+
+![][2]
+买了venchi冰淇淋，小李的最爱，草莓脆片！
+
+![][3]
+鼎泰丰的抄手，很香很好吃
+
+![][4]
+红烧牛肉面，不过没xinzhijiezao的好吃
+
+![][5]
+蟹黄小笼包，还可以
+
+[1]:	https://lujiachun.top/assets/img/20220419_1.jpeg
+[2]:	https://lujiachun.top/assets/img/20220419_2.jpeg
+[3]:	https://lujiachun.top/assets/img/20220419_3.jpeg
+[4]:	https://lujiachun.top/assets/img/20220419_4.jpeg
+[5]:	https://lujiachun.top/assets/img/20220419_5.jpeg
