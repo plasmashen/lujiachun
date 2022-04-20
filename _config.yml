@@ -94,7 +94,7 @@ defaults:
 encoding: utf-8 # Make sure the encoding is right
 lang: en-GB # Set the site language
 title: "鹿佳莼" # Site name or title, also used in jekyll-seo-tag
-logo: "/lujiachun/assets/logos/lujiachun.png" # Site logo, also used in jekyll-seo-tag
+logo: "/assets/logos/lujiachun.png" # Site logo, also used in jekyll-seo-tag
 description: "" # Site description and default description, also used in jekyll-seo-tag
 root: "/"
 url: "https://plasmashen.github.io/lujiachun/" # Site url, also used in jekyll-seo-tag
@@ -111,27 +111,27 @@ css_inline: true # Will insert all styles into a single <style> block in the <he
 
 # 8. Site favicons & manifest icons
 favicons: # Favicons are also used in the manifest file. Syntax is 'size: path'
-  16: '/lujiachun/assets/logos/logo@16px.png'
-  32: '/lujiachun/assets/logos/logo@32px.png'
-  96: '/lujiachun/assets/logos/logo@96px.png'
-  120: '/lujiachun/assets/logos/logo@120px.png'
-  144: '/lujiachun/assets/logos/logo@144px.png'
-  180: '/lujiachun/assets/logos/logo@180px.png'
-  512: '/lujiachun/assets/logos/logo@512px.png'
-  1024: '/lujiachun/assets/logos/logo@1024px.png'
+  16: '/assets/logos/logo@16px.png'
+  32: '/assets/logos/logo@32px.png'
+  96: '/assets/logos/logo@96px.png'
+  120: '/assets/logos/logo@120px.png'
+  144: '/assets/logos/logo@144px.png'
+  180: '/assets/logos/logo@180px.png'
+  512: '/assets/logos/logo@512px.png'
+  1024: '/assets/logos/logo@1024px.png'
 
 # 9. Site navigation
 navigation_header:
 - title: Home
-  url: /lujiachun
+  url: 
 - title: Elements
-  url: /lujiachun/elements/
+  url: /elements/
 - title: Blog
-  url: /lujiachun/blog/
+  url: /blog/
 - title: Categories
-  url: /lujiachun/categories/
+  url: /categories/
 - title: Search
-  url: /lujiachun/search/
+  url: /search/
 # - title: Fork Alembic
 #   url: https://github.com/daviddarnes/alembic
 
