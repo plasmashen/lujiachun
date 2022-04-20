@@ -1,5 +1,5 @@
 ---
-title: 鹿佳莼的第一天
+title: 鹿佳莼的第二天
 categories:
 - 日记
 feature\_image: "https://picsum.photos/2560/600?image=873"
