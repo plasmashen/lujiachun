@@ -2,7 +2,7 @@
 title: 鹿佳莼的第一天
 categories:
 - 日记
-feature\_image: "https://picsum.photos/2560/600?image=872"
+feature_image: "https://picsum.photos/2560/600?image=872"
 ---
 
 
