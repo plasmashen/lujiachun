@@ -9,4 +9,4 @@ feature\_image: "https://picsum.photos/2560/600?image=873"
 
 ![][1]{: width="250" }
 
-[1]:	https://lujiachun.top/assets/img/20220421.jpg
+[1]:	https://lujiachun.top/assets/img/20220421.jpeg
