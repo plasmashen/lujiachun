@@ -12,15 +12,19 @@ feature\_image: "https://picsum.photos/2560/600?image=872"
 和小李一起去万象城，还带了用完的咖啡胶囊。
 
 ![][2]{: width="250" }
+
 买了venchi冰淇淋，小李的最爱，草莓碎片！
 
 ![][3]{: width="250" }
+
 鼎泰丰的抄手，很香很好吃
 
 ![][4]{: width="250" }
+
 红烧牛肉面，不过没幸彘揭灶的好吃
 
 ![][5]{: width="250" }
+
 蟹黄小笼包，还可以
 
 [1]:	https://lujiachun.top/assets/img/20220419_1.jpg
