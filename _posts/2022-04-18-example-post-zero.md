@@ -6,6 +6,5 @@ feature_image: "https://picsum.photos/2560/600?image=870"
 ---
 
 
-小李和小沈的专属博客从今天开始！{: style="color:gray; font-size: 80%; text-align: center;"}
-
+小李和小沈的专属博客从今天开始！
 
