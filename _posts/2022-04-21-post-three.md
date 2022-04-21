@@ -7,7 +7,7 @@ feature_image: "https://picsum.photos/2560/600?image=873"
 
 今天小李的新球拍到了，高端球拍，狂飙5，就是重了一点。不过没事，小李马上步入职业乒乓球生涯，就是要从专业的开始。
 
-{% include figure.html image="https://lujiachun.top/assets/img/20220421.jpeg" caption="中午不睡就要来打乒乓了" width="300" %}
+{% include figure.html image="https://lujiachun.top/assets/img/20220421_1.jpeg" caption="中午不睡就要来打乒乓了" width="300" %}
 
 下班之前17:20我先去曹西看了一下，两张乒乓球台都空着，等着小李来。
 不一会儿来了好多人，还好占着位置了，小李一下班就飞奔过来。
