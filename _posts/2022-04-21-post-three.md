@@ -23,4 +23,5 @@ feature_image: "https://picsum.photos/2560/600?image=873"
 
 {% include figure.html image="https://lujiachun.top/assets/img/20220421_3.jpeg" caption="面疙瘩" width="300" %}
 
-今天又是快乐的一天
+今天又是快乐的一天！
+
