@@ -47,7 +47,7 @@
 
   <body class="layout-{{ page.layout }}{% if page.title %}  {{ page.title | slugify }}{% endif %}">
     {% include site-icons.svg %}
-
+      <link rel="shortcut icon" type="image/png" href="/favicon.png">
     {{ content }}
 
     {% if site.service_worker != false %}{% include site-sw.html %}{% endif %}
