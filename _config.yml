@@ -97,7 +97,7 @@ title: "鹿佳莼" # Site name or title, also used in jekyll-seo-tag
 logo: "/assets/logos/lujiachun.png" # Site logo, also used in jekyll-seo-tag
 description: "" # Site description and default description, also used in jekyll-seo-tag
 root: "/"
-url: "https://plasmashen.github.io/lujiachun/" # Site url, also used in jekyll-seo-tag
+url: "https://plasmashen.github.io/lujiachun" # Site url, also used in jekyll-seo-tag
 baseurl: ""
 repo: "https://github.com/daviddarnes/alembic"
 email: "me@daviddarnes.com"
