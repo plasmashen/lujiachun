@@ -67,7 +67,7 @@ collections:
     output: true
     description: "" # The post list page content
     feature_text: |
-      #欢迎来到鹿佳莼
+      # 欢迎来到鹿佳莼的博客
     feature_image: "https://picsum.photos/2560/600?image=866"
 
 # 6. Jekyll collections settings
