@@ -99,10 +99,10 @@ description: "" # Site description and default description, also used in jekyll-
 root: "/"
 url: "https://plasmashen.github.io/lujiachun" # Site url, also used in jekyll-seo-tag
 baseurl: ""
-repo: "https://github.com/daviddarnes/alembic"
+repo: "https://github.com/plasmashen/lujiachun"
 email: "me@daviddarnes.com"
 # disqus: "alembic-1" # Blog post comments, uncomment the option and set the site ID from your Disqus account
-# date_format: "%-d %B %Y" # Blog post date formatting using placeholder formatting
+date_format: "%B %-d %Y" # Blog post date formatting using placeholder formatting
 # google_analytics: ""
 # google_analytics_anonymize_ip: ""
 # service_worker: false # Will turn off the service worker if set to false
@@ -132,8 +132,8 @@ navigation_header:
   url: /categories/
 - title: Search
   url: /search/
-- title: Fork Alembic
-  url: https://github.com/daviddarnes/alembic
+- title: Fork Lujiachun
+  url: https://github.com/plasmashen/lujiachun
 
 navigation_footer:
 - title: Owned by Lujia Shen
