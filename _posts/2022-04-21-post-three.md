@@ -17,7 +17,7 @@ feature_image: "https://picsum.photos/2560/600?image=873"
 明天再多加练习，可以让师傅升级为中级师傅了。
 哈哈。
 
-晚上回去做了面疙瘩，本来小李说她来炒菜，结果直接开始线上打麻将。然后就上床打麻将去了，留下我切好的一堆菜和还没和的面。没办法，这个家还是得有人撑着，只好自己动手炒菜和面下面煮疙瘩。
+晚上回去做了面疙瘩。
 
 {% include figure.html image="https://lujiachun.top/assets/img/20220421_2.jpeg" caption="趴在床上打麻将" width="300" %}
 
