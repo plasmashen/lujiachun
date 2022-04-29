@@ -2,7 +2,7 @@
 title: 鹿佳莼的第八天
 categories:
 - 日记
-feature\_image: "https://picsum.photos/2560/600?image=873"
+feature\_image: "https://picsum.photos/2560/600?image=871"
 ---
 
 早上做了三明治给宝吃。
