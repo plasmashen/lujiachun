@@ -2,7 +2,7 @@
 title: 鹿佳莼的第十一天
 categories:
 - 日记
-feature\_image: "https://picsum.photos/2560/600?image=871"
+feature_image: "https://picsum.photos/2560/600?image=871"
 ---
 
 这两天小沈改论文很忙，于是写日记的重任落在了小李头上。前天吃了螺蛳粉和巧克力泡芙，昨天吃了加奈荞麦面。今早吃鸡蛋饼和小沈秘制生椰拿铁，很好喝，发现我喜欢的巴布亚新几内亚胶囊网上竟然买不到，看来得去店里买了。小沈写论文加油哦
