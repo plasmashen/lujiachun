@@ -16,8 +16,6 @@ feature_image: "https://picsum.photos/2560/600?image=871"
 
 {% include figure.html image="https://lujiachun.top/assets/img/20220419_4.jpg" caption="红烧牛肉面，不过没幸彘揭灶的好吃" width="300" %}
 
-{% include figure.html image="https://lujiachun.top/assets/img/20220419_5.jpg" caption="蟹黄小笼包，还可以" width="300" %}
-
 
 真是美好的一天
 
