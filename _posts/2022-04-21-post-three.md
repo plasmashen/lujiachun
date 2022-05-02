@@ -19,7 +19,7 @@ feature_image: "https://picsum.photos/2560/600?image=871"
 
 晚上回去做了面疙瘩。
 
-{% include figure.html image="https://lujiachun.top/assets/img/20220421_2.jpeg" caption="趴在床上打麻将" width="300" %}
+{% include figure.html image="https://lujiachun.top/assets/img/20220421_2.jpeg" caption="趴在床上打麻将" width="500" %}
 
 {% include figure.html image="https://lujiachun.top/assets/img/20220421_3.jpeg" caption="面疙瘩" width="300" %}
 
