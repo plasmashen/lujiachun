@@ -12,9 +12,9 @@ feature_image: "https://picsum.photos/2560/600?image=871"
 
 {% include figure.html image="https://lujiachun.top/assets/img/20220419_2.jpg" caption="买了venchi冰淇淋，小李的最爱，草莓碎片！" width="300" %}
 
-{% include figure.html image="https://lujiachun.top/assets/img/20220419_3.jpg" caption="鼎泰丰的抄手，很香很好吃。" width="300" %}
+{% include figure.html image="https://lujiachun.top/assets/img/20220419_3.jpg" caption="鼎泰丰的抄手，很香很好吃。" width="500" %}
 
-{% include figure.html image="https://lujiachun.top/assets/img/20220419_4.jpg" caption="红烧牛肉面，不过没幸彘揭灶的好吃" width="300" %}
+{% include figure.html image="https://lujiachun.top/assets/img/20220419_4.jpg" caption="红烧牛肉面，不过没幸彘揭灶的好吃" width="500" %}
 
 
 真是美好的一天
