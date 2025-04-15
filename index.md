@@ -2,12 +2,12 @@
 title: 关于我
 feature_text: |
   # 鹿佳莼 
-  一个小李和小沈的故事
+  一个小李和小沈和jo宝的故事
 feature_image: "https://picsum.photos/1300/400?image=989"
 ---
 
 
-爱小李，爱生活。
+爱小李，爱jo宝，爱生活。
 
 ![][image-1]
 ![][image-2]
