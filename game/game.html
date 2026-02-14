@@ -1,0 +1,709 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>7x7连珠统计工具</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        .main-content {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .board-section, .control-section {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .board {
+            display: inline-grid;
+            width: 350px;
+            height: 350px;
+            gap: 2px;
+            background-color: #333;
+            margin: 10px auto;
+            padding: 2px;
+            border-radius: 4px;
+        }
+
+        .cell {
+            background-color: #e8d4a0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: bold;
+            border-radius: 2px;
+            transition: all 0.2s;
+        }
+
+        .cell:hover {
+            background-color: #f0e0b0;
+        }
+
+        .cell.selected {
+            background-color: #4CAF50;
+            color: white;
+        }
+
+        .highlight-5 {
+            background-color: #2196F3 !important;
+        }
+
+        .highlight-6 {
+            background-color: #FF9800 !important;
+        }
+
+        .highlight-7 {
+            background-color: #F44336 !important;
+        }
+
+        button {
+            padding: 10px 20px;
+            margin: 5px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background-color 0.2s;
+        }
+
+        .btn-primary {
+            background-color: #2196F3;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: #1976D2;
+        }
+
+        .btn-secondary {
+            background-color: #757575;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background-color: #616161;
+        }
+
+        .btn-success {
+            background-color: #4CAF50;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background-color: #45a049;
+        }
+
+        .btn-warning {
+            background-color: #FF9800;
+            color: white;
+        }
+
+        .btn-warning:hover {
+            background-color: #FB8C00;
+        }
+
+        .status {
+            margin-top: 15px;
+            padding: 10px;
+            background-color: #f5f5f5;
+            border-radius: 4px;
+        }
+
+        .stats-section {
+            margin-top: 20px;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .stat-card {
+            padding: 15px;
+            background-color: #f9f9f9;
+            border-radius: 4px;
+            border-left: 4px solid #2196F3;
+        }
+
+        .stat-card h3 {
+            margin-bottom: 8px;
+            color: #333;
+            font-size: 14px;
+        }
+
+        .stat-card .values {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .freq, .prob {
+            font-size: 16px;
+            font-weight: bold;
+        }
+
+        .freq {
+            color: #2196F3;
+        }
+
+        .prob {
+            color: #FF5722;
+        }
+
+        .stats-summary {
+            margin-top: 15px;
+            padding: 15px;
+            background-color: #fff3e0;
+            border-radius: 4px;
+        }
+
+        .summary-line {
+            margin: 5px 0;
+            font-size: 14px;
+        }
+
+        .total-trials {
+            font-weight: bold;
+            color: #333;
+            font-size: 16px;
+            margin-top: 10px;
+        }
+
+        .input-group {
+            margin: 15px 0;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        .input-group input {
+            width: 100px;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 16px;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 20px;
+            background-color: #e0e0e0;
+            border-radius: 10px;
+            overflow: hidden;
+            margin-top: 10px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background-color: #4CAF50;
+            width: 0%;
+            transition: width 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 12px;
+        }
+
+        .legend {
+            display: flex;
+            gap: 15px;
+            margin-top: 15px;
+            font-size: 12px;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .legend-color {
+            width: 20px;
+            height: 20px;
+            border-radius: 2px;
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .board {
+                width: 300px;
+                height: 300px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>7x7 连珠统计工具</h1>
+
+        <div class="main-content">
+            <div class="board-section">
+                <h2>互动棋盘</h2>
+                <div class="board" id="board"></div>
+
+                <div class="legend">
+                    <div class="legend-item">
+                        <div class="legend-color" style="background-color: #4CAF50;"></div>
+                        <span>已选(21个)</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background-color: #2196F3;"></div>
+                        <span>5连</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background-color: #FF9800;"></div>
+                        <span>6连</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background-color: #F44336;"></div>
+                        <span>7连</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="control-section">
+                <h2>控制面板</h2>
+                <button class="btn-primary" onclick="testOne()">随机选择一次</button>
+                <button class="btn-primary" onclick="test100()">测试100次</button>
+                <button class="btn-warning" onclick="test1000()">测试1000次</button>
+                <button class="btn-success" onclick="test10000()">测试10000次</button>
+                <br>
+                <button class="btn-secondary" onclick="testCustom()">自定义次数</button>
+                <button class="btn-secondary" onclick="resetStats()">重置统计</button>
+                <br><br>
+
+                <div class="input-group">
+                    <label for="customTrials">自定义测试次数:</label>
+                    <input type="number" id="customTrials" value="1000" min="1" max="100000">
+                </div>
+
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressFill">0%</div>
+                </div>
+
+                <div class="status">
+                    <strong>当前选择:</strong>
+                    <label id="selectedCount">0 / 21</label>
+                </div>
+            </div>
+        </div>
+
+        <div class="stats-section">
+            <h2>统计数据</h2>
+            <div class="stats-summary">
+                <div class="summary-line total-trials">
+                    总测试次数: <span id="totalTrials">0</span>
+                </div>
+            </div>
+
+            <div class="stats-grid" id="statsGrid"></div>
+        </div>
+    </div>
+
+    <script>
+        const BOARD_SIZE = 7;
+        const SELECT_COUNT = 21;
+
+        let selectedCells = [];
+        let stats = {
+            h5: 0, v5: 0, d5_1: 0, d5_2: 0,
+            h6: 0, v6: 0, d6_1: 0, d6_2: 0,
+            h7: 0, v7: 0, d7_1: 0, d7_2: 0
+        };
+        let totalTrials = 0;
+        let isRunning = false;
+
+        // 初始化棋盘
+        function initBoard() {
+            const board = document.getElementById('board');
+            board.innerHTML = '';
+            board.style.gridTemplateColumns = `repeat(${BOARD_SIZE}, 1fr)`;
+
+            for (let i = 0; i < BOARD_SIZE * BOARD_SIZE; i++) {
+                const cell = document.createElement('div');
+                cell.className = 'cell';
+                cell.dataset.index = i;
+                cell.textContent = i + 1;
+                cell.onclick = () => toggleCell(i);
+                board.appendChild(cell);
+            }
+
+            updateStatsDisplay();
+        }
+
+        // 切换单元格选中状态
+        function toggleCell(index) {
+            if (isRunning) return;
+
+            const cell = document.querySelector(`[data-index="${index}"]`);
+            const idx = selectedCells.indexOf(index);
+
+            if (idx > -1) {
+                selectedCells.splice(idx, 1);
+                cell.classList.remove('selected');
+                cell.classList.remove('highlight-5', 'highlight-6', 'highlight-7');
+            } else if (selectedCells.length < SELECT_COUNT) {
+                selectedCells.push(index);
+                cell.classList.add('selected');
+            }
+
+            document.getElementById('selectedCount').textContent = `${selectedCells.length} / ${SELECT_COUNT}`;
+        }
+
+        // 从数组中随机选择n个元素
+        function randomSelect(arr, count) {
+            const shuffled = [...arr];
+            for (let i = shuffled.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+            }
+            return shuffled.slice(0, count);
+        }
+
+        // 检测横连
+        function checkHorizontal(selected, length) {
+            const results = [];
+            for (let row = 0; row < BOARD_SIZE; row++) {
+                for (let col = 0; col <= BOARD_SIZE - length; col++) {
+                    const positions = [];
+                    for (let i = 0; i < length; i++) {
+                        positions.push(row * BOARD_SIZE + col + i);
+                    }
+                    if (positions.every(pos => selected.includes(pos))) {
+                        results.push(positions);
+                    }
+                }
+            }
+            return results;
+        }
+
+        // 检测竖连
+        function checkVertical(selected, length) {
+            const results = [];
+            for (let col = 0; col < BOARD_SIZE; col++) {
+                for (let row = 0; row <= BOARD_SIZE - length; row++) {
+                    const positions = [];
+                    for (let i = 0; i < length; i++) {
+                        positions.push((row + i) * BOARD_SIZE + col);
+                    }
+                    if (positions.every(pos => selected.includes(pos))) {
+                        results.push(positions);
+                    }
+                }
+            }
+            return results;
+        }
+
+        // 检测斜连(主对角线方向，从左上到右下)
+        function checkDiagonal1(selected, length) {
+            const results = [];
+            for (let row = 0; row <= BOARD_SIZE - length; row++) {
+                for (let col = 0; col <= BOARD_SIZE - length; col++) {
+                    const positions = [];
+                    for (let i = 0; i < length; i++) {
+                        positions.push((row + i) * BOARD_SIZE + col + i);
+                    }
+                    if (positions.every(pos => selected.includes(pos))) {
+                        results.push(positions);
+                    }
+                }
+            }
+            return results;
+        }
+
+        // 检测斜连(副对角线方向，从右上到左下)
+        function checkDiagonal2(selected, length) {
+            const results = [];
+            for (let row = 0; row <= BOARD_SIZE - length; row++) {
+                for (let col = length - 1; col < BOARD_SIZE; col++) {
+                    const positions = [];
+                    for (let i = 0; i < length; i++) {
+                        positions.push((row + i) * BOARD_SIZE + col - i);
+                    }
+                    if (positions.every(pos => selected.includes(pos))) {
+                        results.push(positions);
+                    }
+                }
+            }
+            return results;
+        }
+
+        // 分析一次选择
+        function analyzeSelection(selected) {
+            const results = {
+                h5: checkHorizontal(selected, 5).length,
+                v5: checkVertical(selected, 5).length,
+                d5_1: checkDiagonal1(selected, 5).length,
+                d5_2: checkDiagonal2(selected, 5).length,
+                h6: checkHorizontal(selected, 6).length,
+                v6: checkVertical(selected, 6).length,
+                d6_1: checkDiagonal1(selected, 6).length,
+                d6_2: checkDiagonal2(selected, 6).length,
+                h7: checkHorizontal(selected, 7).length,
+                v7: checkVertical(selected, 7).length,
+                d7_1: checkDiagonal1(selected, 7).length,
+                d7_2: checkDiagonal2(selected, 7).length
+            };
+
+            return results;
+        }
+
+        // 更新统计
+        function updateStats(result) {
+            if (result.h5 > 0) stats.h5++;
+            if (result.v5 > 0) stats.v5++;
+            if (result.d5_1 > 0) stats.d5_1++;
+            if (result.d5_2 > 0) stats.d5_2++;
+            if (result.h6 > 0) stats.h6++;
+            if (result.v6 > 0) stats.v6++;
+            if (result.d6_1 > 0) stats.d6_1++;
+            if (result.d6_2 > 0) stats.d6_2++;
+            if (result.h7 > 0) stats.h7++;
+            if (result.v7 > 0) stats.v7++;
+            if (result.d7_1 > 0) stats.d7_1++;
+            if (result.d7_2 > 0) stats.d7_2++;
+            totalTrials++;
+        }
+
+        // 更新统计显示
+        function updateStatsDisplay() {
+            const categories = [
+                { key: 'h5', name: '5连横' },
+                { key: 'v5', name: '5连竖' },
+                { key: 'd5_1', name: '5连斜(↘)' },
+                { key: 'd5_2', name: '5连斜(↙)' },
+                { key: 'h6', name: '6连横' },
+                { key: 'v6', name: '6连竖' },
+                { key: 'd6_1', name: '6连斜(↘)' },
+                { key: 'd6_2', name: '6连斜(↙)' },
+                { key: 'h7', name: '7连横' },
+                { key: 'v7', name: '7连竖' },
+                { key: 'd7_1', name: '7连斜(↘)' },
+                { key: 'd7_2', name: '7连斜(↙)' }
+            ];
+
+            let html = '';
+            categories.forEach(cat => {
+                const freq = stats[cat.key];
+                const prob = totalTrials > 0 ? ((freq / totalTrials) * 100).toFixed(2) : '0.00';
+                html += `
+                    <div class="stat-card">
+                        <h3>${cat.name}</h3>
+                        <div class="values">
+                            <span class="freq">频次: ${freq}</span>
+                            <span class="prob">概率: ${prob}%</span>
+                        </div>
+                    </div>
+                `;
+            });
+
+            document.getElementById('statsGrid').innerHTML = html;
+            document.getElementById('totalTrials').textContent = totalTrials.toLocaleString();
+        }
+
+        // 清除棋盘选择
+        function clearBoard() {
+            const cells = document.querySelectorAll('.cell');
+            cells.forEach(cell => {
+                cell.className = 'cell';
+            });
+        }
+
+        // 在棋盘上显示结果
+        function displaySelection(selected) {
+            clearBoard();
+
+            const r = analyzeSelection(selected);
+            const newSelected = [...selected];
+
+            // 高亮7连
+            [
+                ...checkDiagonal1(selected, 7),
+                ...checkDiagonal2(selected, 7),
+                ...checkHorizontal(selected, 7),
+                ...checkVertical(selected, 7)
+            ].forEach(line => {
+                line.forEach(pos => {
+                    const cell = document.querySelector(`[data-index="${pos}"]`);
+                    if (cell) cell.classList.add('highlight-7');
+                });
+            });
+
+            // 高亮6连
+            [
+                ...checkDiagonal1(selected, 6),
+                ...checkDiagonal2(selected, 6),
+                ...checkHorizontal(selected, 6),
+                ...checkVertical(selected, 6)
+            ].forEach(line => {
+                line.forEach(pos => {
+                    const cell = document.querySelector(`[data-index="${pos}"]`);
+                    if (cell && !cell.classList.contains('highlight-7')) {
+                        cell.classList.add('highlight-6');
+                    }
+                });
+            });
+
+            // 高亮5连
+            [
+                ...checkDiagonal1(selected, 5),
+                ...checkDiagonal2(selected, 5),
+                ...checkHorizontal(selected, 5),
+                ...checkVertical(selected, 5)
+            ].forEach(line => {
+                line.forEach(pos => {
+                    const cell = document.querySelector(`[data-index="${pos}"]`);
+                    if (cell) cell.classList.add('highlight-5');
+                });
+            });
+
+            selected.forEach(pos => {
+                const cell = document.querySelector(`[data-index="${pos}"]`);
+                if (cell && !cell.classList.contains('highlight-5') &&
+                    !cell.classList.contains('highlight-6') &&
+                    !cell.classList.contains('highlight-7')) {
+                    cell.classList.add('selected');
+                }
+            });
+
+            document.getElementById('selectedCount').textContent = `${selected.length} / ${SELECT_COUNT}`;
+        }
+
+        // 测试一次并显示
+        function testOne() {
+            if (isRunning) return;
+
+            const allCells = Array.from({length: BOARD_SIZE * BOARD_SIZE}, (_, i) => i);
+            selectedCells = randomSelect(allCells, SELECT_COUNT);
+            displaySelection(selectedCells);
+            const result = analyzeSelection(selectedCells);
+            updateDisplayResult(result);
+        }
+
+        // 更新显示结果
+        function updateDisplayResult(result) {
+            // 这个函数可以用来显示单次测试的详细信息
+        }
+
+        // 批量测试
+        function runBatchTest(count, callback) {
+            if (isRunning) return;
+            isRunning = true;
+
+            let completed = 0;
+            const allCells = Array.from({length: BOARD_SIZE * BOARD_SIZE}, (_, i) => i);
+
+            function runBatch() {
+                const batchSize = 100;
+                for (let i = 0; i < batchSize && completed < count; i++) {
+                    const selected = randomSelect(allCells, SELECT_COUNT);
+                    const result = analyzeSelection(selected);
+                    updateStats(result);
+                    completed++;
+                }
+
+                const progress = Math.min(100, (completed / count) * 100);
+                document.getElementById('progressFill').style.width = `${progress}%`;
+                document.getElementById('progressFill').textContent = `${Math.round(progress)}%`;
+
+                if (completed < count) {
+                    setTimeout(runBatch, 0);
+                } else {
+                    isRunning = false;
+                    // 显示最后一次的选择
+                    const finalSelected = randomSelect(allCells, SELECT_COUNT);
+                    displaySelection(finalSelected);
+                    updateStatsDisplay();
+                }
+            }
+
+            runBatch();
+        }
+
+        function test100() {
+            runBatchTest(100);
+        }
+
+        function test1000() {
+            runBatchTest(1000);
+        }
+
+        function test10000() {
+            runBatchTest(10000);
+        }
+
+        function testCustom() {
+            const input = document.getElementById('customTrials');
+            const count = parseInt(input.value);
+            if (count > 0 && count <= 100000) {
+                runBatchTest(count);
+            } else {
+                alert('请输入1到100000之间的数字');
+            }
+        }
+
+        function resetStats() {
+            if (isRunning) return;
+            stats = {
+                h5: 0, v5: 0, d5_1: 0, d5_2: 0,
+                h6: 0, v6: 0, d6_1: 0, d6_2: 0,
+                h7: 0, v7: 0, d7_1: 0, d7_2: 0
+            };
+            totalTrials = 0;
+            selectedCells = [];
+            document.getElementById('progressFill').style.width = '0%';
+            document.getElementById('progressFill').textContent = '0%';
+            clearBoard();
+            document.getElementById('selectedCount').textContent = `0 / ${SELECT_COUNT}`;
+            updateStatsDisplay();
+        }
+
+        // 初始化
+        initBoard();
+    </script>
+</body>
+</html>
