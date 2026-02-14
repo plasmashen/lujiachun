@@ -316,8 +316,8 @@
                     <div class="value" id="flipCount">0 / 5</div>
                 </div>
                 <div class="info-item">
-                    <h3>已翻牌</h3>
-                    <div class="value" id="flippedCards">-</div>
+                    <h3>当前奖品</h3>
+                    <div class="value" id="currentPrize">-</div>
                 </div>
             </div>
 
@@ -535,9 +535,19 @@
                 cardsArea.appendChild(cardDiv);
             }
 
-            document.getElementById('currentSum').textContent = calculateSum();
+            const sum = calculateSum();
+            document.getElementById('currentSum').textContent = sum;
             document.getElementById('flipCount').textContent = `${flippedCards.length} / ${MAX_FLIPS}`;
-            document.getElementById('flippedCards').textContent = flippedCards.length > 0 ? `[${flippedCards.join(',')}]` : '-';
+
+            // 显示当前点数和对应的奖品
+            if (flippedCards.length >= MIN_FLIPS && sum <= 21) {
+                document.getElementById('currentPrize').textContent = prizeMap[sum];
+            } else if (flippedCards.length >= MIN_FLIPS && sum > 21) {
+                document.getElementById('currentPrize').textContent = LOSE_PRIZE;
+            } else {
+                document.getElementById('currentPrize').textContent = '-';
+            }
+
             document.getElementById('deckCount').textContent = deck.length;
 
             updateButtons();
