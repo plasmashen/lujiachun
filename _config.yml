@@ -132,6 +132,8 @@ navigation_header:
   url: /categories/
 - title: Search
   url: /search/
+- title: Game
+  url: /game/
 - title: Fork Lujiachun
   url: https://github.com/plasmashen/lujiachun
 
