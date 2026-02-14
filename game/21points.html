@@ -434,8 +434,15 @@
                 return;
             }
 
-            const card = deck.pop();
-            flippedCards.push(card);
+            // 第一次翻牌直接翻两张
+            if (flippedCards.length === 0) {
+                const card1 = deck.pop();
+                const card2 = deck.pop();
+                flippedCards.push(card1, card2);
+            } else {
+                const card = deck.pop();
+                flippedCards.push(card);
+            }
 
             updateDisplay();
 
