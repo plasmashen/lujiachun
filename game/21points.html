@@ -299,6 +299,281 @@
             background: #fff3cd;
             border-color: #ffc107;
         }
+
+        /* 抽奖模态框样式 */
+        .lottery-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .lottery-content {
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            max-width: 600px;
+            width: 90%;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            animation: slideIn 0.3s ease-out;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .lottery-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .lottery-header h2 {
+            color: #333;
+            margin: 0;
+        }
+
+        .lottery-body {
+            text-align: center;
+        }
+
+        .lottery-info {
+            margin-bottom: 25px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+
+        .lottery-draw {
+            margin: 20px 0;
+        }
+
+        .lottery-result {
+            margin-top: 25px;
+            padding: 20px;
+            background: linear-gradient(145deg, #d4edda, #c3e6cb);
+            border-radius: 10px;
+            border: 2px solid #28a745;
+        }
+
+        .result-prize {
+            font-size: 36px;
+            font-weight: bold;
+            color: #e74c3c;
+            margin: 15px 0;
+        }
+
+        .result-rank {
+            font-size: 18px;
+            color: #666;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateY(-50px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        /* 抽奖卡牌动画 */
+        .lottery-cards-container {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 8px;
+            margin: 15px 0;
+            max-width: 400px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .lottery-card {
+            width: 70px;
+            height: 95px;
+            background: linear-gradient(145deg, #ffffff, #e6e6e6);
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            font-weight: bold;
+            color: #333;
+            border: 2px solid #ddd;
+            box-shadow: 2px 2px 5px rgba(0,0,0,0.2);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .lottery-card.active {
+            transform: scale(1.1);
+            border-color: #e74c3c;
+            box-shadow: 0 0 20px rgba(231, 76, 60, 0.6);
+            color: #e74c3c;
+        }
+
+        .lottery-card.winner {
+            animation: pulse 1s ease-in-out;
+            background: linear-gradient(145deg, #ffd700, #ffed4e);
+            border-color: #f39c12;
+            transform: scale(1.2);
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                transform: scale(1.2);
+            }
+            50% {
+                transform: scale(1.3);
+            }
+        }
+
+        /* 自动化测试样式 */
+        .test-area {
+            margin-top: 20px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 10px;
+        }
+
+        .test-controls {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+
+        .threshold-settings {
+            flex: 1;
+            min-width: 300px;
+        }
+
+        .threshold-settings h4 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .threshold-item {
+            margin: 8px 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .threshold-item label {
+            font-weight: bold;
+            color: #555;
+            min-width: 120px;
+        }
+
+        .threshold-item input {
+            padding: 6px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            width: 60px;
+        }
+
+        .test-buttons {
+            flex: 1;
+            min-width: 300px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .test-buttons button {
+            padding: 8px 15px;
+            font-size: 14px;
+        }
+
+        .test-results {
+            margin-top: 15px;
+        }
+
+        .test-results h4 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+            gap: 8px;
+            margin-bottom: 10px;
+        }
+
+        .stat-item {
+            padding: 8px;
+            background: #fff;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+            text-align: center;
+            font-size: 14px;
+        }
+
+        .stat-item.high {
+            background: #d4edda;
+            border-color: #28a745;
+            font-weight: bold;
+        }
+
+        .stat-item.medium {
+            background: #fff3cd;
+            border-color: #ffc107;
+        }
+
+        .test-summary {
+            padding: 10px;
+            background: #e8f4f8;
+            border-radius: 6px;
+            border: 1px solid #b8d4e3;
+            font-size: 14px;
+            color: #495057;
+        }
+
+        .lottery-draw-button {
+            margin: 20px auto;
+            display: block;
+            padding: 15px 40px;
+            font-size: 20px;
+            background: linear-gradient(145deg, #e74c3c, #c0392b);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: bold;
+        }
+
+        .lottery-draw-button:hover {
+            background: linear-gradient(145deg, #f39c12, #e67e22);
+            transform: scale(1.05);
+        }
+
+        .lottery-draw-button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .lottery-animation-message {
+            text-align: center;
+            font-size: 18px;
+            color: #666;
+            margin: 15px 0;
+            height: 25px;
+        }
     </style>
 </head>
 <body>
@@ -316,8 +591,12 @@
                     <div class="value" id="flipCount">0 / 5</div>
                 </div>
                 <div class="info-item">
-                    <h3>当前奖品</h3>
+                    <h3>奖品期望</h3>
                     <div class="value" id="currentPrize">-</div>
+                </div>
+                <div class="info-item">
+                    <h3>平均中奖金额</h3>
+                    <div class="value" id="avgPrize">0</div>
                 </div>
             </div>
 
@@ -344,7 +623,7 @@
                     翻牌
                 </button>
                 <button class="btn-success" id="endButton" onclick="endGame()">
-                    结束游戏
+                    下车
                 </button>
                 <button class="btn-warning" id="resetButton" onclick="resetGame()">
                     重新开始
@@ -362,6 +641,31 @@
                 <button class="btn-primary" onclick="resetGame()">再来一局</button>
             </div>
 
+            <!-- 抽奖模态框 -->
+            <div class="lottery-modal" id="lotteryModal">
+                <div class="lottery-content">
+                    <div class="lottery-header">
+                        <h2 id="lotteryTitle">抽奖环节</h2>
+                        <button class="btn-secondary" onclick="closeLottery()">关闭</button>
+                    </div>
+                    <div class="lottery-body">
+                        <div class="lottery-info">
+                            <p id="lotteryDescription"></p>
+                        </div>
+                        <div class="lottery-animation-message" id="lotteryMessage"></div>
+                        <div class="lottery-cards-container" id="lotteryCards"></div>
+                        <div class="lottery-draw">
+                            <button class="lottery-draw-button" id="drawButton" onclick="drawLottery()">开始抽奖</button>
+                        </div>
+                        <div class="lottery-result" id="lotteryResult" style="display: none;">
+                            <h3>抽奖结果</h3>
+                            <div class="result-prize" id="resultPrize"></div>
+                            <div class="result-rank" id="resultRank"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <div class="prize-table">
                 <h3>奖品表</h3>
                 <div class="prize-grid" id="prizeGrid"></div>
@@ -376,6 +680,40 @@
                     <li>点数和>21时自动结束，获得奖品5</li>
                     <li>特权数字(1、20、21)可获得229.3，0、2点可获得151.3或140</li>
                 </ul>
+            </div>
+
+            <!-- 自动化测试区域 -->
+            <div class="test-area">
+                <h3>自动化测试</h3>
+                <div class="test-controls">
+                    <div class="threshold-settings">
+                        <h4>下车阈值设置</h4>
+                        <div class="threshold-item">
+                            <label>第一次翻牌阈值:</label>
+                            <input type="number" id="threshold1" value="15" min="0" max="21">
+                        </div>
+                        <div class="threshold-item">
+                            <label>第二次翻牌阈值:</label>
+                            <input type="number" id="threshold2" value="18" min="0" max="21">
+                        </div>
+                        <div class="threshold-item">
+                            <label>第三次翻牌阈值:</label>
+                            <input type="number" id="threshold3" value="20" min="0" max="21">
+                        </div>
+                    </div>
+                    <div class="test-buttons">
+                        <button class="btn-primary" onclick="runTest(1)">随机测试1次</button>
+                        <button class="btn-primary" onclick="runTest(100)">随机测试100次</button>
+                        <button class="btn-primary" onclick="runTest(10000)">随机测试10000次</button>
+                        <button class="btn-primary" onclick="runCustomTest()">自定义次数测试</button>
+                        <input type="number" id="customTestCount" value="1000" min="1" max="100000" style="width: 80px; margin-left: 10px;">
+                    </div>
+                </div>
+                <div class="test-results">
+                    <h4>测试结果统计</h4>
+                    <div class="stats-grid" id="statsGrid"></div>
+                    <div class="test-summary" id="testSummary"></div>
+                </div>
             </div>
         </div>
     </div>
@@ -406,6 +744,10 @@
             20: 151.3,
             21: 229.3
         };
+
+        // 抽奖奖品数组
+        const lotteryPrizes1 = [500, 280, 280, 180, 180, 100, 100, 100, 100, 100, 70, 70, 70, 70, 70]; // 1或20点时的抽奖奖品
+        const lotteryPrizes2 = [1000, 500, 280, 280, 180, 140, 140, 140, 140, 140, 100, 100, 100, 100, 100]; // 0或21点时的抽奖奖品
 
         const LOSE_PRIZE = 5; // 超过21时的奖品
         const MAX_FLIPS = 5;
@@ -479,10 +821,13 @@
                 resultTitle.textContent = '超过21点！';
                 resultTitle.style.color = '#dc3545';
             } else if (sum === 1 || sum === 20) {
-                prize = 229.3;
-                resultType = 'win';
-                resultTitle.textContent = '特权奖励！';
-                resultTitle.style.color = '#27ae60';
+                // 触发抽奖1
+                showLotteryModal(sum, lotteryPrizes1);
+                return;
+            } else if (sum === 0 || sum === 21) {
+                // 触发抽奖2
+                showLotteryModal(sum, lotteryPrizes2);
+                return;
             } else if (sum === 21) {
                 prize = 151.3;
                 resultType = 'win';
@@ -516,7 +861,513 @@
 
             resultPanel.className = `result-panel show ${resultType}`;
 
+            // 记录中奖（包括非抽奖情况）
+            recordWin(prize, true);
+
             disableButtons();
+        }
+
+        // 显示抽奖模态框
+        function showLotteryModal(sum, prizes) {
+            const modal = document.getElementById('lotteryModal');
+            const title = document.getElementById('lotteryTitle');
+            const description = document.getElementById('lotteryDescription');
+            const drawButton = document.getElementById('drawButton');
+            const resultDiv = document.getElementById('lotteryResult');
+            const resultPrize = document.getElementById('resultPrize');
+            const resultRank = document.getElementById('resultRank');
+            const lotteryCards = document.getElementById('lotteryCards');
+            const messageDiv = document.getElementById('lotteryMessage');
+
+            modal.style.display = 'flex';
+
+            if (sum === 1 || sum === 20) {
+                title.textContent = '特权抽奖环节';
+                description.textContent = '恭喜获得特权抽奖机会！点击下方按钮开始15抽1抽奖';
+            } else if (sum === 0 || sum === 21) {
+                title.textContent = '大奖抽奖环节';
+                description.textContent = '恭喜获得大奖抽奖机会！点击下方按钮开始15抽1抽奖';
+            }
+
+            // 创建抽奖卡牌（复制 prizes 数组到16个）
+            lotteryCards.innerHTML = '';
+            const extendedPrizes = [];
+            while (extendedPrizes.length < 16) {
+                const prizeIndex = Math.floor(Math.random() * prizes.length);
+                extendedPrizes.push(prizes[prizeIndex]);
+            }
+            extendedPrizes.forEach((prize, index) => {
+                const cardDiv = document.createElement('div');
+                cardDiv.className = 'lottery-card';
+                cardDiv.textContent = prize;
+                cardDiv.id = `lottery-card-${index}`;
+                lotteryCards.appendChild(cardDiv);
+            });
+
+            drawButton.style.display = 'block';
+            resultDiv.style.display = 'none';
+            messageDiv.textContent = '';
+        }
+
+        // 关闭抽奖模态框
+        function closeLottery() {
+            const modal = document.getElementById('lotteryModal');
+            modal.style.display = 'none';
+        }
+
+        // 更新阈值设置
+        function updateThresholds() {
+            testThresholds[1] = parseInt(document.getElementById('threshold1').value) || 15;
+            testThresholds[2] = parseInt(document.getElementById('threshold2').value) || 18;
+            testThresholds[3] = parseInt(document.getElementById('threshold3').value) || 20;
+        }
+
+        // 执行单次测试
+        function performSingleTest() {
+            updateThresholds();
+
+            // 重置游戏
+            resetGame();
+
+            // 翻第一张牌（两张）
+            flipCard();
+            flipCard();
+
+            const sum = calculateSum();
+            if (sum >= testThresholds[1]) {
+                endGame();
+                return;
+            }
+
+            // 翻第三张牌
+            flipCard();
+            if (flippedCards.length >= 3) {
+                const sum = calculateSum();
+                if (sum >= testThresholds[2]) {
+                    endGame();
+                    return;
+                }
+            }
+
+            // 翻第四张牌
+            flipCard();
+            if (flippedCards.length >= 4) {
+                const sum = calculateSum();
+                if (sum >= testThresholds[3]) {
+                    endGame();
+                    return;
+                }
+            }
+
+            // 继续翻牌直到结束或超过21
+            while (!isGameOver && flippedCards.length < MAX_FLIPS && deck.length > 0) {
+                flipCard();
+                if (isGameOver) break;
+            }
+
+            // 如果还没结束，手动结束
+            if (!isGameOver) {
+                endGame();
+            }
+        }
+
+        // 自动抽奖函数（后台直接计算）
+        function autoDrawLottery(prizes) {
+            const randomIndex = Math.floor(Math.random() * prizes.length);
+            const prize = prizes[randomIndex];
+            return prize;
+        }
+
+        // 修改endGame函数，在抽奖时自动抽奖（后台计算）
+        function endGame(autoEnd = false) {
+            if (isGameOver) {
+                return;
+            }
+
+            isGameOver = true;
+
+            const sum = calculateSum();
+            const resultPanel = document.getElementById('resultPanel');
+            const resultTitle = document.getElementById('resultTitle');
+            const resultCards = document.getElementById('resultCards');
+            const resultValue = document.getElementById('resultValue');
+
+            let prize;
+            let resultType;
+
+            if (sum > 21) {
+                prize = LOSE_PRIZE;
+                resultType = 'lose';
+                resultTitle.textContent = '超过21点！';
+                resultTitle.style.color = '#dc3545';
+            } else if (sum === 1 || sum === 20) {
+                // 触发抽奖1
+                if (autoEnd) {
+                    // 测试模式下直接计算
+                    prize = autoDrawLottery(lotteryPrizes1);
+                    resultType = 'win';
+                    resultTitle.textContent = '特权抽奖中奖！';
+                    resultTitle.style.color = '#27ae60';
+                } else {
+                    // 手动模式下显示抽奖界面
+                    showLotteryModal(sum, lotteryPrizes1);
+                    setTimeout(autoDrawLottery, 500); // 延迟500ms后自动抽奖
+                    return;
+                }
+            } else if (sum === 0 || sum === 21) {
+                // 触发抽奖2
+                if (autoEnd) {
+                    // 测试模式下直接计算
+                    prize = autoDrawLottery(lotteryPrizes2);
+                    resultType = 'win';
+                    resultTitle.textContent = '大奖抽奖中奖！';
+                    resultTitle.style.color = '#e74c3c';
+                } else {
+                    // 手动模式下显示抽奖界面
+                    showLotteryModal(sum, lotteryPrizes2);
+                    setTimeout(autoDrawLottery, 500); // 延迟500ms后自动抽奖
+                    return;
+                }
+            } else if (sum === 21) {
+                prize = 151.3;
+                resultType = 'win';
+                resultTitle.textContent = '21点大奖！';
+                resultTitle.style.color = '#e74c3c';
+            } else if (sum <= 12) {
+                prize = prizeMap[sum];
+                if (prize >= 90 || sum === 0 || sum === 2) {
+                    resultType = 'win';
+                    resultTitle.textContent = '恭喜中奖！';
+                    resultTitle.style.color = '#27ae60';
+                } else {
+                    resultType = 'normal';
+                    resultTitle.textContent = '游戏结束';
+                    resultTitle.style.color = '#856404';
+                }
+            } else if (sum >= 18 && sum <= 19) {
+                prize = prizeMap[sum];
+                resultType = 'win';
+                resultTitle.textContent = '恭喜中奖！';
+                resultTitle.style.color = '#27ae60';
+            } else {
+                prize = prizeMap[sum];
+                resultType = 'normal';
+                resultTitle.textContent = '游戏结束';
+                resultTitle.style.color = '#856404';
+            }
+
+            resultCards.textContent = `翻牌: [${flippedCards.join(', ')}] 点数和: ${sum}`;
+            resultValue.textContent = `💰 ${prize}`;
+
+            resultPanel.className = `result-panel show ${resultType}`;
+
+            // 记录中奖
+            recordWin(prize);
+
+            disableButtons();
+        }
+
+        // 自动抽奖函数
+        function autoDrawLottery() {
+            const drawButton = document.getElementById('drawButton');
+            const resultDiv = document.getElementById('lotteryResult');
+            const resultPrize = document.getElementById('resultPrize');
+            const resultRank = document.getElementById('resultRank');
+            const messageDiv = document.getElementById('lotteryMessage');
+            const prizes = document.getElementById('lotteryTitle').textContent.includes('特权') ? lotteryPrizes1 : lotteryPrizes2;
+
+            drawButton.disabled = true;
+            drawButton.textContent = '抽奖中...';
+
+            // 开始动画
+            messageDiv.textContent = '正在抽选中...';
+            animateLottery(prizes, drawButton, resultDiv, resultPrize, resultRank, messageDiv);
+        }
+
+        // 修改endGame函数，在抽奖时自动抽奖
+        function endGame(autoEnd = false) {
+            if (isGameOver) {
+                return;
+            }
+
+            isGameOver = true;
+
+            const sum = calculateSum();
+            const resultPanel = document.getElementById('resultPanel');
+            const resultTitle = document.getElementById('resultTitle');
+            const resultCards = document.getElementById('resultCards');
+            const resultValue = document.getElementById('resultValue');
+
+            let prize;
+            let resultType;
+
+            if (sum > 21) {
+                prize = LOSE_PRIZE;
+                resultType = 'lose';
+                resultTitle.textContent = '超过21点！';
+                resultTitle.style.color = '#dc3545';
+            } else if (sum === 1 || sum === 20) {
+                // 触发抽奖1
+                if (autoEnd) {
+                    // 测试模式下直接计算
+                    prize = autoDrawLottery(lotteryPrizes1);
+                    resultType = 'win';
+                    resultTitle.textContent = '特权抽奖中奖！';
+                    resultTitle.style.color = '#27ae60';
+                } else {
+                    // 手动模式下显示抽奖界面
+                    showLotteryModal(sum, lotteryPrizes1);
+                    setTimeout(autoDrawLottery, 500); // 延迟500ms后自动抽奖
+                    return;
+                }
+            } else if (sum === 0 || sum === 21) {
+                // 触发抽奖2
+                if (autoEnd) {
+                    // 测试模式下直接计算
+                    prize = autoDrawLottery(lotteryPrizes2);
+                    resultType = 'win';
+                    resultTitle.textContent = '大奖抽奖中奖！';
+                    resultTitle.style.color = '#e74c3c';
+                } else {
+                    // 手动模式下显示抽奖界面
+                    showLotteryModal(sum, lotteryPrizes2);
+                    setTimeout(autoDrawLottery, 500); // 延迟500ms后自动抽奖
+                    return;
+                }
+            } else if (sum === 21) {
+                prize = 151.3;
+                resultType = 'win';
+                resultTitle.textContent = '21点大奖！';
+                resultTitle.style.color = '#e74c3c';
+            } else if (sum <= 12) {
+                prize = prizeMap[sum];
+                if (prize >= 90 || sum === 0 || sum === 2) {
+                    resultType = 'win';
+                    resultTitle.textContent = '恭喜中奖！';
+                    resultTitle.style.color = '#27ae60';
+                } else {
+                    resultType = 'normal';
+                    resultTitle.textContent = '游戏结束';
+                    resultTitle.style.color = '#856404';
+                }
+            } else if (sum >= 18 && sum <= 19) {
+                prize = prizeMap[sum];
+                resultType = 'win';
+                resultTitle.textContent = '恭喜中奖！';
+                resultTitle.style.color = '#27ae60';
+            } else {
+                prize = prizeMap[sum];
+                resultType = 'normal';
+                resultTitle.textContent = '游戏结束';
+                resultTitle.style.color = '#856404';
+            }
+
+            resultCards.textContent = `翻牌: [${flippedCards.join(', ')}] 点数和: ${sum}`;
+            resultValue.textContent = `💰 ${prize}`;
+
+            resultPanel.className = `result-panel show ${resultType}`;
+
+            // 记录中奖（包括非抽奖情况）
+            recordWin(prize, true);
+
+            disableButtons();
+        }
+
+        // 运行测试
+        function runTest(times) {
+            if (testRunning) return;
+
+            testRunning = true;
+            testResults = {
+                sums: {},
+                prizes: []
+            };
+
+            // 初始化统计
+            for (let i = 0; i <= 21; i++) {
+                testResults.sums[i] = 0;
+            }
+            testResults.sums['>21'] = 0;
+
+            let completed = 0;
+
+            function runNextTest() {
+                if (completed < times) {
+                    performSingleTest();
+
+                    // 等待游戏结束
+                    setTimeout(() => {
+                        const sum = calculateSum();
+                        let prize = 0;
+
+                        if (sum > 21) {
+                            testResults.sums['>21']++;
+                        } else {
+                            testResults.sums[sum]++;
+                            // 获取中奖金额
+                            const resultValue = document.getElementById('resultValue').textContent;
+                            const prizeMatch = resultValue.match(/💰 ([\d.]+)/);
+                            if (prizeMatch) {
+                                prize = parseFloat(prizeMatch[1]);
+                                testResults.prizes.push(prize);
+                            }
+                        }
+
+                        completed++;
+
+                        // 更新显示
+                        updateTestResults();
+
+                        if (completed < times) {
+                            runNextTest();
+                        } else {
+                            testRunning = false;
+                            showTestSummary(times);
+                        }
+                    }, 100);
+                }
+            }
+
+            runNextTest();
+        }
+
+        // 运行自定义次数测试
+        function runCustomTest() {
+            const count = parseInt(document.getElementById('customTestCount').value) || 1000;
+            runTest(count);
+        }
+
+        // 更新测试结果统计
+        function updateTestResults() {
+            const statsGrid = document.getElementById('statsGrid');
+            statsGrid.innerHTML = '';
+
+            // 显示点数分布
+            for (let sum = 0; sum <= 21; sum++) {
+                const count = testResults.sums[sum] || 0;
+                const item = document.createElement('div');
+                item.className = 'stat-item';
+                if (count > 0) {
+                    if (count > 100) {
+                        item.classList.add('high');
+                    } else if (count > 50) {
+                        item.classList.add('medium');
+                    }
+                }
+                item.textContent = `${sum}点: ${count}`;
+                statsGrid.appendChild(item);
+            }
+
+            const over21Count = testResults.sums['>21'] || 0;
+            const over21Item = document.createElement('div');
+            over21Item.className = 'stat-item';
+            over21Item.style.background = '#f8d7da';
+            over21Item.style.borderColor = '#dc3545';
+            over21Item.textContent = '>21点: ' + over21Count;
+            statsGrid.appendChild(over21Item);
+
+            // 计算并显示平均中奖金额
+            const totalPrizes = testResults.prizes.length;
+            if (totalPrizes > 0) {
+                const totalAmount = testResults.prizes.reduce((sum, prize) => sum + prize, 0);
+                const avgPrize = (totalAmount / totalPrizes).toFixed(2);
+                const avgItem = document.createElement('div');
+                avgItem.className = 'stat-item';
+                avgItem.style.background = '#e8f4f8';
+                avgItem.style.borderColor = '#28a745';
+                avgItem.textContent = `平均中奖: ${avgPrize} 元`;
+                statsGrid.appendChild(avgItem);
+            }
+        }
+
+        // 显示测试总结
+        function showTestSummary(times) {
+            const summary = document.getElementById('testSummary');
+
+            // 计算统计数据
+            let totalGames = 0;
+            for (let sum in testResults.sums) {
+                totalGames += testResults.sums[sum];
+            }
+
+            const totalPrizes = testResults.prizes.length;
+            let avgPrizeText = '';
+            if (totalPrizes > 0) {
+                const totalAmount = testResults.prizes.reduce((sum, prize) => sum + prize, 0);
+                const avgPrize = (totalAmount / totalPrizes).toFixed(2);
+                avgPrizeText = `平均中奖: ${avgPrize} 元 | `;
+            }
+
+            // 简化测试结果文本
+            let summaryText = `测试完成！共运行 ${times} 局，${avgPrizeText}总统计: ${totalGames} 局`;
+
+            summary.textContent = summaryText;
+        }
+
+        // 抽奖函数
+        function drawLottery() {
+            const drawButton = document.getElementById('drawButton');
+            const resultDiv = document.getElementById('lotteryResult');
+            const resultPrize = document.getElementById('resultPrize');
+            const resultRank = document.getElementById('resultRank');
+            const messageDiv = document.getElementById('lotteryMessage');
+            const prizes = document.getElementById('lotteryTitle').textContent.includes('特权') ? lotteryPrizes1 : lotteryPrizes2;
+
+            drawButton.disabled = true;
+            drawButton.textContent = '抽奖中...';
+
+            // 开始动画
+            messageDiv.textContent = '正在抽选中...';
+            animateLottery(prizes, drawButton, resultDiv, resultPrize, resultRank, messageDiv);
+        }
+
+        // 抽奖动画函数
+        function animateLottery(prizes, drawButton, resultDiv, resultPrize, resultRank, messageDiv) {
+            const cards = document.querySelectorAll('.lottery-card');
+            let animationCount = 0;
+            const maxAnimations = 15; // 闪烁次数
+            let currentIndex = 0;
+
+            // 随机闪烁动画
+            const animationInterval = setInterval(() => {
+                // 移除所有active状态
+                cards.forEach(card => card.classList.remove('active'));
+
+                // 随机选择一张卡牌闪烁
+                currentIndex = Math.floor(Math.random() * cards.length);
+                cards[currentIndex].classList.add('active');
+
+                animationCount++;
+
+                if (animationCount >= maxAnimations) {
+                    clearInterval(animationInterval);
+                    finishLottery(prizes, cards, currentIndex, drawButton, resultDiv, resultPrize, resultRank, messageDiv);
+                }
+            }, 150); // 每150ms闪烁一次
+        }
+
+        // 完成抽奖
+        function finishLottery(prizes, cards, winnerIndex, drawButton, resultDiv, resultPrize, resultRank, messageDiv) {
+            const prize = prizes[winnerIndex];
+            const rank = winnerIndex + 1;
+
+            // 显示中奖卡牌
+            cards[winnerIndex].classList.add('winner');
+            cards[winnerIndex].textContent = `${prize} 🎉`;
+
+            messageDiv.textContent = '恭喜中奖！';
+            resultPrize.textContent = `💰 ${prize} 元`;
+            resultRank.textContent = `中奖等级: 第 ${rank} 名`;
+
+            resultDiv.style.display = 'block';
+
+            // 记录中奖
+            recordWin(prize);
+
+            // 5秒后自动关闭抽奖窗口
+            setTimeout(() => {
+                closeLottery();
+            }, 5000);
         }
 
         function updateDisplay() {
@@ -616,10 +1467,62 @@
             prizeGrid.appendChild(loseItem);
         }
 
+        // 中奖记录相关变量
+        let winRecords = [];
+        let totalPrize = 0;
+        let gameCount = 0;
+
+        // 自动化测试相关变量
+        let testRunning = false;
+        let testResults = {
+            sums: {},
+            prizes: []
+        };
+        const testThresholds = {
+            1: 15, // 第一次翻牌阈值
+            2: 18, // 第二次翻牌阈值
+            3: 20  // 第三次翻牌阈值
+        };
+
+        // 添加阈值输入框事件监听
+        document.getElementById('threshold1').addEventListener('change', updateThresholds);
+        document.getElementById('threshold2').addEventListener('change', updateThresholds);
+        document.getElementById('threshold3').addEventListener('change', updateThresholds);
+
+        // 记录中奖
+        function recordWin(prize, isTest = false) {
+            // 确保prize是数字
+            const prizeNum = parseFloat(prize);
+            if (isNaN(prizeNum)) return;
+
+            if (!isTest) {
+                winRecords.push(prizeNum);
+                totalPrize += prizeNum;
+                gameCount++;
+                updateWinRecordDisplay();
+            } else {
+                // 测试模式下也记录到全局统计
+                winRecords.push(prizeNum);
+                totalPrize += prizeNum;
+                gameCount++;
+                updateWinRecordDisplay();
+            }
+        }
+
+        // 更新中奖记录显示
+        function updateWinRecordDisplay() {
+            const avgPrize = gameCount > 0 ? (totalPrize / gameCount).toFixed(2) : 0;
+            document.getElementById('avgPrize').textContent = avgPrize;
+            document.getElementById('totalGames').textContent = gameCount;
+            document.getElementById('totalPrize').textContent = totalPrize.toFixed(2);
+        }
+
         // 初始化游戏
         initDeck();
         updateDisplay();
         initPrizeTable();
+        updateThresholds();
+        updateWinRecordDisplay();
     </script>
 </body>
 </html>
