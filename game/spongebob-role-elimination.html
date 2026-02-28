@@ -892,6 +892,79 @@
             }
         }
 
+        // 自动完成一局游戏（消除所有对子直到结束）
+        function autoPlayGame() {
+            // 随机选择角色
+            const randomRole = Math.floor(Math.random() * ROLE_COUNT);
+            targetRole = randomRole;
+
+            // 初始化牌堆和手牌
+            deck = [];
+            hand = [];
+            eliminationCount = 0;
+            initDeck();
+
+            // 发初始 9 张牌
+            hand = deck.splice(0, INITIAL_HAND_SIZE);
+
+            // 统计许愿角色出现次数，补发对应数量的牌
+            const n = hand.filter(card => card === targetRole).length;
+            if (n > 0 && deck.length >= n) {
+                hand.push(...deck.splice(0, n));
+            }
+
+            // 自动消除所有对子
+            while (true) {
+                // 查找对子
+                const counts = {};
+                for (const card of hand) {
+                    counts[card] = (counts[card] || 0) + 1;
+                }
+
+                const pairs = Object.entries(counts).filter(([_, count]) => count >= 2);
+
+                if (pairs.length === 0 || hand.length < 2) {
+                    // 没有对子可消除
+                    break;
+                }
+
+                // 随机选择一个对子消除
+                const [roleToEliminate] = pairs[Math.floor(Math.random() * pairs.length)];
+                const roleIndex = parseInt(roleToEliminate);
+
+                // 从手牌中移除恰好两张该角色
+                let removedCount = 0;
+                const newHand = [];
+                for (const card of hand) {
+                    if (card === roleIndex && removedCount < 2) {
+                        removedCount++;
+                    } else {
+                        newHand.push(card);
+                    }
+                }
+                hand = newHand;
+                eliminationCount++;
+
+                // 补发 1 张牌
+                if (deck.length > 0) {
+                    const drawnCard = deck.shift();
+                    hand.push(drawnCard);
+
+                    // 如果补的牌是许愿角色，需要再补一张
+                    if (drawnCard === targetRole && deck.length > 0) {
+                        hand.push(deck.shift());
+                    }
+                }
+
+                // 检查牌堆是否为空
+                if (deck.length === 0) {
+                    break;
+                }
+            }
+
+            return eliminationCount;
+        }
+
         // 运行测试
         function runTest(times) {
             if (testRunning) return;
@@ -912,33 +985,29 @@
 
             function runNextTest() {
                 if (completed < times) {
-                    performSingleTest();
+                    // 自动完成一局游戏
+                    const elim = autoPlayGame();
+                    let prize = 0;
 
-                    // 等待游戏结束
-                    setTimeout(() => {
-                        const elim = eliminationCount;
-                        let prize = 0;
+                    if (elim > MAX_ELIMINATIONS) {
+                        testResults.eliminations['>13']++;
+                    } else {
+                        testResults.eliminations[elim]++;
+                        prize = prizeMap[elim] || 0;
+                        testResults.prizes.push(prize);
+                    }
 
-                        if (elim > MAX_ELIMINATIONS) {
-                            testResults.eliminations['>13']++;
-                        } else {
-                            testResults.eliminations[elim]++;
-                            prize = prizeMap[elim] || 0;
-                            testResults.prizes.push(prize);
-                        }
+                    completed++;
 
-                        completed++;
+                    // 更新显示
+                    updateTestResults();
 
-                        // 更新显示
-                        updateTestResults();
-
-                        if (completed < times) {
-                            runNextTest();
-                        } else {
-                            testRunning = false;
-                            showTestSummary(times);
-                        }
-                    }, 50);
+                    if (completed < times) {
+                        setTimeout(runNextTest, 0);
+                    } else {
+                        testRunning = false;
+                        showTestSummary(times);
+                    }
                 }
             }
 
@@ -949,18 +1018,6 @@
         function runCustomTest() {
             const count = parseInt(document.getElementById('customTestCount').value) || 1000;
             runTest(count);
-        }
-
-        // 执行单次测试
-        function performSingleTest() {
-            resetGame();
-
-            // 随机选择角色
-            const randomRole = Math.floor(Math.random() * ROLE_COUNT);
-            selectRole(randomRole);
-
-            // 开始游戏
-            startGame();
         }
 
         // 更新测试结果统计
