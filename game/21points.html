@@ -493,6 +493,95 @@
         }
 
         .test-buttons button {
+        .config-panel {
+            margin-top: 20px;
+            padding: 15px;
+            background: #e8f4f8;
+            border-radius: 10px;
+            border: 2px solid #3498db;
+        }
+
+        .config-panel h3 {
+            color: #2980b9;
+            margin-bottom: 10px;
+        }
+
+        .config-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            gap: 10px;
+        }
+
+        .config-item {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .config-item label {
+            font-size: 12px;
+            color: #666;
+        }
+
+        .config-item input {
+            padding: 5px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        .config-item input:focus {
+            outline: none;
+            border-color: #3498db;
+        }
+
+        .strategy-panel {
+            margin-top: 20px;
+            padding: 15px;
+            background: #f0fff4;
+            border-radius: 10px;
+            border: 2px solid #27ae60;
+        }
+
+        .strategy-panel h3 {
+            color: #1e8449;
+            margin-bottom: 10px;
+        }
+
+        .strategy-content {
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        .strategy-action {
+            font-weight: bold;
+            padding: 3px 8px;
+            border-radius: 4px;
+            margin: 0 5px;
+        }
+
+        .strategy-action.take {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .strategy-action.flip {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .expectation-value {
+            font-weight: bold;
+            color: #e74c3c;
+        }
+
+        .config-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .config-buttons button {
             padding: 8px 15px;
             font-size: 14px;
         }
@@ -573,6 +662,19 @@
             color: #666;
             margin: 15px 0;
             height: 25px;
+        .ep-panel {
+            margin-top: 15px;
+            padding: 10px;
+            background: linear-gradient(145deg, #fff5f5, #ffe0e0);
+            border-radius: 8px;
+            border: 1px solid #e74c3c;
+            text-align: center;
+        }
+
+        .ep-value {
+            font-size: 24px;
+            font-weight: bold;
+            color: #c0392b;
         }
     </style>
 </head>
@@ -663,6 +765,25 @@
                             <div class="result-rank" id="resultRank"></div>
                         </div>
                     </div>
+            <div class="config-panel">
+                <h3>🎯 奖品配置 (可自由调整)</h3>
+                <div class="config-grid" id="configGrid"></div>
+                <div class="config-buttons">
+                    <button class="btn-primary" onclick="applyConfig()">应用配置</button>
+                    <button class="btn-secondary" onclick="resetConfig()">恢复默认</button>
+                    <button class="btn-warning" onclick="exportConfig()">导出配置</button>
+                    <button class="btn-warning" onclick="importConfig()">导入配置</button>
+                </div>
+            </div>
+
+            <div class="strategy-panel">
+                <h3>🧠 最优策略建议</h3>
+                <div class="strategy-content" id="strategyContent">
+                    <p>翻两张牌后将显示最优策略...</p>
+                </div>
+                <div class="ep-panel">
+                    <div>当前最优策略期望值 (EP):</div>
+                    <div class="ep-value" id="epValue">--</div>
                 </div>
             </div>
 
@@ -678,8 +799,7 @@
                     <li>最少翻2张后可选择结束或继续翻牌（最多翻5张）</li>
                     <li>点数和≤21时可随时结束，获得对应奖品</li>
                     <li>点数和>21时自动结束，获得奖品5</li>
-                    <li>特权数字(1、20、21)可获得229.3，0、2点可获得151.3或140</li>
-                </ul>
+                    </ul>
             </div>
 
             <!-- 自动化测试区域 -->
@@ -719,11 +839,11 @@
     </div>
 
     <script>
-        // 奖品映射表（和不超过21）
-        const prizeMap = {
-            0: 229.3,
-            1: 151.3,
-            2: 140,
+        // 默认奖品映射表（和不超过21）
+        const defaultPrizeMap = {
+            0: 158.0,
+            1: 122,
+            2: 90,
             3: 20,
             4: 20,
             5: 20,
@@ -734,15 +854,15 @@
             10: 20,
             11: 20,
             12: 20,
-            13: 90,
-            14: 55,
-            15: 55,
-            16: 55,
-            17: 55,
-            18: 30,
-            19: 30,
-            20: 151.3,
-            21: 229.3
+            13: 70,
+            14: 20,
+            15: 20,
+            16: 20,
+            17: 20,
+            18: 20,
+            19: 55,
+            20: 122,
+            21: 158.0
         };
 
         // 抽奖奖品数组
@@ -750,12 +870,17 @@
         const lotteryPrizes2 = [1000, 500, 280, 280, 180, 140, 140, 140, 140, 140, 100, 100, 100, 100, 100]; // 0或21点时的抽奖奖品
 
         const LOSE_PRIZE = 5; // 超过21时的奖品
+        let prizeMap = {...defaultPrizeMap};
+        // let LOSE_PRIZE = 2; // 超过21时的奖品
         const MAX_FLIPS = 5;
         const MIN_FLIPS = 2;
 
         let deck = [];
         let flippedCards = [];
         let isGameOver = false;
+        let bestStrategy = {};
+        let optimalEV = 0;
+        let currentEV = 0;
 
         function initDeck() {
             deck = [];
@@ -1140,8 +1265,13 @@
                 resultTitle.textContent = '21点大奖！';
                 resultTitle.style.color = '#e74c3c';
             } else if (sum <= 12) {
+            } else {
                 prize = prizeMap[sum];
-                if (prize >= 90 || sum === 0 || sum === 2) {
+                if (prize >= 120) {
+                    resultType = 'win';
+                    resultTitle.textContent = '🎉 超级大奖！';
+                    resultTitle.style.color = '#27ae60';
+                } else if (prize >= 50) {
                     resultType = 'win';
                     resultTitle.textContent = '恭喜中奖！';
                     resultTitle.style.color = '#27ae60';
@@ -1150,16 +1280,6 @@
                     resultTitle.textContent = '游戏结束';
                     resultTitle.style.color = '#856404';
                 }
-            } else if (sum >= 18 && sum <= 19) {
-                prize = prizeMap[sum];
-                resultType = 'win';
-                resultTitle.textContent = '恭喜中奖！';
-                resultTitle.style.color = '#27ae60';
-            } else {
-                prize = prizeMap[sum];
-                resultType = 'normal';
-                resultTitle.textContent = '游戏结束';
-                resultTitle.style.color = '#856404';
             }
 
             resultCards.textContent = `翻牌: [${flippedCards.join(', ')}] 点数和: ${sum}`;
@@ -1402,6 +1522,9 @@
             document.getElementById('deckCount').textContent = deck.length;
 
             updateButtons();
+
+            // 更新策略显示
+            updateStrategyDisplay();
         }
 
         function updateButtons() {
@@ -1448,9 +1571,9 @@
                 const item = document.createElement('div');
                 item.className = 'prize-item';
 
-                if (prize >= 200) {
+                if (prize >= 120) {
                     item.classList.add('high');
-                } else if (prize >= 90) {
+                } else if (prize >= 50) {
                     item.classList.add('medium');
                 }
 
@@ -1463,7 +1586,7 @@
             loseItem.className = 'prize-item';
             loseItem.style.background = '#f8d7da';
             loseItem.style.borderColor = '#dc3545';
-            loseItem.textContent = '>21点: 5';
+            loseItem.textContent = `>21点: ${LOSE_PRIZE}`;
             prizeGrid.appendChild(loseItem);
         }
 
@@ -1515,9 +1638,266 @@
             document.getElementById('avgPrize').textContent = avgPrize;
             document.getElementById('totalGames').textContent = gameCount;
             document.getElementById('totalPrize').textContent = totalPrize.toFixed(2);
+        // 初始化配置面板
+        function initConfigPanel() {
+            const configGrid = document.getElementById('configGrid');
+            configGrid.innerHTML = '';
+
+            for (let sum = 0; sum <= 21; sum++) {
+                const configItem = document.createElement('div');
+                configItem.className = 'config-item';
+
+                const label = document.createElement('label');
+                label.textContent = `${sum}点奖品:`;
+                configItem.appendChild(label);
+
+                const input = document.createElement('input');
+                input.type = 'number';
+                input.step = '0.1';
+                input.value = prizeMap[sum];
+                input.id = `prize-${sum}`;
+                configItem.appendChild(input);
+
+                configGrid.appendChild(configItem);
+            }
+
+            // 超过21的配置
+            const loseConfig = document.createElement('div');
+            loseConfig.className = 'config-item';
+
+            const loseLabel = document.createElement('label');
+            loseLabel.textContent = '>21点奖品:';
+            loseConfig.appendChild(loseLabel);
+
+            const loseInput = document.createElement('input');
+            loseInput.type = 'number';
+            loseInput.step = '0.1';
+            loseInput.value = LOSE_PRIZE;
+            loseInput.id = 'prize-lose';
+            loseConfig.appendChild(loseInput);
+
+            configGrid.appendChild(loseConfig);
+        }
+
+        // 应用配置
+        function applyConfig() {
+            for (let sum = 0; sum <= 21; sum++) {
+                const input = document.getElementById(`prize-${sum}`);
+                const value = parseFloat(input.value);
+                if (!isNaN(value)) {
+                    prizeMap[sum] = value;
+                }
+            }
+
+            const loseInput = document.getElementById('prize-lose');
+            const loseValue = parseFloat(loseInput.value);
+            if (!isNaN(loseValue)) {
+                LOSE_PRIZE = loseValue;
+            }
+
+            // 重新计算策略
+            calculateBestStrategy();
+            initPrizeTable();
+            alert('配置已应用！策略已重新计算。');
+        }
+
+        // 恢复默认配置
+        function resetConfig() {
+            prizeMap = {...defaultPrizeMap};
+            LOSE_PRIZE = 2;
+
+            // 更新输入框
+            for (let sum = 0; sum <= 21; sum++) {
+                document.getElementById(`prize-${sum}`).value = prizeMap[sum];
+            }
+            document.getElementById('prize-lose').value = LOSE_PRIZE;
+
+            // 重新计算策略
+            calculateBestStrategy();
+            initPrizeTable();
+            alert('已恢复默认配置！');
+        }
+
+        // 导出配置
+        function exportConfig() {
+            const config = {prizeMap, LOSE_PRIZE};
+            const json = JSON.stringify(config, null, 2);
+            const blob = new Blob([json], {type: 'application/json'});
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = '21points_config.json';
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        // 导入配置
+        function importConfig() {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = '.json';
+            input.onchange = (e) => {
+                const file = e.target.files[0];
+                const reader = new FileReader();
+                reader.onload = (event) => {
+                    try {
+                        const config = JSON.parse(event.target.result);
+                        if (config.prizeMap && config.LOSE_PRIZE !== undefined) {
+                            prizeMap = config.prizeMap;
+                            LOSE_PRIZE = config.LOSE_PRIZE;
+
+                            // 更新输入框
+                            for (let sum = 0; sum <= 21; sum++) {
+                                document.getElementById(`prize-${sum}`).value = prizeMap[sum];
+                            }
+                            document.getElementById('prize-lose').value = LOSE_PRIZE;
+
+                            // 重新计算策略
+                            calculateBestStrategy();
+                            initPrizeTable();
+                            alert('配置导入成功！');
+                        } else {
+                            alert('配置格式错误！');
+                        }
+                    } catch (err) {
+                        alert('解析文件失败：' + err.message);
+                    }
+                };
+                reader.readAsText(file);
+            };
+            input.click();
+        }
+
+        // 获取奖品
+        function getPrize(s) {
+            if (s <= 21) {
+                return prizeMap[s] || 0;
+            }
+            return LOSE_PRIZE;
+        }
+
+        // 计算最佳策略（动态规划）
+        function calculateBestStrategy() {
+            const memo = {};
+            bestStrategy = {};
+
+            function dp(drawnCards) {
+                // 排序转数组作为状态唯一标识
+                const stateKey = [...drawnCards].sort((a, b) => a - b).join(',');
+
+                if (memo[stateKey] !== undefined) {
+                    return memo[stateKey];
+                }
+
+                const currentSum = drawnCards.reduce((a, b) => a + b, 0);
+
+                // 自动结束条件
+                if (currentSum > 21) {
+                    return getPrize(currentSum);
+                }
+                if (drawnCards.length === 5) {
+                    return getPrize(currentSum);
+                }
+
+                // 构建当前剩余牌堆
+                const deck = {};
+                for (let i = 0; i <= 9; i++) {
+                    deck[i] = 2;
+                }
+                for (const card of drawnCards) {
+                    deck[card]--;
+                }
+
+                const remainingCards = 20 - drawnCards.length;
+
+                // 计算继续翻牌的期望
+                let continueEV = 0;
+                for (let card = 0; card <= 9; card++) {
+                    if (deck[card] > 0) {
+                        const prob = deck[card] / remainingCards;
+                        continueEV += prob * dp([...drawnCards, card]);
+                    }
+                }
+
+                // 决策与记录
+                let ans;
+                if (drawnCards.length < 2) {
+                    ans = continueEV;
+                } else {
+                    const stopEV = getPrize(currentSum);
+                    if (stopEV >= continueEV) {
+                        ans = stopEV;
+                        bestStrategy[stateKey] = {
+                            action: 'take',
+                            cards: [...drawnCards].sort((a, b) => a - b),
+                            sum: currentSum,
+                            stopEV: stopEV,
+                            continueEV: continueEV
+                        };
+                    } else {
+                        ans = continueEV;
+                        bestStrategy[stateKey] = {
+                            action: 'flip',
+                            cards: [...drawnCards].sort((a, b) => a - b),
+                            sum: currentSum,
+                            stopEV: stopEV,
+                            continueEV: continueEV
+                        };
+                    }
+                }
+
+                memo[stateKey] = ans;
+                return ans;
+            }
+
+            optimalEV = dp([]);
+        }
+
+        // 更新策略显示
+        function updateStrategyDisplay() {
+            const strategyContent = document.getElementById('strategyContent');
+
+            if (flippedCards.length < 2) {
+                strategyContent.innerHTML = '<p>翻两张牌后将显示最优策略...</p>';
+                document.getElementById('epValue').textContent = '--';
+                return;
+            }
+
+            const currentStateKey = [...flippedCards].sort((a, b) => a - b).join(',');
+            const strategy = bestStrategy[currentStateKey];
+
+            if (!strategy) {
+                strategyContent.innerHTML = '<p>策略计算中...</p>';
+                return;
+            }
+
+            const isTake = strategy.action === 'take';
+            const actionText = isTake ? '【拿奖】' : '【翻牌】';
+            const actionClass = isTake ? 'take' : 'flip';
+            const reason = isTake
+                ? `当前奖金 (${strategy.stopEV.toFixed(2)}) ≥ 继续期望 (${strategy.continueEV.toFixed(2)})，建议拿奖`
+                : `当前奖金 (${strategy.stopEV.toFixed(2)}) < 继续期望 (${strategy.continueEV.toFixed(2)})，建议继续`;
+
+            const cardsStr = flippedCards.join(', ');
+            currentEV = strategy.continueEV;
+
+            strategyContent.innerHTML = `
+                <p><strong>当前手牌：</strong> [${cardsStr}] (和: ${strategy.sum})</p>
+                <p><strong>最优策略：</strong><span class="strategy-action ${actionClass}">${actionText}</span></p>
+                <p><strong>决策依据：</strong>${reason}</p>
+                <p><strong>详细数据：</strong></p>
+                <ul style="margin-left: 20px;">
+                    <li>见好就收可获得：<span class="expectation-value">${strategy.stopEV.toFixed(2)}</span></li>
+                    <li>继续翻牌期望：<span class="expectation-value">${strategy.continueEV.toFixed(2)}</span></li>
+                </ul>
+            `;
+
+            document.getElementById('epValue').textContent = optimalEV.toFixed(4);
         }
 
         // 初始化游戏
+        initConfigPanel();
+        calculateBestStrategy();
         initDeck();
         updateDisplay();
         initPrizeTable();
