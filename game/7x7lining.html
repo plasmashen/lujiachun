@@ -1,9 +1,9 @@
-]<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>7x7连珠统计工具</title>
+    <title>7x7连珠游戏</title>
     <style>
         * {
             margin: 0;
@@ -18,7 +18,7 @@
         }
 
         .container {
-            max-width: 1200px;
+            max-width: 1400px;
             margin: 0 auto;
         }
 
@@ -35,7 +35,7 @@
             flex-wrap: wrap;
         }
 
-        .board-section, .control-section {
+        .board-section, .control-section, .game-section {
             background: white;
             padding: 20px;
             border-radius: 8px;
@@ -149,7 +149,7 @@
 
         .stats-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
             gap: 10px;
             margin-top: 15px;
         }
@@ -263,6 +263,124 @@
             border-radius: 2px;
         }
 
+        .prize-config {
+            background-color: #e3f2fd;
+            padding: 15px;
+            border-radius: 4px;
+            margin-bottom: 15px;
+        }
+
+        .prize-config h3 {
+            margin-bottom: 10px;
+            color: #1565c0;
+        }
+
+        .prize-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 10px 0;
+            gap: 10px;
+        }
+
+        .bet-options {
+            margin-top: 15px;
+        }
+
+        .bet-options h3 {
+            margin-bottom: 10px;
+            color: #1565c0;
+        }
+
+        .bet-buttons {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .bet-btn {
+            flex: 1;
+            min-width: 80px;
+            padding: 10px 15px;
+            border: 2px solid #2196F3;
+            background-color: white;
+            color: #2196F3;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: bold;
+            transition: all 0.2s;
+        }
+
+        .bet-btn.active {
+            background-color: #2196F3;
+            color: white;
+        }
+
+        .bet-btn:hover {
+            background-color: #1976D2;
+            color: white;
+        }
+
+        .bet-buttons .input-group {
+            margin: 5px 0;
+        }
+
+        .bet-buttons .input-group label {
+            font-size: 12px;
+            margin-bottom: 3px;
+        }
+
+        .bet-buttons .input-group input {
+            width: 80px;
+            padding: 5px;
+            font-size: 14px;
+        }
+
+        .result-display {
+            margin-top: 15px;
+            padding: 15px;
+            background-color: #f9f9f9;
+            border-radius: 4px;
+        }
+
+        .result-display h3 {
+            margin-bottom: 10px;
+            color: #333;
+        }
+
+        .result-value {
+            font-size: 24px;
+            font-weight: bold;
+            color: #2196F3;
+        }
+
+        .expectation-display {
+            margin-top: 15px;
+            padding: 15px;
+            background-color: #e8f5e9;
+            border-radius: 4px;
+        }
+
+        .expectation-display h3 {
+            margin-bottom: 10px;
+            color: #2e7d32;
+        }
+
+        .expectation-value {
+            font-size: 20px;
+            font-weight: bold;
+            color: #2e7d32;
+        }
+
+        .expectation-value.negative {
+            color: #c62828;
+        }
+
+        .text-success {
+            color: #2e7d32;
+        }
+
         @media (max-width: 768px) {
             .main-content {
                 flex-direction: column;
@@ -278,7 +396,7 @@
 </head>
 <body>
     <div class="container">
-        <h1>7x7 连珠统计工具</h1>
+        <h1>7x7 连珠游戏</h1>
 
         <div class="main-content">
             <div class="board-section">
@@ -305,9 +423,67 @@
                 </div>
             </div>
 
+            <div class="game-section">
+                <h2>奖金配置</h2>
+                <div class="prize-config">
+                    <h3>设置中奖奖金</h3>
+                    <div class="prize-row">
+                        <label>5连奖金:</label>
+                        <input type="number" id="prize5" value="10" min="0" step="1">
+                    </div>
+                    <div class="prize-row">
+                        <label>6连奖金:</label>
+                        <input type="number" id="prize6" value="50" min="0" step="1">
+                    </div>
+                    <div class="prize-row">
+                        <label>7连奖金:</label>
+                        <input type="number" id="prize7" value="200" min="0" step="1">
+                    </div>
+                    <div class="prize-row">
+                        <label>保底奖励:</label>
+                        <input type="number" id="basePrize" value="5" min="0" step="1">
+                    </div>
+                </div>
+
+                <div class="bet-options">
+                    <h3>选择下注方式</h3>
+                    <div class="bet-buttons">
+                        <button class="bet-btn" onclick="selectBet('horizontal')" id="bet-horizontal">横</button>
+                        <div class="input-group" style="margin: 5px 0;">
+                            <label for="betAmountHorizontal">横投注金额:</label>
+                            <input type="number" id="betAmountHorizontal" value="1" min="1" step="1">
+                        </div>
+                        <button class="bet-btn" onclick="selectBet('vertical')" id="bet-vertical">竖</button>
+                        <div class="input-group" style="margin: 5px 0;">
+                            <label for="betAmountVertical">竖投注金额:</label>
+                            <input type="number" id="betAmountVertical" value="1" min="1" step="1">
+                        </div>
+                        <button class="bet-btn" onclick="selectBet('diagonal')" id="bet-diagonal">斜</button>
+                        <div class="input-group" style="margin: 5px 0;">
+                            <label for="betAmountDiagonal">斜投注金额:</label>
+                            <input type="number" id="betAmountDiagonal" value="1" min="1" step="1">
+                        </div>
+                        <button class="bet-btn" onclick="selectBet('all')" id="bet-all">全包</button>
+                        <div class="input-group" style="margin: 5px 0;">
+                            <label for="betAmountAll">全包投注金额:</label>
+                            <input type="number" id="betAmountAll" value="1" min="1" step="1">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="result-display">
+                    <h3>本期奖金</h3>
+                    <div class="result-value" id="currentPrize">-</div>
+                </div>
+
+                <div style="margin-top: 15px;">
+                    <button class="btn-primary" onclick="playOne()">玩一次</button>
+                </div>
+            </div>
+
             <div class="control-section">
-                <h2>控制面板</h2>
-                <button class="btn-primary" onclick="testOne()">随机选择一次</button>
+                <h2>统计测试</h2>
+                <button class="btn-primary" onclick="testOne()">随机一次</button>
                 <button class="btn-primary" onclick="test100()">测试100次</button>
                 <button class="btn-warning" onclick="test1000()">测试1000次</button>
                 <button class="btn-success" onclick="test10000()">测试10000次</button>
@@ -318,7 +494,7 @@
 
                 <div class="input-group">
                     <label for="customTrials">自定义测试次数:</label>
-                    <input type="number" id="customTrials" value="1000" min="1" max="100000">
+                    <input type="number" id="customTrials" value="1000" min="1" max="1000000">
                 </div>
 
                 <div class="progress-bar">
@@ -326,8 +502,8 @@
                 </div>
 
                 <div class="status">
-                    <strong>当前选择:</strong>
-                    <label id="selectedCount">0 / 21</label>
+                    <strong>测试次数:</strong>
+                    <label id="testCount">0</label>
                 </div>
             </div>
         </div>
@@ -341,6 +517,11 @@
             </div>
 
             <div class="stats-grid" id="statsGrid"></div>
+
+            <div class="expectation-display">
+                <h3>游戏期望值</h3>
+                <div class="expectation-value" id="expectation">-</div>
+            </div>
         </div>
     </div>
 
@@ -349,10 +530,11 @@
         const SELECT_COUNT = 21;
 
         let selectedCells = [];
+        let currentBet = null;
         let stats = {
-            h5: 0, v5: 0, d5_1: 0, d5_2: 0,
-            h6: 0, v6: 0, d6_1: 0, d6_2: 0,
-            h7: 0, v7: 0, d7_1: 0, d7_2: 0
+            h5: 0, v5: 0, d5: 0,
+            h6: 0, v6: 0, d6: 0,
+            h7: 0, v7: 0, d7: 0
         };
         let totalTrials = 0;
         let isRunning = false;
@@ -390,8 +572,6 @@
                 selectedCells.push(index);
                 cell.classList.add('selected');
             }
-
-            document.getElementById('selectedCount').textContent = `${selectedCells.length} / ${SELECT_COUNT}`;
         }
 
         // 从数组中随机选择n个元素
@@ -492,20 +672,96 @@
             return results;
         }
 
+        // 选择下注方式
+        function selectBet(type) {
+            currentBet = type;
+
+            // 移除所有激活状态
+            document.querySelectorAll('.bet-btn').forEach(btn => btn.classList.remove('active'));
+
+            // 激活当前选中的按钮
+            document.getElementById(`bet-${type}`).classList.add('active');
+        }
+
+        // 计算奖金
+        function calculatePrize(result) {
+            const prize5 = parseInt(document.getElementById('prize5').value) || 10;
+            const prize6 = parseInt(document.getElementById('prize6').value) || 50;
+            const prize7 = parseInt(document.getElementById('prize7').value) || 200;
+            const basePrizeInput = parseInt(document.getElementById('basePrize').value) || 5;
+
+            let total = 0;
+            let foundWin = false;
+
+            // 合并斜的情况
+            const d5 = result.d5_1 + result.d5_2;
+            const d6 = result.d6_1 + result.d6_2;
+            const d7 = result.d7_1 + result.d7_2;
+
+            switch (currentBet) {
+                case 'horizontal': // 横
+                    if (result.h5 > 0) { total += result.h5 * prize5; foundWin = true; }
+                    if (result.h6 > 0) { total += result.h6 * prize6; foundWin = true; }
+                    if (result.h7 > 0) { total += result.h7 * prize7; foundWin = true; }
+                    break;
+                case 'vertical': // 竖
+                    if (result.v5 > 0) { total += result.v5 * prize5; foundWin = true; }
+                    if (result.v6 > 0) { total += result.v6 * prize6; foundWin = true; }
+                    if (result.v7 > 0) { total += result.v7 * prize7; foundWin = true; }
+                    break;
+                case 'diagonal': // 斜
+                    if (d5 > 0) { total += d5 * prize5; foundWin = true; }
+                    if (d6 > 0) { total += d6 * prize6; foundWin = true; }
+                    if (d7 > 0) { total += d7 * prize7; foundWin = true; }
+                    break;
+                case 'all': // 全包
+                    if (result.h5 > 0) { total += result.h5 * prize5; foundWin = true; }
+                    if (result.v5 > 0) { total += result.v5 * prize5; foundWin = true; }
+                    if (d5 > 0) { total += d5 * prize5; foundWin = true; }
+                    if (result.h6 > 0) { total += result.h6 * prize6; foundWin = true; }
+                    if (result.v6 > 0) { total += result.v6 * prize6; foundWin = true; }
+                    if (d6 > 0) { total += d6 * prize6; foundWin = true; }
+                    if (result.h7 > 0) { total += result.h7 * prize7; foundWin = true; }
+                    if (result.v7 > 0) { total += result.v7 * prize7; foundWin = true; }
+                    if (d7 > 0) { total += d7 * prize7; foundWin = true; }
+                    break;
+            }
+
+            // 如果没有中奖，返回保底奖励
+            if (!foundWin && currentBet !== null) {
+                return basePrizeInput;
+            }
+
+            return total;
+        }
+
+        // 玩一次
+        function playOne() {
+            if (isRunning || !currentBet) {
+                if (!currentBet) alert('请先选择下注方式！');
+                return;
+            }
+
+            const allCells = Array.from({length: BOARD_SIZE * BOARD_SIZE}, (_, i) => i);
+            selectedCells = randomSelect(allCells, SELECT_COUNT);
+            displaySelection(selectedCells);
+
+            const result = analyzeSelection(selectedCells);
+            const prize = calculatePrize(result);
+            document.getElementById('currentPrize').textContent = prize;
+        }
+
         // 更新统计
         function updateStats(result) {
-            if (result.h5 > 0) stats.h5++;
-            if (result.v5 > 0) stats.v5++;
-            if (result.d5_1 > 0) stats.d5_1++;
-            if (result.d5_2 > 0) stats.d5_2++;
-            if (result.h6 > 0) stats.h6++;
-            if (result.v6 > 0) stats.v6++;
-            if (result.d6_1 > 0) stats.d6_1++;
-            if (result.d6_2 > 0) stats.d6_2++;
-            if (result.h7 > 0) stats.h7++;
-            if (result.v7 > 0) stats.v7++;
-            if (result.d7_1 > 0) stats.d7_1++;
-            if (result.d7_2 > 0) stats.d7_2++;
+            stats.h5 += result.h5;
+            stats.v5 += result.v5;
+            stats.d5 += result.d5_1 + result.d5_2;
+            stats.h6 += result.h6;
+            stats.v6 += result.v6;
+            stats.d6 += result.d6_1 + result.d6_2;
+            stats.h7 += result.h7;
+            stats.v7 += result.v7;
+            stats.d7 += result.d7_1 + result.d7_2;
             totalTrials++;
         }
 
@@ -514,16 +770,13 @@
             const categories = [
                 { key: 'h5', name: '5连横' },
                 { key: 'v5', name: '5连竖' },
-                { key: 'd5_1', name: '5连斜(↘)' },
-                { key: 'd5_2', name: '5连斜(↙)' },
+                { key: 'd5', name: '5连斜' },
                 { key: 'h6', name: '6连横' },
                 { key: 'v6', name: '6连竖' },
-                { key: 'd6_1', name: '6连斜(↘)' },
-                { key: 'd6_2', name: '6连斜(↙)' },
+                { key: 'd6', name: '6连斜' },
                 { key: 'h7', name: '7连横' },
                 { key: 'v7', name: '7连竖' },
-                { key: 'd7_1', name: '7连斜(↘)' },
-                { key: 'd7_2', name: '7连斜(↙)' }
+                { key: 'd7', name: '7连斜' }
             ];
 
             let html = '';
@@ -543,6 +796,68 @@
 
             document.getElementById('statsGrid').innerHTML = html;
             document.getElementById('totalTrials').textContent = totalTrials.toLocaleString();
+            document.getElementById('testCount').textContent = totalTrials.toLocaleString();
+
+            // 计算并显示期望值
+            updateExpectation();
+        }
+
+        // 计算期望值
+        function updateExpectation() {
+            if (totalTrials === 0) {
+                document.getElementById('expectation').textContent = '-';
+                return;
+            }
+
+            const prize5 = parseInt(document.getElementById('prize5').value) || 10;
+            const prize6 = parseInt(document.getElementById('prize6').value) || 50;
+            const prize7 = parseInt(document.getElementById('prize7').value) || 200;
+
+            // 读取各下注方式的投注金额
+            const betAmountHorizontal = parseInt(document.getElementById('betAmountHorizontal').value) || 1;
+            const betAmountVertical = parseInt(document.getElementById('betAmountVertical').value) || 1;
+            const betAmountDiagonal = parseInt(document.getElementById('betAmountDiagonal').value) || 1;
+            const betAmountAll = parseInt(document.getElementById('betAmountAll').value) || 1;
+
+            // 计算每种连珠出现的期望奖金
+            // 横向期望奖金（每局平均获得的横连奖金）
+            const h5_expected = (stats.h5 / totalTrials) * prize5;
+            const h6_expected = (stats.h6 / totalTrials) * prize6;
+            const h7_expected = (stats.h7 / totalTrials) * prize7;
+            const h_win_expectation = h5_expected + h6_expected + h7_expected;
+            const h_net_expectation = h_win_expectation / betAmountHorizontal;
+
+            // 竖向期望奖金
+            const v5_expected = (stats.v5 / totalTrials) * prize5;
+            const v6_expected = (stats.v6 / totalTrials) * prize6;
+            const v7_expected = (stats.v7 / totalTrials) * prize7;
+            const v_win_expectation = v5_expected + v6_expected + v7_expected;
+            const v_net_expectation = v_win_expectation / betAmountVertical;
+
+            // 斜向期望奖金
+            const d5_expected = (stats.d5 / totalTrials) * prize5;
+            const d6_expected = (stats.d6 / totalTrials) * prize6;
+            const d7_expected = (stats.d7 / totalTrials) * prize7;
+            const d_win_expectation = d5_expected + d6_expected + d7_expected;
+            const d_net_expectation = d_win_expectation / betAmountDiagonal;
+
+            // 全包的期望奖金
+            const all_win_expectation = h_win_expectation + v_win_expectation + d_win_expectation;
+            const all_net_expectation = all_win_expectation / betAmountAll;
+
+            let html = '<div style="margin-top: 10px;">';
+            html += `<div><strong>横（投注${betAmountHorizontal}）:</strong> ${h_win_expectation.toFixed(4)} <span class="${h_net_expectation >= 1 ? 'text-success' : 'negative'}">[${h_net_expectation.toFixed(4)}]</span></div>`;
+            html += `<div><strong>竖（投注${betAmountVertical}）:</strong> ${v_win_expectation.toFixed(4)} <span class="${v_net_expectation >= 1 ? 'text-success' : 'negative'}">[${v_net_expectation.toFixed(4)}]</span></div>`;
+            html += `<div><strong>斜（投注${betAmountDiagonal}）:</strong> ${d_win_expectation.toFixed(4)} <span class="${d_net_expectation >= 1 ? 'text-success' : 'negative'}">[${d_net_expectation.toFixed(4)}]</span></div>`;
+            html += `<div style="margin-top: 5px; padding-top: 5px; border-top: 1px solid #ddd;">`;
+            html += `<strong>全包（投注${betAmountAll}）:</strong> ${all_win_expectation.toFixed(4)} <span class="${all_net_expectation >= 1 ? 'text-success' : 'negative'}">[${all_net_expectation.toFixed(4)}]</span></div>`;
+            html += `<div style="font-size: 12px; color: #666; margin-top: 5px;">`;
+            html += `(中括号内为净期望值 = 中奖期望 / 投注金额，大于1为盈利，小于1为亏损)<br>`;
+            html += `(保底奖励在无中奖时体现，此处仅显示中奖部分的期望)`;
+            html += '</div></div>';
+
+            const expElement = document.getElementById('expectation');
+            expElement.innerHTML = html;
         }
 
         // 清除棋盘选择
@@ -556,9 +871,6 @@
         // 在棋盘上显示结果
         function displaySelection(selected) {
             clearBoard();
-
-            const r = analyzeSelection(selected);
-            const newSelected = [...selected];
 
             // 高亮7连
             [
@@ -609,28 +921,19 @@
                     cell.classList.add('selected');
                 }
             });
-
-            document.getElementById('selectedCount').textContent = `${selected.length} / ${SELECT_COUNT}`;
         }
 
-        // 测试一次并显示
+        // 测试一次
         function testOne() {
             if (isRunning) return;
 
             const allCells = Array.from({length: BOARD_SIZE * BOARD_SIZE}, (_, i) => i);
             selectedCells = randomSelect(allCells, SELECT_COUNT);
             displaySelection(selectedCells);
-            const result = analyzeSelection(selectedCells);
-            updateDisplayResult(result);
-        }
-
-        // 更新显示结果
-        function updateDisplayResult(result) {
-            // 这个函数可以用来显示单次测试的详细信息
         }
 
         // 批量测试
-        function runBatchTest(count, callback) {
+        function runBatchTest(count) {
             if (isRunning) return;
             isRunning = true;
 
@@ -679,26 +982,28 @@
         function testCustom() {
             const input = document.getElementById('customTrials');
             const count = parseInt(input.value);
-            if (count > 0 && count <= 100000) {
+            if (count > 0 && count <= 1000000) {
                 runBatchTest(count);
             } else {
-                alert('请输入1到100000之间的数字');
+                alert('请输入1到1000000之间的数字');
             }
         }
 
         function resetStats() {
             if (isRunning) return;
             stats = {
-                h5: 0, v5: 0, d5_1: 0, d5_2: 0,
-                h6: 0, v6: 0, d6_1: 0, d6_2: 0,
-                h7: 0, v7: 0, d7_1: 0, d7_2: 0
+                h5: 0, v5: 0, d5: 0,
+                h6: 0, v6: 0, d6: 0,
+                h7: 0, v7: 0, d7: 0
             };
             totalTrials = 0;
             selectedCells = [];
             document.getElementById('progressFill').style.width = '0%';
             document.getElementById('progressFill').textContent = '0%';
             clearBoard();
-            document.getElementById('selectedCount').textContent = `0 / ${SELECT_COUNT}`;
+            currentBet = null;
+            document.querySelectorAll('.bet-btn').forEach(btn => btn.classList.remove('active'));
+            document.getElementById('currentPrize').textContent = '-';
             updateStatsDisplay();
         }
 
