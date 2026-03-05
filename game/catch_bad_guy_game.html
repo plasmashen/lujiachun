@@ -1,0 +1,813 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎯 抓坏仔 - 幸运翻牌游戏</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Microsoft YaHei', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            text-align: center;
+            color: white;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .subtitle {
+            text-align: center;
+            color: rgba(255,255,255,0.9);
+            margin-bottom: 30px;
+            font-size: 1.1em;
+        }
+
+        /* 游戏状态栏 */
+        .game-status {
+            background: rgba(255,255,255,0.95);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        .status-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+        }
+
+        .status-item {
+            text-align: center;
+            padding: 15px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 10px;
+            color: white;
+        }
+
+        .status-item .label {
+            font-size: 0.9em;
+            opacity: 0.9;
+            margin-bottom: 5px;
+        }
+
+        .status-item .value {
+            font-size: 2em;
+            font-weight: bold;
+        }
+
+        /* 卡片区域 */
+        .cards-container {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        @media (max-width: 768px) {
+            .cards-container {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
+        .card {
+            aspect-ratio: 1/1;
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            border-radius: 15px;
+            cursor: pointer;
+            position: relative;
+            transform-style: preserve-3d;
+            transition: transform 0.6s;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .card.flipped {
+            transform: rotateY(180deg);
+        }
+
+        .card.disabled {
+            cursor: not-allowed;
+            opacity: 0.5;
+        }
+
+        .card-face {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            border-radius: 15px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .card-front {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-size: 3em;
+        }
+
+        .card-back {
+            background: white;
+            transform: rotateY(180deg);
+            padding: 10px;
+            text-align: center;
+        }
+
+        .card-back .emoji {
+            font-size: 2.5em;
+            margin-bottom: 5px;
+        }
+
+        .card-back .text {
+            font-size: 0.9em;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .card-back.lucky {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+        }
+
+        .card-back.bad {
+            background: linear-gradient(135deg, #434343 0%, #000000 100%);
+            color: white;
+        }
+
+        .card-back.double {
+            background: linear-gradient(135deg, #ffd700 0%, #ff8c00 100%);
+            color: white;
+        }
+
+        .card-back.revive {
+            background: linear-gradient(135deg, #00c6ff 0%, #0072ff 100%);
+            color: white;
+        }
+
+        /* 控制按钮 */
+        .controls {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-bottom: 30px;
+        }
+
+        .btn {
+            padding: 15px 40px;
+            font-size: 1.2em;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: bold;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+            color: white;
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #eb3349 0%, #f45c43 100%);
+            color: white;
+        }
+
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* 奖品展示 */
+        .prizes-panel {
+            background: rgba(255,255,255,0.95);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        .prizes-panel h2 {
+            text-align: center;
+            margin-bottom: 20px;
+            color: #667eea;
+        }
+
+        .prizes-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 10px;
+        }
+
+        .prize-item {
+            padding: 15px;
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            border-radius: 10px;
+            color: white;
+            text-align: center;
+            position: relative;
+            transition: all 0.3s;
+        }
+
+        .prize-item.active {
+            transform: scale(1.05);
+            box-shadow: 0 5px 20px rgba(0,0,0,0.3);
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+        }
+
+        .prize-item .lucky-count {
+            font-size: 1.5em;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .prize-item .prize-name {
+            font-size: 1.1em;
+            margin-bottom: 5px;
+        }
+
+        .prize-item .prize-value {
+            font-size: 0.9em;
+            opacity: 0.9;
+        }
+
+        /* 游戏结束弹窗 */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal.show {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            max-width: 500px;
+            width: 90%;
+            text-align: center;
+            animation: modalPop 0.3s ease-out;
+        }
+
+        @keyframes modalPop {
+            from {
+                transform: scale(0.8);
+                opacity: 0;
+            }
+            to {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        .modal-content h2 {
+            font-size: 2em;
+            margin-bottom: 20px;
+            color: #667eea;
+        }
+
+        .modal-content .result-emoji {
+            font-size: 4em;
+            margin-bottom: 20px;
+        }
+
+        .modal-content .result-text {
+            font-size: 1.2em;
+            margin-bottom: 10px;
+            color: #333;
+        }
+
+        .modal-content .result-prize {
+            font-size: 1.5em;
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 30px;
+        }
+
+        /* 消息提示 */
+        .message {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0,0,0,0.9);
+            color: white;
+            padding: 15px 30px;
+            border-radius: 50px;
+            font-size: 1.1em;
+            z-index: 1001;
+            animation: slideDown 0.3s ease-out;
+        }
+
+        @keyframes slideDown {
+            from {
+                top: -100px;
+                opacity: 0;
+            }
+            to {
+                top: 20px;
+                opacity: 1;
+            }
+        }
+
+        /* 剩余卡片提示 */
+        .remaining-info {
+            text-align: center;
+            color: white;
+            margin-bottom: 20px;
+            font-size: 1.1em;
+        }
+
+        .remaining-info span {
+            display: inline-block;
+            margin: 0 10px;
+            padding: 5px 15px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎯 抓坏仔</h1>
+        <p class="subtitle">幸运翻牌游戏 - 翻出 Lucky 赢大奖！</p>
+
+        <!-- 游戏状态栏 -->
+        <div class="game-status">
+            <div class="status-grid">
+                <div class="status-item">
+                    <div class="label">🍀 Lucky 数</div>
+                    <div class="value" id="luckyCount">0</div>
+                </div>
+                <div class="status-item">
+                    <div class="label">💰 当前奖品</div>
+                    <div class="value" id="currentPrize">-</div>
+                </div>
+                <div class="status-item">
+                    <div class="label">💀 坏仔数</div>
+                    <div class="value" id="badCount">0</div>
+                </div>
+                <div class="status-item">
+                    <div class="label">🔄 复活机会</div>
+                    <div class="value" id="reviveCount">0</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 剩余卡片提示 -->
+        <div class="remaining-info">
+            <span>📦 剩余卡片：<b id="remainingCards">15</b></span>
+            <span>🍀 Lucky：<b id="remainingLucky">8</b></span>
+            <span>💀 坏仔：<b id="remainingBad">5</b></span>
+        </div>
+
+        <!-- 卡片区域 -->
+        <div class="cards-container" id="cardsContainer"></div>
+
+        <!-- 控制按钮 -->
+        <div class="controls">
+            <button class="btn btn-success" id="cashOutBtn" onclick="cashOut()" disabled>
+                💰 下车拿奖
+            </button>
+            <button class="btn btn-primary" id="continueBtn" onclick="continueGame()" disabled>
+                🎲 继续挑战
+            </button>
+            <button class="btn btn-danger" onclick="resetGame()">
+                🔄 重新开始
+            </button>
+        </div>
+
+        <!-- 奖品展示 -->
+        <div class="prizes-panel">
+            <h2>🎁 奖品对应表</h2>
+            <div class="prizes-grid" id="prizesGrid"></div>
+        </div>
+    </div>
+
+    <!-- 游戏结束弹窗 -->
+    <div class="modal" id="gameModal">
+        <div class="modal-content">
+            <div class="result-emoji" id="resultEmoji">🎉</div>
+            <h2 id="resultTitle">游戏结束</h2>
+            <p class="result-text" id="resultText"></p>
+            <p class="result-prize" id="resultPrize"></p>
+            <button class="btn btn-primary" onclick="resetGame()">🔄 再玩一次</button>
+        </div>
+    </div>
+
+    <script>
+        // 游戏配置
+        const CARDS_CONFIG = [
+            { type: 'lucky', count: 8, emoji: '🍀', text: 'Lucky' },
+            { type: 'double', count: 1, emoji: '✖️2', text: 'Lucky x2' },
+            { type: 'revive', count: 1, emoji: '🔄', text: '复活' },
+            { type: 'bad', count: 5, emoji: '💀', text: '坏仔' }
+        ];
+
+        // 奖品配置
+        const PRIZES = [
+            { lucky: 2, name: '便利店盲盒', value: 80 },
+            { lucky: 3, name: '光织园', value: 120 },
+            { lucky: 4, name: '小米兰', value: 200 },
+            { lucky: 5, name: '毛球', value: 350 },
+            { lucky: 6, name: '国王', value: 500 },
+            { lucky: 7, name: '童心 400%', value: 700 },
+            { lucky: 8, name: '气泡 400%', value: 900 },
+            { lucky: 9, name: '花落 400%', value: 2100 },
+            { lucky: 10, name: '杏花 400%', value: 3000 }
+        ];
+
+        // 坏仔奖品配置（只有纯坏仔路线才能获得）
+        const BAD_PRIZES = [
+            { bad: 1, name: '从头开始（1 坏仔）', value: 50 },
+            { bad: 3, name: '皇后（3 坏仔）', value: 150 },
+            { bad: 4, name: '便利店（4 坏仔）', value: 300 },
+            { bad: 5, name: '杏花（5 坏仔）', value: 400 }
+        ];
+
+        // 游戏状态
+        let gameState = {
+            cards: [],
+            flipped: [],
+            luckyCount: 0,
+            badCount: 0,
+            reviveCount: 0,
+            gameOver: false,
+            hasFlippedLucky: false  // 是否翻过 Lucky（一旦翻了 Lucky 就不能走坏仔路线）
+        };
+
+        // 初始化游戏
+        function initGame() {
+            // 创建卡片数组
+            gameState.cards = [];
+            CARDS_CONFIG.forEach(config => {
+                for (let i = 0; i < config.count; i++) {
+                    gameState.cards.push({
+                        type: config.type,
+                        emoji: config.emoji,
+                        text: config.text,
+                        id: gameState.cards.length
+                    });
+                }
+            });
+
+            // 洗牌
+            shuffleArray(gameState.cards);
+
+            // 重置状态
+            gameState.flipped = [];
+            gameState.luckyCount = 0;
+            gameState.badCount = 0;
+            gameState.reviveCount = 0;
+            gameState.gameOver = false;
+            gameState.canContinue = false;
+
+            // 渲染卡片
+            renderCards();
+            renderPrizes();
+            updateStatus();
+            hideModal();
+        }
+
+        // 洗牌算法
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+        }
+
+        // 渲染卡片
+        function renderCards() {
+            const container = document.getElementById('cardsContainer');
+            container.innerHTML = '';
+
+            gameState.cards.forEach((card, index) => {
+                const cardEl = document.createElement('div');
+                cardEl.className = 'card';
+                cardEl.id = `card-${index}`;
+                cardEl.onclick = () => flipCard(index);
+
+                cardEl.innerHTML = `
+                    <div class="card-face card-front">❓</div>
+                    <div class="card-face card-back ${card.type === 'bad' ? 'bad' : card.type === 'double' ? 'double' : card.type === 'revive' ? 'revive' : 'lucky'}">
+                        <div class="emoji">${card.emoji}</div>
+                        <div class="text">${card.text}</div>
+                    </div>
+                `;
+
+                container.appendChild(cardEl);
+            });
+        }
+
+        // 渲染奖品
+        function renderPrizes() {
+            const grid = document.getElementById('prizesGrid');
+            grid.innerHTML = '';
+
+            // 渲染坏仔奖品
+            BAD_PRIZES.forEach((prize) => {
+                const prizeEl = document.createElement('div');
+                prizeEl.className = 'prize-item';
+                prizeEl.id = `prize-bad-${prize.bad}`;
+                prizeEl.innerHTML = `
+                    <div class="lucky-count">${prize.bad} 坏仔</div>
+                    <div class="prize-name">${prize.name}</div>
+                    <div class="prize-value">价值 ¥${prize.value}</div>
+                `;
+                grid.appendChild(prizeEl);
+            });
+
+            // 渲染 Lucky 奖品
+            PRIZES.forEach((prize) => {
+                const prizeEl = document.createElement('div');
+                prizeEl.className = 'prize-item';
+                prizeEl.id = `prize-${prize.lucky}`;
+                prizeEl.innerHTML = `
+                    <div class="lucky-count">${prize.lucky} Lucky</div>
+                    <div class="prize-name">${prize.name}</div>
+                    <div class="prize-value">价值 ¥${prize.value}</div>
+                `;
+                grid.appendChild(prizeEl);
+            });
+        }
+
+        // 翻牌
+        function flipCard(index) {
+            if (gameState.gameOver || gameState.flipped.includes(index)) return;
+
+            const card = gameState.cards[index];
+            const cardEl = document.getElementById(`card-${index}`);
+
+            // 翻牌动画
+            cardEl.classList.add('flipped');
+            gameState.flipped.push(index);
+
+            // 处理卡片效果
+            setTimeout(() => {
+                handleCardEffect(card);
+            }, 600);
+        }
+
+        // 处理卡片效果
+        function handleCardEffect(card) {
+            if (card.type === 'lucky') {
+                // 如果已经有坏仔，翻到 Lucky 就直接结束，只能拿 5 元
+                if (gameState.badCount > 0) {
+                    showMessage('🍀 翻出 Lucky！游戏结束！');
+                    setTimeout(() => {
+                        endGame(false);
+                    }, 1000);
+                    return;
+                }
+                gameState.luckyCount++;
+                gameState.hasFlippedLucky = true;
+                showMessage('🍀 Lucky +1！');
+            } else if (card.type === 'double') {
+                // 如果已经有坏仔，翻到 Double Lucky 也直接结束
+                if (gameState.badCount > 0) {
+                    showMessage('✖️2 翻出 Lucky x2！游戏结束！');
+                    setTimeout(() => {
+                        endGame(false);
+                    }, 1000);
+                    return;
+                }
+                gameState.luckyCount += 2;
+                gameState.hasFlippedLucky = true;
+                showMessage('✖️2 Lucky +2！');
+            } else if (card.type === 'revive') {
+                gameState.reviveCount++;
+                showMessage('🔄 获得复活机会！');
+            } else if (card.type === 'bad') {
+                handleBadCard();
+                return;
+            }
+
+            updateStatus();
+            updatePrizesHighlight();
+            checkGameStatus();
+        }
+
+        // 处理坏仔
+        function handleBadCard() {
+            gameState.badCount++;
+
+            // 如果已经翻过 Lucky，翻到坏仔就直接结束，只能拿 5 元
+            if (gameState.hasFlippedLucky) {
+                showMessage('💀 翻出坏仔！游戏结束！');
+                setTimeout(() => {
+                    endGame(false);  // false 表示只拿 5 元安慰奖
+                }, 1000);
+                return;
+            }
+
+            // 纯坏仔路线，可以继续
+            if (gameState.badCount === 1) {
+                showMessage('💀 从头开始就是坏仔！继续翻坏仔赢大奖！');
+            } else {
+                showMessage(`💀 连续 ${gameState.badCount} 个坏仔！继续挑战还是下车？`);
+            }
+
+            updateStatus();
+            updatePrizesHighlight();
+            checkGameStatus();
+        }
+
+        // 检查游戏状态
+        function checkGameStatus() {
+            const remaining = 15 - gameState.flipped.length;
+            document.getElementById('remainingCards').textContent = remaining;
+
+            // 更新按钮状态 - 只要翻了牌就可以下车
+            const hasFlipped = gameState.flipped.length > 0;
+            document.getElementById('cashOutBtn').disabled = !hasFlipped || gameState.gameOver;
+            document.getElementById('continueBtn').disabled = !hasFlipped || remaining === 0 || gameState.gameOver;
+
+            // 如果所有卡片都翻开了
+            if (remaining === 0 && !gameState.gameOver) {
+                setTimeout(() => {
+                    endGame();
+                }, 1000);
+            }
+        }
+
+        // 下车拿奖
+        function cashOut() {
+            // 纯坏仔路线或纯 Lucky 路线都可以下车
+            if (gameState.badCount === 0 && gameState.luckyCount < 2) {
+                showMessage('❌ 至少需要 2 个 Lucky 才能兑奖！');
+                return;
+            }
+            endGame(true);
+        }
+
+        // 继续游戏
+        function continueGame() {
+            // 继续翻牌，无需额外逻辑
+            showMessage('🎲 继续挑战！祝你好运！');
+        }
+
+        // 结束游戏
+        function endGame(cashedOut) {
+            gameState.gameOver = true;
+            const modal = document.getElementById('gameModal');
+            const emoji = document.getElementById('resultEmoji');
+            const title = document.getElementById('resultTitle');
+            const text = document.getElementById('resultText');
+            const prizeEl = document.getElementById('resultPrize');
+
+            if (!cashedOut) {
+                // 游戏失败（混合路线），只能拿 5 元
+                emoji.textContent = '😢';
+                title.textContent = '游戏结束';
+                text.textContent = `混合路线失败！`;
+                prizeEl.textContent = '🎁 获得：拆袋香片（价值 ¥5）';
+            } else {
+                // 正常下车
+                const prizeInfo = getPrize(gameState.luckyCount, gameState.badCount, gameState.hasFlippedLucky);
+                emoji.textContent = '🎉';
+                title.textContent = '恭喜获奖！';
+                text.textContent = `你累计了 ${gameState.luckyCount} 个 Lucky，翻到 ${gameState.badCount} 个坏仔`;
+                prizeEl.textContent = `🎁 获得：${prizeInfo.name}（价值 ¥${prizeInfo.value}）`;
+            }
+
+            modal.classList.add('show');
+            updateStatus();
+        }
+
+        // 获取奖品
+        function getPrize(luckyCount, badCount, hasFlippedLucky) {
+            // 纯坏仔路线（没有翻过 Lucky）
+            if (!hasFlippedLucky && badCount > 0) {
+                let bestPrize = BAD_PRIZES[0];
+                for (const prize of BAD_PRIZES) {
+                    if (prize.bad <= badCount && prize.bad >= bestPrize.bad) {
+                        bestPrize = prize;
+                    }
+                }
+                return bestPrize;
+            }
+
+            // Lucky 路线
+            let bestPrize = PRIZES[0];
+            for (const prize of PRIZES) {
+                if (prize.lucky <= luckyCount && prize.lucky >= bestPrize.lucky) {
+                    bestPrize = prize;
+                }
+            }
+            return bestPrize;
+        }
+
+        // 更新状态显示
+        function updateStatus() {
+            document.getElementById('luckyCount').textContent = gameState.luckyCount;
+            document.getElementById('badCount').textContent = gameState.badCount;
+            document.getElementById('reviveCount').textContent = gameState.reviveCount;
+
+            const prize = getPrize(gameState.luckyCount, gameState.badCount, gameState.hasFlippedLucky);
+            if (gameState.hasFlippedLucky && gameState.luckyCount >= 2) {
+                document.getElementById('currentPrize').textContent = prize.name;
+            } else if (!gameState.hasFlippedLucky && gameState.badCount > 0) {
+                document.getElementById('currentPrize').textContent = prize.name;
+            } else {
+                document.getElementById('currentPrize').textContent = '-';
+            }
+
+            // 更新剩余卡片
+            const remainingBad = 5 - gameState.badCount;
+            document.getElementById('remainingLucky').textContent = Math.max(0, 9 - gameState.luckyCount);
+            document.getElementById('remainingBad').textContent = Math.max(0, remainingBad);
+        }
+
+        // 更新奖品高亮
+        function updatePrizesHighlight() {
+            document.querySelectorAll('.prize-item').forEach(el => {
+                el.classList.remove('active');
+            });
+
+            let prizeEl;
+            // 纯坏仔路线
+            if (!gameState.hasFlippedLucky && gameState.badCount > 0) {
+                const prizeInfo = getPrize(gameState.luckyCount, gameState.badCount, gameState.hasFlippedLucky);
+                prizeEl = document.getElementById(`prize-bad-${prizeInfo.bad}`);
+            }
+            // Lucky 路线
+            else if (gameState.hasFlippedLucky && gameState.luckyCount >= 2) {
+                const prizeInfo = getPrize(gameState.luckyCount, gameState.badCount, gameState.hasFlippedLucky);
+                prizeEl = document.getElementById(`prize-${prizeInfo.lucky}`);
+            }
+
+            if (prizeEl) {
+                prizeEl.classList.add('active');
+            }
+        }
+
+        // 显示消息
+        function showMessage(msg) {
+            const existingMsg = document.querySelector('.message');
+            if (existingMsg) existingMsg.remove();
+
+            const msgEl = document.createElement('div');
+            msgEl.className = 'message';
+            msgEl.textContent = msg;
+            document.body.appendChild(msgEl);
+
+            setTimeout(() => {
+                msgEl.remove();
+            }, 2000);
+        }
+
+        // 隐藏弹窗
+        function hideModal() {
+            document.getElementById('gameModal').classList.remove('show');
+        }
+
+        // 重新开始
+        function resetGame() {
+            initGame();
+        }
+
+        // 页面加载时初始化游戏
+        window.onload = initGame;
+    </script>
+</body>
+</html>
