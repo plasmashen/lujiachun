@@ -1,0 +1,657 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>游戏记分工具</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: #f5f5f5;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 10px;
+            padding: 30px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        .toolbar {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+        }
+
+        .toolbar input {
+            padding: 10px 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+
+        .toolbar input:focus {
+            border-color: #4CAF50;
+            outline: none;
+        }
+
+        button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .btn-manage {
+            background: #2196F3;
+            color: white;
+        }
+
+        .btn-export {
+            background: #ff9800;
+            color: white;
+        }
+
+        .btn-clear {
+            background: #f44336;
+            color: white;
+        }
+
+        .btn-add {
+            background: #4CAF50;
+            color: white;
+        }
+
+        button:hover {
+            opacity: 0.85;
+        }
+
+        .table-container {
+            overflow-x: auto;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+        }
+
+        th {
+            background: #4CAF50;
+            color: white;
+            padding: 12px 10px;
+            text-align: center;
+            font-weight: bold;
+            min-width: 80px;
+        }
+
+        td {
+            padding: 8px 5px;
+            border-bottom: 1px solid #eee;
+            text-align: center;
+            min-width: 80px;
+        }
+
+        tbody tr:hover {
+            background: #f8f9fa;
+        }
+
+        .player-cell {
+            min-width: 100px;
+            text-align: center;
+        }
+
+        .player-cell select {
+            padding: 6px 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+            background: white;
+        }
+
+        .score-cell input {
+            width: 60px;
+            padding: 6px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            text-align: center;
+            font-size: 14px;
+        }
+
+        .score-cell input:focus {
+            border-color: #4CAF50;
+            outline: none;
+        }
+
+        .time-cell {
+            min-width: 90px;
+            font-size: 12px;
+            color: #666;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 5px;
+            justify-content: center;
+        }
+
+        .action-btn {
+            padding: 5px 12px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+
+        .btn-edit {
+            background: #ffc107;
+            color: #000;
+        }
+
+        .btn-save {
+            background: #4CAF50;
+            color: white;
+        }
+
+        .btn-delete {
+            background: #f44336;
+            color: white;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+        }
+
+        .modal.show {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            max-width: 500px;
+            width: 90%;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+        }
+
+        .modal-content h2 {
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        .modal-input-group {
+            margin-bottom: 15px;
+        }
+
+        .modal-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #555;
+        }
+
+        .modal-input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 15px;
+        }
+
+        .manage-list {
+            max-height: 200px;
+            overflow-y: auto;
+            background: #f8f9fa;
+            border-radius: 5px;
+            padding: 10px;
+            margin-top: 10px;
+        }
+
+        .manage-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px;
+            background: white;
+            margin-bottom: 5px;
+            border-radius: 3px;
+        }
+
+        .manage-item:hover {
+            background: #f0f0f0;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+            margin-top: 20px;
+        }
+
+        @media (max-width: 768px) {
+            .toolbar {
+                flex-direction: column;
+            }
+
+            table {
+                font-size: 12px;
+            }
+
+            th, td {
+                padding: 5px 3px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎮 游戏记分工具</h1>
+
+        <div class="toolbar">
+            <button class="btn-manage" onclick="showManageModal()">⚙️ 管理</button>
+            <button class="btn-export" onclick="exportData()">📥 导出</button>
+            <button class="btn-clear" onclick="clearAll()">🗑️ 清空</button>
+        </div>
+
+        <div class="table-container">
+            <table id="recordsTable">
+                <thead id="tableHead"></thead>
+                <tbody id="tableBody"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <div id="manageModal" class="modal">
+        <div class="modal-content">
+            <h2>⚙️ 管理</h2>
+
+            <div class="modal-input-group">
+                <span class="modal-label">👥 玩家</span>
+                <input type="text" class="modal-input" id="newPlayerInput" placeholder="新玩家名">
+                <button class="btn-add" onclick="addPlayer()" style="margin-top:8px;margin-right:8px;">添加</button>
+                <div id="playerList" class="manage-list"></div>
+            </div>
+
+            <div class="modal-input-group" style="margin-top: 20px;">
+                <span class="modal-label">🎮 游戏</span>
+                <input type="text" class="modal-input" id="newGameInput" placeholder="新游戏名">
+                <button class="btn-add" onclick="addGame()" style="margin-top:8px;margin-right:8px;">添加</button>
+                <div id="gameList" class="manage-list"></div>
+            </div>
+
+            <div class="modal-actions">
+                <button onclick="hideManageModal()" style="background:#6c757d;color:white;padding:10px 20px;border-radius:5px;font-weight:bold;">关闭</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const STORAGE_KEY = 'gameSimple_v2';
+
+        let data = {
+            players: ['树', '翠', '龙', '欣欣'],
+            games: ['对对碰', '21点', '五子棋'],
+            records: []
+        };
+
+        function init() {
+            const saved = localStorage.getItem(STORAGE_KEY);
+            if (saved) {
+                const parsed = JSON.parse(saved);
+                // 确保数据结构完整
+                data = {
+                    players: parsed.players || ['树', '翠', '龙', '欣欣'],
+                    games: parsed.games || ['对对碰', '21点', '五子棋'],
+                    records: parsed.records || []
+                };
+            }
+            render();
+        }
+
+        function save() {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+        }
+
+        function render() {
+            const thead = document.getElementById('tableHead');
+            const tbody = document.getElementById('tableBody');
+
+            // 渲染表头
+            let headerHTML = '<tr><th>序号</th><th>玩家</th>';
+            data.games.forEach(game => {
+                headerHTML += `<th>${game}</th>`;
+            });
+            headerHTML += '<th>奖金</th><th>时间</th><th>操作</th></tr>';
+            thead.innerHTML = headerHTML;
+
+            // 渲染表格内容
+            let bodyHTML = '';
+            data.records.forEach((record, index) => {
+                bodyHTML += `<tr id="row-${record.id}">`;
+                bodyHTML += `<td>${index + 1}</td>`;
+
+                // 玩家列
+                const playerOptions = data.players.map(p => {
+                    const selected = p === record.player ? ' selected' : '';
+                    return `<option value="${p}"${selected}>${p}</option>`;
+                }).join('');
+                bodyHTML += `<td class="player-cell">
+                    <select onchange="updateRecord(${record.id}, 'player', this.value)">${playerOptions}</select>
+                </td>`;
+
+                // 游戏列
+                data.games.forEach(game => {
+                    const value = record.scores[game] || '';
+                    bodyHTML += `<td class="score-cell">
+                        <input type="number" min="0" value="${value}" oninput="updateRecord(${record.id}, 'game', '${game}', this.value)">
+                    </td>`;
+                });
+
+                // 奖金列
+                bodyHTML += `<td class="score-cell">
+                    <input type="number" min="0" value="${record.bonus || ''}" oninput="updateRecord(${record.id}, 'bonus', this.value)">
+                </td>`;
+
+                // 时间列
+                bodyHTML += `<td class="time-cell">${record.time || ''}</td>`;
+
+                // 操作列
+                bodyHTML += `<td class="action-buttons">
+                    <button class="action-btn btn-edit" onclick="editRow(${record.id})">修改</button>
+                    <button class="action-btn btn-delete" onclick="deleteRecord(${record.id})">删除</button>
+                </td>`;
+
+                bodyHTML += '</tr>';
+            });
+
+            // 始终显示一行可编辑的空白行
+            bodyHTML += `<tr id="new-row">`;
+            bodyHTML += `<td>-</td>`;
+
+            const playerOptions = data.players.map(p => `<option value="${p}">${p}</option>`).join('');
+            bodyHTML += `<td class="player-cell">
+                <select id="new-player" onchange="handleNewRowChange()">${playerOptions}</select>
+            </td>`;
+
+            data.games.forEach(game => {
+                bodyHTML += `<td class="score-cell">
+                    <input type="number" min="0" id="new-${game}" placeholder="" oninput="handleNewRowChange()">
+                </td>`;
+            });
+
+            bodyHTML += `<td class="score-cell">
+                <input type="number" min="0" id="new-bonus" placeholder="" oninput="handleNewRowChange()">
+            </td>`;
+
+            bodyHTML += `<td class="time-cell">-</td>`;
+
+            bodyHTML += `<td class="action-buttons">
+                <button class="action-btn btn-save" onclick="addNewRecord()">添加</button>
+            </td>`;
+
+            bodyHTML += '</tr>';
+
+            tbody.innerHTML = bodyHTML;
+        }
+
+        function editRow(id) {
+            // 切换到编辑状态（如果有需要可以做inline编辑，现在主要是提醒用户可以直接在表格中编辑）
+            alert('可以直接在表格中修改数值，修改后自动保存！');
+        }
+
+        function updateRecord(id, field, gameOrValue, value) {
+            const record = data.records.find(r => r.id === id);
+            if (!record) return;
+
+            if (field === 'player') {
+                record.player = gameOrValue;
+            } else if (field === 'game') {
+                record.scores[gameOrValue] = parseInt(value) || 0;
+            } else if (field === 'bonus') {
+                record.bonus = parseInt(gameOrValue) || 0;
+            }
+
+            save();
+        }
+
+        function handleNewRowChange() {
+            // 可以在这里做实时预览
+        }
+
+        function addNewRecord() {
+            const player = document.getElementById('new-player').value;
+            if (!player) {
+                alert('请选择玩家！');
+                return;
+            }
+
+            const scores = {};
+            let hasValue = false;
+
+            data.games.forEach(game => {
+                const input = document.getElementById(`new-${game}`);
+                const value = parseInt(input.value) || 0;
+                if (value > 0) {
+                    scores[game] = value;
+                    hasValue = true;
+                }
+            });
+
+            const bonus = parseInt(document.getElementById('new-bonus').value) || 0;
+
+            if (!hasValue && !bonus) {
+                alert('请至少填写游戏分数或奖金！');
+                return;
+            }
+
+            const newRecord = {
+                id: Date.now(),
+                player: player,
+                scores: scores,
+                bonus: bonus,
+                time: new Date().toLocaleString()
+            };
+
+            data.records.push(newRecord);
+            save();
+            render();
+        }
+
+        function deleteRecord(id) {
+            if (!confirm('确定删除这条记录吗？')) {
+                return;
+            }
+
+            data.records = data.records.filter(r => r.id !== id);
+            save();
+            render();
+        }
+
+        function clearAll() {
+            if (!confirm('确定清空所有记录吗？')) {
+                return;
+            }
+
+            data.records = [];
+            save();
+            render();
+        }
+
+        function showManageModal() {
+            document.getElementById('manageModal').classList.add('show');
+            renderManageLists();
+        }
+
+        function hideManageModal() {
+            document.getElementById('manageModal').classList.remove('show');
+        }
+
+        function renderManageLists() {
+            // 渲染玩家列表
+            let playerHTML = '';
+            data.players.forEach(player => {
+                playerHTML += `
+                    <div class="manage-item">
+                        <span>${player}</span>
+                        <button class="action-btn btn-delete" onclick="deletePlayer('${player}')">删除</button>
+                    </div>
+                `;
+            });
+            document.getElementById('playerList').innerHTML = playerHTML;
+
+            // 渲染游戏列表
+            let gameHTML = '';
+            data.games.forEach(game => {
+                gameHTML += `
+                    <div class="manage-item">
+                        <span>${game}</span>
+                        <button class="action-btn btn-delete" onclick="deleteGame('${game}')">删除</button>
+                    </div>
+                `;
+            });
+            document.getElementById('gameList').innerHTML = gameHTML;
+        }
+
+        function addPlayer() {
+            const input = document.getElementById('newPlayerInput');
+            const name = input.value.trim();
+
+            if (!name) {
+                alert('请输入玩家名！');
+                return;
+            }
+
+            if (data.players.includes(name)) {
+                alert('该玩家已存在！');
+                return;
+            }
+
+            data.players.push(name);
+            input.value = '';
+            save();
+            renderManageLists();
+            render();
+        }
+
+        function deletePlayer(name) {
+            if (!confirm(`确定删除玩家"${name}"吗？`)) {
+                return;
+            }
+
+            data.players = data.players.filter(p => p !== name);
+            save();
+            renderManageLists();
+            render();
+        }
+
+        function addGame() {
+            const input = document.getElementById('newGameInput');
+            const name = input.value.trim();
+
+            if (!name) {
+                alert('请输入游戏名！');
+                return;
+            }
+
+            if (data.games.includes(name)) {
+                alert('该游戏已存在！');
+                return;
+            }
+
+            data.games.push(name);
+            input.value = '';
+            save();
+            renderManageLists();
+            render();
+        }
+
+        function deleteGame(name) {
+            if (!confirm(`确定删除游戏"${name}"吗？删除后该游戏的分数将丢失！`)) {
+                return;
+            }
+
+            data.games = data.games.filter(g => g !== name);
+
+            // 从所有记录中删除该游戏的分数
+            data.records.forEach(record => {
+                delete record.scores[name];
+            });
+
+            save();
+            renderManageLists();
+            render();
+        }
+
+        function exportData() {
+            if (data.records.length === 0) {
+                alert('暂无数据可导出！');
+                return;
+            }
+
+            let csv = '\uFEFF'; // UTF-8 BOM
+
+            // 表头
+            csv += '序号,玩家';
+            data.games.forEach(game => {
+                csv += `,${game}`;
+            });
+            csv += ',奖金,时间\n';
+
+            // 数据行
+            data.records.forEach((record, index) => {
+                csv += `${index + 1},${record.player}`;
+                data.games.forEach(game => {
+                    csv += `,${record.scores[game] || ''}`;
+                });
+                csv += `,${record.bonus || ''},"${record.time}"\n`;
+            });
+
+            // 创建下载
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = `记分_${new Date().toLocaleDateString('zh-CN')}.csv`;
+            link.click();
+        }
+
+        window.onclick = function(event) {
+            const modal = document.getElementById('manageModal');
+            if (event.target === modal) {
+                hideManageModal();
+            }
+        };
+
+        window.onload = init;
+    </script>
+</body>
+</html>
