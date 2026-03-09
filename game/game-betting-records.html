@@ -699,7 +699,14 @@
                 localStorage.setItem(STORAGE_KEY, JSON.stringify([]));
             }
 
+            // 先更新选择框，再显示记录
             updateSelectOptions();
+        }
+
+        // 获取所有记录
+        function getRecords() {
+            const records = localStorage.getItem(STORAGE_KEY);
+            return records ? JSON.parse(records) : [];
         }
 
         // 获取玩家列表
@@ -761,12 +768,6 @@
             }
         }
 
-        // 获取所有记录
-        function getRecords() {
-            const records = localStorage.getItem(STORAGE_KEY);
-            return records ? JSON.parse(records) : [];
-        }
-
         // 保存记录
         function saveRecords(records) {
             localStorage.setItem(STORAGE_KEY, JSON.stringify(records));
@@ -816,7 +817,6 @@
 
             // 刷新显示
             displayRecords();
-            alert('下单创建成功！');
         }
 
         // 显示得分录入模态框
@@ -861,7 +861,6 @@
                 saveRecords(records);
                 displayRecords();
                 hideScoreModal();
-                alert('得分录入成功！');
             }
         }
 
@@ -1070,9 +1069,11 @@
 
         // 显示管理模态框
         function showManageModal() {
-            updatePlayerList();
-            updateGameList();
             document.getElementById('manageModal').classList.add('show');
+            setTimeout(() => {
+                updatePlayerList();
+                updateGameList();
+            }, 10);
         }
 
         // 隐藏管理模态框
@@ -1084,6 +1085,8 @@
         function updatePlayerList() {
             const players = getPlayers();
             const playerList = document.getElementById('playerList');
+            if (!playerList) return;
+
             playerList.innerHTML = '';
 
             players.forEach(player => {
@@ -1101,6 +1104,8 @@
         function updateGameList() {
             const games = getGames();
             const gameList = document.getElementById('gameList');
+            if (!gameList) return;
+
             gameList.innerHTML = '';
 
             games.forEach(game => {
@@ -1132,10 +1137,9 @@
 
             players.push(playerName);
             savePlayers(players);
+            input.value = '';
             updateSelectOptions();
             updatePlayerList();
-            input.value = '';
-            alert('玩家添加成功！');
         }
 
         // 添加新游戏
@@ -1156,10 +1160,9 @@
 
             games.push(gameName);
             saveGames(games);
+            input.value = '';
             updateSelectOptions();
             updateGameList();
-            input.value = '';
-            alert('游戏添加成功！');
         }
 
         // 删除玩家
@@ -1264,8 +1267,8 @@
 
         // 页面加载时显示记录和初始化数据
         window.onload = function() {
-            initializeData();
             displayRecords();
+            initializeData();
         };
     </script>
 </body>
