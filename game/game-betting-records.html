@@ -1,0 +1,1272 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>游戏下单和中奖记录</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            padding: 30px;
+        }
+
+        h1 {
+            text-align: center;
+            color: #667eea;
+            margin-bottom: 10px;
+            font-size: 28px;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+
+        .form-section {
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 10px;
+            margin-bottom: 25px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        select, input, textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        select:focus, input:focus, textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        button {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-add {
+            background: #667eea;
+            color: white;
+            flex: 1;
+        }
+
+        .btn-add:hover {
+            background: #5568d3;
+            transform: translateY(-2px);
+        }
+
+        .btn-clear {
+            background: #dc3545;
+            color: white;
+        }
+
+        .btn-clear:hover {
+            background: #c82333;
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+            margin-left: 10px;
+        }
+
+        .btn-secondary:hover {
+            background: #5a6268;
+        }
+
+        .btn-danger-confirm {
+            background: #c82333;
+            color: white;
+            margin-left: 10px;
+        }
+
+        .btn-danger-confirm:hover {
+            background: #a71d2a;
+        }
+
+        .btn-export {
+            background: #28a745;
+            color: white;
+        }
+
+        .btn-export:hover {
+            background: #218838;
+        }
+
+        .btn-manage {
+            background: #17a2b8;
+            color: white;
+        }
+
+        .btn-manage:hover {
+            background: #138496;
+        }
+
+        .records-section {
+            margin-top: 25px;
+        }
+
+        .records-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .records-header h2 {
+            color: #333;
+            font-size: 22px;
+        }
+
+        .table-container {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+        }
+
+        thead {
+            background: #667eea;
+            color: white;
+        }
+
+        th, td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        th {
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        tbody tr:hover {
+            background: #f8f9fa;
+        }
+
+        tbody tr.unfinished {
+            background: #fff3cd;
+        }
+
+        tbody tr.unfinished:hover {
+            background: #ffe69c;
+        }
+
+        .status-tag {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .status-finished {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status-unfinished {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 5px;
+            flex-wrap: wrap;
+        }
+
+        .btn-sm {
+            padding: 6px 12px;
+            font-size: 13px;
+            border-radius: 5px;
+            cursor: pointer;
+            border: none;
+            transition: all 0.2s;
+        }
+
+        .btn-edit {
+            background: #ffc107;
+            color: #000;
+        }
+
+        .btn-edit:hover {
+            background: #e0a800;
+        }
+
+        .btn-score {
+            background: #28a745;
+            color: white;
+        }
+
+        .btn-score:hover {
+            background: #218838;
+        }
+
+        .btn-delete {
+            background: #dc3545;
+            color: white;
+        }
+
+        .btn-delete:hover {
+            background: #c82333;
+        }
+
+        .note-text {
+            font-size: 12px;
+            color: #666;
+            font-style: italic;
+            max-width: 200px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .add-new-btn {
+            background: #667eea;
+            color: white;
+            padding: 8px 12px;
+            font-size: 13px;
+            margin-top: 10px;
+            cursor: pointer;
+            border: none;
+            border-radius: 5px;
+            transition: all 0.2s;
+        }
+
+        .add-new-btn:hover {
+            background: #5568d3;
+        }
+
+        .input-with-add {
+            display: flex;
+            gap: 10px;
+        }
+
+        .input-with-add input {
+            flex: 1;
+        }
+
+        .item-list {
+            margin-top: 10px;
+            max-height: 150px;
+            overflow-y: auto;
+        }
+
+        .item-list-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 12px;
+            background: #f8f9fa;
+            margin-bottom: 5px;
+            border-radius: 5px;
+        }
+
+        .item-list-item:hover {
+            background: #e9ecef;
+        }
+
+        .item-name {
+            font-weight: 500;
+        }
+
+        .delete-item-btn {
+            background: #dc3545;
+            color: white;
+            padding: 4px 8px;
+            font-size: 12px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .delete-item-btn:hover {
+            background: #c82333;
+        }
+
+        .total-section {
+            background: #e7f3ff;
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 20px;
+        }
+
+        .total-section h3 {
+            color: #0056b3;
+            margin-bottom: 10px;
+        }
+
+        .total-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+
+        .total-item {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .total-item-label {
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 5px;
+        }
+
+        .total-item-value {
+            font-size: 20px;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+        }
+
+        .modal.show {
+            display: block;
+        }
+
+        .modal-content {
+            background-color: white;
+            margin: 5% auto;
+            padding: 30px;
+            border-radius: 10px;
+            width: 90%;
+            max-width: 500px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+        }
+
+        .modal-title {
+            color: #667eea;
+            font-size: 20px;
+            font-weight: bold;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .modal-message {
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 16px;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+        }
+
+        .btn-modal-cancel {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-modal-confirm {
+            background: #667eea;
+            color: white;
+        }
+
+        .modal-section {
+            margin-bottom: 15px;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 15px;
+            }
+
+            .button-group {
+                flex-direction: column;
+            }
+
+            button {
+                width: 100%;
+            }
+
+            .action-buttons {
+                flex-direction: column;
+            }
+
+            .btn-sm {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎮 游戏下单和中奖记录</h1>
+        <p class="subtitle">记录玩家下单情况，游戏结束后更新得分</p>
+
+        <div class="form-section">
+            <h3 style="margin-bottom: 20px; color: #667eea;">📝 新建下单</h3>
+
+            <div class="form-group">
+                <label for="player">玩家名:</label>
+                <select id="player">
+                    <option value="">请选择玩家</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="game">下单游戏:</label>
+                <select id="game">
+                    <option value="">请选择游戏</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="betAmount">下单数量:</label>
+                <input type="number" id="betAmount" placeholder="请输入下单数量" min="0" step="0.01">
+            </div>
+
+            <div class="form-group">
+                <label for="note">备注:</label>
+                <textarea id="note" placeholder="可选：添加备注信息（如游戏轮次、特殊规则等）"></textarea>
+            </div>
+
+            <div class="button-group">
+                <button class="btn-add" onclick="addBet()">🎯 创建下单</button>
+                <button class="btn-manage" onclick="showManageModal()">⚙️ 管理玩家/游戏</button>
+                <button class="btn-export" onclick="exportData()">📥 导出数据</button>
+                <button class="btn-clear" onclick="showClearModal()">🗑️ 清除所有数据</button>
+            </div>
+        </div>
+
+        <div class="records-section">
+            <div class="records-header">
+                <h2>📊 记录列表</h2>
+            </div>
+
+            <div class="table-container">
+                <table id="recordsTable">
+                    <thead>
+                        <tr>
+                            <th>序号</th>
+                            <th>玩家名</th>
+                            <th>游戏</th>
+                            <th>下单数量</th>
+                            <th>得分</th>
+                            <th>状态</th>
+                            <th>备注</th>
+                            <th>时间</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody id="recordsBody">
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="total-section">
+                <h3>📈 统计信息</h3>
+                <div class="total-grid">
+                    <div class="total-item">
+                        <div class="total-item-label">总记录数</div>
+                        <div class="total-item-value" id="totalCount">0</div>
+                    </div>
+                    <div class="total-item">
+                        <div class="total-item-label">已完成</div>
+                        <div class="total-item-value" id="finishedCount">0</div>
+                    </div>
+                    <div class="total-item">
+                        <div class="total-item-label">进行中</div>
+                        <div class="total-item-value" id="unfinishedCount">0</div>
+                    </div>
+                    <div class="total-item">
+                        <div class="total-item-label">总得分</div>
+                        <div class="total-item-value" id="totalScore">0</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 录入得分模态框 -->
+    <div id="scoreModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-title">🎯 录入得分</div>
+            <div class="modal-section">
+                <div class="form-group">
+                    <label for="inputScore">得分:</label>
+                    <input type="number" id="inputScore" placeholder="请输入得分" min="0" step="0.01">
+                </div>
+                <div class="form-group">
+                    <label for="inputNote">备注:</label>
+                    <textarea id="inputNote" placeholder="可选：添加备注信息（如中奖情况、游戏结果等）"></textarea>
+                </div>
+            </div>
+            <div class="modal-actions">
+                <button class="btn-modal-cancel" onclick="hideScoreModal()">取消</button>
+                <button class="btn-modal-confirm" onclick="submitScore()">确认提交</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 编辑记录模态框 -->
+    <div id="editModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-title">✏️ 编辑记录</div>
+            <div class="modal-section">
+                <div class="form-group">
+                    <label for="editPlayer">玩家名:</label>
+                    <select id="editPlayer">
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="editGame">游戏:</label>
+                    <select id="editGame">
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="editBetAmount">下单数量:</label>
+                    <input type="number" id="editBetAmount" placeholder="请输入下单数量" min="0" step="0.01">
+                </div>
+                <div class="form-group">
+                    <label for="editScore">得分:</label>
+                    <input type="number" id="editScore" placeholder="请输入得分（留空表示未完成）" min="0" step="0.01">
+                </div>
+                <div class="form-group">
+                    <label for="editNote">备注:</label>
+                    <textarea id="editNote" placeholder="备注信息"></textarea>
+                </div>
+            </div>
+            <div class="modal-actions">
+                <button class="btn-modal-cancel" onclick="hideEditModal()">取消</button>
+                <button class="btn-modal-confirm" onclick="submitEdit()">确认保存</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 管理玩家和游戏模态框 -->
+    <div id="manageModal" class="modal">
+        <div class="modal-content" style="max-width: 600px;">
+            <div class="modal-title">⚙️ 管理玩家和游戏</div>
+
+            <div class="modal-section">
+                <h4 style="margin-bottom: 10px; color: #667eea;">👥 玩家列表</h4>
+                <div class="form-group">
+                    <div class="input-with-add">
+                        <input type="text" id="newPlayerName" placeholder="输入新玩家名">
+                        <button class="add-new-btn" onclick="addNewPlayer()">添加</button>
+                    </div>
+                </div>
+                <div class="item-list" id="playerList">
+                </div>
+            </div>
+
+            <div class="modal-section">
+                <h4 style="margin-bottom: 10px; color: #667eea;">🎮 游戏列表</h4>
+                <div class="form-group">
+                    <div class="input-with-add">
+                        <input type="text" id="newGameName" placeholder="输入新游戏名">
+                        <button class="add-new-btn" onclick="addNewGame()">添加</button>
+                    </div>
+                </div>
+                <div class="item-list" id="gameList">
+                </div>
+            </div>
+
+            <div class="modal-actions">
+                <button class="btn-modal-cancel" onclick="hideManageModal()">关闭</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 清除数据确认模态框 -->
+    <div id="clearModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-title">⚠️ 确认清除数据</div>
+            <div class="modal-message">
+                您确定要清除所有记录吗？<br>
+                此操作不可恢复！
+            </div>
+            <div class="modal-actions">
+                <button class="btn-modal-cancel" onclick="hideClearModal()">取消</button>
+                <button class="btn-modal-confirm" onclick="confirmFirstStep()">我已明白，继续清除</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 第二次确认模态框 -->
+    <div id="clearModal2" class="modal">
+        <div class="modal-content">
+            <div class="modal-title">🚨 最后确认</div>
+            <div class="modal-message">
+                真的要删除所有数据吗？<br>
+                点击"确认清除"将永久删除所有记录！
+            </div>
+            <div class="modal-actions">
+                <button class="btn-modal-cancel" onclick="hideClearModal2()">取消</button>
+                <button class="btn-danger-confirm" onclick="confirmClearData()">确认清除</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 数据存储键名
+        const STORAGE_KEY = 'gameBettingRecords';
+        const PLAYERS_KEY = 'gamePlayers';
+        const GAMES_KEY = 'gameGames';
+
+        // 默认玩家和游戏列表
+        const DEFAULT_PLAYERS = ['树', '翠', '龙', '欣欣'];
+        const DEFAULT_GAMES = ['对对碰', '五子棋', '21点'];
+
+        // 当前操作的记录ID
+        let currentRecordId = null;
+
+        // 初始化玩家和游戏列表
+        function initializeData() {
+            // 初始化玩家列表
+            if (!localStorage.getItem(PLAYERS_KEY)) {
+                localStorage.setItem(PLAYERS_KEY, JSON.stringify(DEFAULT_PLAYERS));
+            }
+
+            // 初始化游戏列表
+            if (!localStorage.getItem(GAMES_KEY)) {
+                localStorage.setItem(GAMES_KEY, JSON.stringify(DEFAULT_GAMES));
+            }
+
+            // 确保记录列表存在
+            if (!localStorage.getItem(STORAGE_KEY)) {
+                localStorage.setItem(STORAGE_KEY, JSON.stringify([]));
+            }
+
+            updateSelectOptions();
+        }
+
+        // 获取玩家列表
+        function getPlayers() {
+            return JSON.parse(localStorage.getItem(PLAYERS_KEY) || JSON.stringify(DEFAULT_PLAYERS));
+        }
+
+        // 保存玩家列表
+        function savePlayers(players) {
+            localStorage.setItem(PLAYERS_KEY, JSON.stringify(players));
+        }
+
+        // 获取游戏列表
+        function getGames() {
+            return JSON.parse(localStorage.getItem(GAMES_KEY) || JSON.stringify(DEFAULT_GAMES));
+        }
+
+        // 保存游戏列表
+        function saveGames(games) {
+            localStorage.setItem(GAMES_KEY, JSON.stringify(games));
+        }
+
+        // 更新所有选择框的选项
+        function updateSelectOptions() {
+            const players = getPlayers();
+            const games = getGames();
+
+            // 更新主要表单的选择框
+            updateSelect('player', players);
+            updateSelect('game', games);
+
+            // 更新编辑模态框的选择框
+            updateSelect('editPlayer', players);
+            updateSelect('editGame', games);
+        }
+
+        // 更新单个选择框的选项
+        function updateSelect(selectId, options) {
+            const select = document.getElementById(selectId);
+            const currentValue = select.value;
+
+            // 保存原有的第一个选项（通常是"请选择XX"）
+            const firstOption = select.querySelector('option').outerHTML;
+
+            // 清空选项
+            select.innerHTML = firstOption;
+
+            // 添加新选项
+            options.forEach(option => {
+                const optionElement = document.createElement('option');
+                optionElement.value = option;
+                optionElement.textContent = option;
+                select.appendChild(optionElement);
+            });
+
+            // 尝试恢复选中的值
+            if (currentValue && options.includes(currentValue)) {
+                select.value = currentValue;
+            }
+        }
+
+        // 获取所有记录
+        function getRecords() {
+            const records = localStorage.getItem(STORAGE_KEY);
+            return records ? JSON.parse(records) : [];
+        }
+
+        // 保存记录
+        function saveRecords(records) {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(records));
+        }
+
+        // 添加下单
+        function addBet() {
+            const player = document.getElementById('player').value;
+            const game = document.getElementById('game').value;
+            const betAmount = document.getElementById('betAmount').value;
+            const note = document.getElementById('note').value;
+
+            // 验证输入
+            if (!player || !game || !betAmount) {
+                alert('请填写玩家名、游戏和下单数量！');
+                return;
+            }
+
+            if (parseFloat(betAmount) < 0) {
+                alert('下单数量不能为负数！');
+                return;
+            }
+
+            // 创建新下单记录
+            const newRecord = {
+                id: Date.now(),
+                player: player,
+                game: game,
+                betAmount: parseFloat(betAmount),
+                score: null,
+                note: note || '',
+                status: 'unfinished', // unfinished（进行中）或 finished（已完成）
+                betTime: new Date().toLocaleString(),
+                finishTime: null
+            };
+
+            // 获取现有记录并添加新记录
+            const records = getRecords();
+            records.unshift(newRecord);
+            saveRecords(records);
+
+            // 清空表单
+            document.getElementById('player').value = '';
+            document.getElementById('game').value = '';
+            document.getElementById('betAmount').value = '';
+            document.getElementById('note').value = '';
+
+            // 刷新显示
+            displayRecords();
+            alert('下单创建成功！');
+        }
+
+        // 显示得分录入模态框
+        function showScoreModal(id) {
+            currentRecordId = id;
+            document.getElementById('scoreModal').classList.add('show');
+            document.getElementById('inputScore').value = '';
+            document.getElementById('inputNote').value = '';
+        }
+
+        // 隐藏得分录入模态框
+        function hideScoreModal() {
+            document.getElementById('scoreModal').classList.remove('show');
+            currentRecordId = null;
+        }
+
+        // 提交得分
+        function submitScore() {
+            const score = document.getElementById('inputScore').value;
+            const note = document.getElementById('inputNote').value;
+
+            if (!score) {
+                alert('请输入得分！');
+                return;
+            }
+
+            if (parseFloat(score) < 0) {
+                alert('得分不能为负数！');
+                return;
+            }
+
+            const records = getRecords();
+            const recordIndex = records.findIndex(r => r.id === currentRecordId);
+
+            if (recordIndex !== -1) {
+                records[recordIndex].score = parseFloat(score);
+                records[recordIndex].status = 'finished';
+                records[recordIndex].finishTime = new Date().toLocaleString();
+                if (note) {
+                    records[recordIndex].note = note;
+                }
+                saveRecords(records);
+                displayRecords();
+                hideScoreModal();
+                alert('得分录入成功！');
+            }
+        }
+
+        // 显示编辑模态框
+        function showEditModal(id) {
+            currentRecordId = id;
+            const records = getRecords();
+            const record = records.find(r => r.id === id);
+
+            if (record) {
+                document.getElementById('editPlayer').value = record.player;
+                document.getElementById('editGame').value = record.game;
+                document.getElementById('editBetAmount').value = record.betAmount;
+                document.getElementById('editScore').value = record.score || '';
+                document.getElementById('editNote').value = record.note || '';
+                document.getElementById('editModal').classList.add('show');
+            }
+        }
+
+        // 隐藏编辑模态框
+        function hideEditModal() {
+            document.getElementById('editModal').classList.remove('show');
+            currentRecordId = null;
+        }
+
+        // 提交编辑
+        function submitEdit() {
+            const player = document.getElementById('editPlayer').value;
+            const game = document.getElementById('editGame').value;
+            const betAmount = document.getElementById('editBetAmount').value;
+            const score = document.getElementById('editScore').value;
+            const note = document.getElementById('editNote').value;
+
+            if (!player || !game || !betAmount) {
+                alert('请填写玩家名、游戏和下单数量！');
+                return;
+            }
+
+            if (parseFloat(betAmount) < 0) {
+                alert('下单数量不能为负数！');
+                return;
+            }
+
+            if (score && parseFloat(score) < 0) {
+                alert('得分不能为负数！');
+                return;
+            }
+
+            const records = getRecords();
+            const recordIndex = records.findIndex(r => r.id === currentRecordId);
+
+            if (recordIndex !== -1) {
+                records[recordIndex].player = player;
+                records[recordIndex].game = game;
+                records[recordIndex].betAmount = parseFloat(betAmount);
+                if (score !== '') {
+                    records[recordIndex].score = parseFloat(score);
+                    records[recordIndex].status = 'finished';
+                    records[recordIndex].finishTime = new Date().toLocaleString();
+                } else {
+                    records[recordIndex].score = null;
+                    records[recordIndex].status = 'unfinished';
+                    records[recordIndex].finishTime = null;
+                }
+                records[recordIndex].note = note;
+
+                saveRecords(records);
+                displayRecords();
+                hideEditModal();
+                alert('记录更新成功！');
+            }
+        }
+
+        // 删除记录
+        function deleteRecord(id) {
+            if (!confirm('确定要删除这条记录吗？')) {
+                return;
+            }
+
+            const records = getRecords();
+            const filteredRecords = records.filter(r => r.id !== id);
+            saveRecords(filteredRecords);
+            displayRecords();
+            alert('记录已删除！');
+        }
+
+        // 显示所有记录
+        function displayRecords() {
+            const records = getRecords();
+            const tbody = document.getElementById('recordsBody');
+            const totalCount = document.getElementById('totalCount');
+            const finishedCount = document.getElementById('finishedCount');
+            const unfinishedCount = document.getElementById('unfinishedCount');
+            const totalScore = document.getElementById('totalScore');
+
+            // 清空表格
+            tbody.innerHTML = '';
+
+            // 显示记录
+            if (records.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="9" style="text-align: center; padding: 30px;">
+                            暂无记录，请创建新的下单
+                        </td>
+                    </tr>
+                `;
+                totalCount.textContent = '0';
+                finishedCount.textContent = '0';
+                unfinishedCount.textContent = '0';
+                totalScore.textContent = '0';
+                return;
+            }
+
+            // 按下单时间倒序排列
+            records.sort((a, b) => b.id - a.id);
+
+            let finished = 0;
+            let unfinished = 0;
+            let totalScoreSum = 0;
+
+            records.forEach((record, index) => {
+                // 统计信息
+                if (record.status === 'finished') {
+                    finished++;
+                    totalScoreSum += record.score || 0;
+                } else {
+                    unfinished++;
+                }
+
+                const row = document.createElement('tr');
+                if (record.status === 'unfinished') {
+                    row.classList.add('unfinished');
+                }
+
+                const statusTag = record.status === 'finished'
+                    ? '<span class="status-tag status-finished">已完成</span>'
+                    : '<span class="status-tag status-unfinished">进行中</span>';
+
+                const scoreDisplay = record.score !== null ? record.score.toFixed(2) : '-';
+
+                const actionButtons = `
+                    <div class="action-buttons">
+                        <button class="btn-sm btn-edit" onclick="showEditModal(${record.id})">编辑</button>
+                        ${record.status === 'unfinished' ?
+                            `<button class="btn-sm btn-score" onclick="showScoreModal(${record.id})">录入得分</button>` :
+                            ''}
+                        <button class="btn-sm btn-delete" onclick="deleteRecord(${record.id})">删除</button>
+                    </div>
+                `;
+
+                row.innerHTML = `
+                    <td>${index + 1}</td>
+                    <td><strong>${record.player}</strong></td>
+                    <td>${record.game}</td>
+                    <td>${record.betAmount.toFixed(2)}</td>
+                    <td style="font-weight: bold; color: #667eea;">${scoreDisplay}</td>
+                    <td>${statusTag}</td>
+                    <td><span class="note-text" title="${record.note || '无备注'}">${record.note || '-'}</span></td>
+                    <td style="font-size: 12px; color: #666;">${record.betTime}</td>
+                    <td>${actionButtons}</td>
+                `;
+                tbody.appendChild(row);
+            });
+
+            // 更新统计信息
+            totalCount.textContent = records.length;
+            finishedCount.textContent = finished;
+            unfinishedCount.textContent = unfinished;
+            totalScore.textContent = totalScoreSum.toFixed(2);
+        }
+
+        // 显示第一个清除确认模态框
+        function showClearModal() {
+            const records = getRecords();
+            if (records.length === 0) {
+                alert('暂无数据可清除！');
+                return;
+            }
+            document.getElementById('clearModal').classList.add('show');
+        }
+
+        // 隐藏第一个清除确认模态框
+        function hideClearModal() {
+            document.getElementById('clearModal').classList.remove('show');
+        }
+
+        // 第一步确认完成
+        function confirmFirstStep() {
+            hideClearModal();
+            document.getElementById('clearModal2').classList.add('show');
+        }
+
+        // 隐藏第二个清除确认模态框
+        function hideClearModal2() {
+            document.getElementById('clearModal2').classList.remove('show');
+        }
+
+        // 最终确认清除数据
+        function confirmClearData() {
+            saveRecords([]);
+            hideClearModal2();
+            displayRecords();
+            alert('所有数据已清除！');
+        }
+
+        // 显示管理模态框
+        function showManageModal() {
+            updatePlayerList();
+            updateGameList();
+            document.getElementById('manageModal').classList.add('show');
+        }
+
+        // 隐藏管理模态框
+        function hideManageModal() {
+            document.getElementById('manageModal').classList.remove('show');
+        }
+
+        // 更新玩家列表显示
+        function updatePlayerList() {
+            const players = getPlayers();
+            const playerList = document.getElementById('playerList');
+            playerList.innerHTML = '';
+
+            players.forEach(player => {
+                const item = document.createElement('div');
+                item.className = 'item-list-item';
+                item.innerHTML = `
+                    <span class="item-name">${player}</span>
+                    <button class="delete-item-btn" onclick="deletePlayer('${player}')">删除</button>
+                `;
+                playerList.appendChild(item);
+            });
+        }
+
+        // 更新游戏列表显示
+        function updateGameList() {
+            const games = getGames();
+            const gameList = document.getElementById('gameList');
+            gameList.innerHTML = '';
+
+            games.forEach(game => {
+                const item = document.createElement('div');
+                item.className = 'item-list-item';
+                item.innerHTML = `
+                    <span class="item-name">${game}</span>
+                    <button class="delete-item-btn" onclick="deleteGame('${game}')">删除</button>
+                `;
+                gameList.appendChild(item);
+            });
+        }
+
+        // 添加新玩家
+        function addNewPlayer() {
+            const input = document.getElementById('newPlayerName');
+            const playerName = input.value.trim();
+
+            if (!playerName) {
+                alert('请输入玩家名！');
+                return;
+            }
+
+            const players = getPlayers();
+            if (players.includes(playerName)) {
+                alert('该玩家已存在！');
+                return;
+            }
+
+            players.push(playerName);
+            savePlayers(players);
+            updateSelectOptions();
+            updatePlayerList();
+            input.value = '';
+            alert('玩家添加成功！');
+        }
+
+        // 添加新游戏
+        function addNewGame() {
+            const input = document.getElementById('newGameName');
+            const gameName = input.value.trim();
+
+            if (!gameName) {
+                alert('请输入游戏名！');
+                return;
+            }
+
+            const games = getGames();
+            if (games.includes(gameName)) {
+                alert('该游戏已存在！');
+                return;
+            }
+
+            games.push(gameName);
+            saveGames(games);
+            updateSelectOptions();
+            updateGameList();
+            input.value = '';
+            alert('游戏添加成功！');
+        }
+
+        // 删除玩家
+        function deletePlayer(playerName) {
+            if (!confirm(`确定要删除玩家 "${playerName}" 吗？`)) {
+                return;
+            }
+
+            const players = getPlayers();
+            const index = players.indexOf(playerName);
+            if (index > -1) {
+                players.splice(index, 1);
+                savePlayers(players);
+                updateSelectOptions();
+                updatePlayerList();
+                alert('玩家删除成功！');
+            }
+        }
+
+        // 删除游戏
+        function deleteGame(gameName) {
+            if (!confirm(`确定要删除游戏 "${gameName}" 吗？`)) {
+                return;
+            }
+
+            const games = getGames();
+            const index = games.indexOf(gameName);
+            if (index > -1) {
+                games.splice(index, 1);
+                saveGames(games);
+                updateSelectOptions();
+                updateGameList();
+                alert('游戏删除成功！');
+            }
+        }
+
+        // 导出数据
+        function exportData() {
+            const records = getRecords();
+            if (records.length === 0) {
+                alert('暂无数据可导出！');
+                return;
+            }
+
+            // 创建CSV内容
+            let csvContent = '\uFEFF'; // 添加BOM以支持Excel中文显示
+            csvContent += '序号,玩家名,游戏,下单数量,得分,状态,备注,下单时间,完成时间\n';
+
+            records.forEach((record, index) => {
+                const statusText = record.status === 'finished' ? '已完成' : '进行中';
+                const note = record.note || '';
+                const betTime = record.betTime || '';
+                const finishTime = record.finishTime || '';
+
+                // 处理CSV中的特殊字符
+                const escapeCsvValue = (value) => {
+                    if (typeof value !== 'string') return value;
+                    // 如果包含逗号、引号或换行符，需要用引号包裹并转义引号
+                    if (value.includes(',') || value.includes('"') || value.includes('\n')) {
+                        return '"' + value.replace(/"/g, '""') + '"';
+                    }
+                    return value;
+                };
+
+                csvContent += `${index + 1},${escapeCsvValue(record.player)},${escapeCsvValue(record.game)},${record.betAmount},`;
+                csvContent += `${record.score || '-'},${statusText},${escapeCsvValue(note)},${escapeCsvValue(betTime)},${escapeCsvValue(finishTime)}\n`;
+            });
+
+            // 创建下载链接
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+
+            // 生成文件名（带日期时间）
+            const now = new Date();
+            const fileName = `游戏记录_${now.getFullYear()}${(now.getMonth()+1).toString().padStart(2,'0')}${now.getDate().toString().padStart(2,'0')}_${now.getHours().toString().padStart(2,'0')}${now.getMinutes().toString().padStart(2,'0')}${now.getSeconds().toString().padStart(2,'0')}.csv`;
+
+            link.setAttribute('download', fileName);
+            link.style.visibility = 'hidden';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+
+            alert('数据导出成功！');
+        }
+
+        // 点击模态框外部关闭
+        window.onclick = function(event) {
+            const scoreModal = document.getElementById('scoreModal');
+            const editModal = document.getElementById('editModal');
+            const manageModal = document.getElementById('manageModal');
+            const clearModal = document.getElementById('clearModal');
+            const clearModal2 = document.getElementById('clearModal2');
+
+            if (event.target === scoreModal) hideScoreModal();
+            if (event.target === editModal) hideEditModal();
+            if (event.target === manageModal) hideManageModal();
+            if (event.target === clearModal) hideClearModal();
+            if (event.target === clearModal2) hideClearModal2();
+        }
+
+        // 页面加载时显示记录和初始化数据
+        window.onload = function() {
+            initializeData();
+            displayRecords();
+        };
+    </script>
+</body>
+</html>
