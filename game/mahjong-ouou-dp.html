@@ -1,0 +1,1036 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>49.9 麻将欧欧乐 - 智能 DP 版</title>
+    <meta name="description" content="动态规划最优策略 · 50 元看 3 张 · 后续 +10 元/张">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Microsoft YaHei', sans-serif;
+            background: linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #fff;
+        }
+        .container {
+            max-width: 1500px;
+            margin: 0 auto;
+            background: rgba(255,255,255,0.05);
+            border-radius: 20px;
+            padding: 30px;
+            backdrop-filter: blur(10px);
+        }
+        h1 {
+            text-align: center;
+            background: linear-gradient(135deg, #ffd700, #ff6b6b);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+        .subtitle {
+            text-align: center;
+            color: #aaa;
+            margin-bottom: 25px;
+        }
+        .tabs {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 25px;
+        }
+        .tab {
+            padding: 12px 30px;
+            background: rgba(255,255,255,0.1);
+            border: 2px solid rgba(255,215,0,0.3);
+            border-radius: 50px;
+            color: #fff;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+        .tab.active {
+            background: linear-gradient(135deg, #ffd700, #ff6b6b);
+            color: #000;
+        }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+        
+        /* 资金显示 */
+        .money-panel {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+        }
+        .money-box {
+            background: linear-gradient(135deg, #1a1a2e, #0f0f1a);
+            border: 3px solid #ffd700;
+            border-radius: 15px;
+            padding: 20px 35px;
+            text-align: center;
+            min-width: 180px;
+        }
+        .money-box label {
+            display: block;
+            color: #aaa;
+            margin-bottom: 10px;
+        }
+        .money-box .value {
+            font-size: 2.2em;
+            font-weight: bold;
+            color: #ffd700;
+        }
+        .money-box.cost .value { color: #ff6b6b; }
+        .money-box.win .value { color: #00ff88; }
+        .money-box.ev .value { color: #00bfff; }
+        
+        /* 策略建议 */
+        .strategy-box {
+            background: linear-gradient(135deg, rgba(0,191,255,0.2), rgba(0,123,255,0.2));
+            border: 2px solid #00bfff;
+            border-radius: 15px;
+            padding: 20px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .strategy-box .title {
+            color: #00bfff;
+            font-size: 1.2em;
+            margin-bottom: 10px;
+        }
+        .strategy-box .action {
+            font-size: 2em;
+            font-weight: bold;
+            color: #fff;
+            margin: 15px 0;
+        }
+        .strategy-box .ev {
+            color: #00ff88;
+            font-size: 1.3em;
+        }
+        .strategy-box .reason {
+            color: #aaa;
+            font-size: 0.9em;
+            margin-top: 10px;
+        }
+        
+        /* 信息栏 */
+        .info-bar {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+            padding: 15px;
+            background: rgba(255,215,0,0.1);
+            border-radius: 15px;
+            margin-bottom: 20px;
+        }
+        .info-item {
+            text-align: center;
+        }
+        .info-item label {
+            display: block;
+            color: #aaa;
+            font-size: 0.9em;
+        }
+        .info-item .value {
+            font-size: 1.6em;
+            font-weight: bold;
+            color: #fff;
+        }
+        
+        /* 牌桌 */
+        .board {
+            display: grid;
+            grid-template-columns: repeat(8, 1fr);
+            gap: 10px;
+            padding: 20px;
+            background: rgba(0,0,0,0.3);
+            border-radius: 15px;
+            margin-bottom: 20px;
+        }
+        .tile {
+            aspect-ratio: 3/4;
+            background: linear-gradient(145deg, #2d3436, #1a1a2e);
+            border: 3px solid #555;
+            border-radius: 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .tile:hover {
+            transform: translateY(-5px);
+            border-color: #ffd700;
+            box-shadow: 0 10px 30px rgba(255,215,0,0.3);
+        }
+        .tile.revealed {
+            background: linear-gradient(145deg, #fffef8, #f0e6d2);
+            border-color: #ffd700;
+        }
+        .tile.matched {
+            opacity: 0;
+            transform: scale(0);
+            pointer-events: none;
+        }
+        .tile-content {
+            font-size: 1.8em;
+            font-weight: bold;
+            color: transparent;
+        }
+        .tile.revealed .tile-content { color: #333; }
+        .tile-label {
+            font-size: 0.7em;
+            color: transparent;
+            margin-top: 3px;
+        }
+        .tile.revealed .tile-label { color: #666; }
+        .tile.selected {
+            border-color: #00ff88;
+            box-shadow: 0 0 20px rgba(0,255,136,0.5);
+        }
+        
+        /* 按钮 */
+        .controls {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+        }
+        .btn {
+            padding: 15px 35px;
+            font-size: 1em;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+        .btn-reveal {
+            background: linear-gradient(135deg, #ffd700, #ff6b6b);
+            color: #000;
+        }
+        .btn-check {
+            background: linear-gradient(135deg, #00ff88, #00b862);
+            color: #000;
+        }
+        .btn-auto {
+            background: linear-gradient(135deg, #00bfff, #0077ff);
+            color: #fff;
+        }
+        .btn-reset {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: #fff;
+        }
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.4);
+        }
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        /* 面板 */
+        .panel {
+            background: rgba(0,0,0,0.3);
+            padding: 25px;
+            border-radius: 15px;
+            margin-top: 20px;
+        }
+        .panel h3 {
+            background: linear-gradient(135deg, #ffd700, #ff6b6b);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-align: center;
+            font-size: 1.5em;
+            margin-bottom: 20px;
+        }
+        
+        /* 奖金配置 */
+        .prize-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        .prize-item {
+            background: rgba(255,255,255,0.05);
+            padding: 15px;
+            border-radius: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border: 1px solid rgba(255,215,0,0.2);
+        }
+        .prize-item label {
+            color: #fff;
+            font-size: 0.95em;
+        }
+        .prize-item input {
+            width: 90px;
+            padding: 10px;
+            border: 2px solid rgba(255,215,0,0.3);
+            border-radius: 8px;
+            background: rgba(0,0,0,0.5);
+            color: #ffd700;
+            font-size: 1.1em;
+            text-align: center;
+        }
+        
+        /* 期望显示 */
+        .expect-panel {
+            background: linear-gradient(135deg, rgba(0,255,136,0.1), rgba(0,184,98,0.1));
+            border: 2px solid #00ff88;
+            padding: 25px;
+            border-radius: 15px;
+            text-align: center;
+            margin-top: 20px;
+        }
+        .expect-panel .title {
+            color: #aaa;
+            font-size: 1em;
+            margin-bottom: 15px;
+        }
+        .expect-panel .value {
+            color: #00ff88;
+            font-size: 3em;
+            font-weight: bold;
+        }
+        .expect-panel .detail {
+            color: #aaa;
+            margin-top: 15px;
+            font-size: 0.95em;
+        }
+        .expect-panel .detail span {
+            color: #ffd700;
+            font-weight: bold;
+        }
+        
+        /* 概率统计 */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 12px;
+        }
+        .stat-card {
+            background: rgba(255,255,255,0.05);
+            padding: 15px;
+            border-radius: 12px;
+            text-align: center;
+            border: 1px solid rgba(255,215,0,0.1);
+        }
+        .stat-card .name {
+            color: #fff;
+            font-size: 0.9em;
+            margin-bottom: 8px;
+        }
+        .stat-card .prob {
+            color: #ffd700;
+            font-size: 1.5em;
+            font-weight: bold;
+        }
+        .stat-card .ev {
+            color: #00bfff;
+            font-size: 0.9em;
+            margin-top: 5px;
+        }
+        
+        /* 消息弹窗 */
+        .message {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: linear-gradient(135deg, #ffd700, #ff6b6b);
+            color: #000;
+            padding: 40px 60px;
+            border-radius: 25px;
+            font-size: 2em;
+            font-weight: bold;
+            box-shadow: 0 30px 80px rgba(0,0,0,0.5);
+            z-index: 1000;
+            display: none;
+            text-align: center;
+        }
+        
+        /* 可组合提示 */
+        .combo-hint {
+            background: rgba(0,255,136,0.1);
+            border: 1px solid #00ff88;
+            border-radius: 10px;
+            padding: 10px 15px;
+            margin: 10px 0;
+            text-align: center;
+            color: #00ff88;
+        }
+        
+        @media (max-width: 1024px) {
+            .board { grid-template-columns: repeat(6, 1fr); }
+        }
+        @media (max-width: 768px) {
+            .board { grid-template-columns: repeat(4, 1fr); }
+            h1 { font-size: 1.8em; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🀄 49.9 麻将欧欧乐</h1>
+        <p class="subtitle">🤖 动态规划最优策略 · 50 元看 3 张 · 后续 +10 元/张</p>
+        
+        <div class="tabs">
+            <button class="tab active" onclick="switchTab('game')">🎮 游戏</button>
+            <button class="tab" onclick="switchTab('prize')">⚙️ 奖金设置</button>
+            <button class="tab" onclick="switchTab('analysis')">📊 DP 分析</button>
+        </div>
+        
+        <!-- 游戏页面 -->
+        <div id="tab-game" class="tab-content active">
+            <div class="strategy-box" id="strategy-box">
+                <div class="title">🤖 AI 策略建议</div>
+                <div class="action" id="strategy-action">等待游戏开始...</div>
+                <div class="ev" id="strategy-ev"></div>
+                <div class="reason" id="strategy-reason"></div>
+            </div>
+            
+            <div class="money-panel">
+                <div class="money-box">
+                    <label>💵 当前余额</label>
+                    <div class="value" id="balance">1000</div>
+                </div>
+                <div class="money-box cost">
+                    <label>💸 看牌费用</label>
+                    <div class="value" id="cost">50</div>
+                </div>
+                <div class="money-box win">
+                    <label>🏆 累计赢取</label>
+                    <div class="value" id="win">0</div>
+                </div>
+                <div class="money-box ev">
+                    <label>📈 期望收益</label>
+                    <div class="value" id="ev">0</div>
+                </div>
+            </div>
+            
+            <div class="info-bar">
+                <div class="info-item">
+                    <label>👁️ 已看牌数</label>
+                    <div class="value" id="revealed">0</div>
+                </div>
+                <div class="info-item">
+                    <label>🎯 成功组合</label>
+                    <div class="value" id="combos">0</div>
+                </div>
+                <div class="info-item">
+                    <label>🃏 剩余牌数</label>
+                    <div class="value" id="remaining">64</div>
+                </div>
+            </div>
+            
+            <div class="board" id="board"></div>
+            
+            <div id="combo-hints"></div>
+            
+            <div class="controls">
+                <button class="btn btn-reveal" id="btn-reveal" onclick="game.reveal()">👁️ 看牌 (50 元/3 张)</button>
+                <button class="btn btn-check" id="btn-check" onclick="game.check()" disabled>🎯 检查组合</button>
+                <button class="btn btn-auto" id="btn-auto" onclick="game.autoPlay()" disabled>🤖 AI 自动</button>
+                <button class="btn btn-reset" onclick="game.newGame()">🔄 新游戏</button>
+            </div>
+        </div>
+        
+        <!-- 奖金设置页面 -->
+        <div id="tab-prize" class="tab-content">
+            <div class="panel">
+                <h3>⚙️ 自定义奖金金额</h3>
+                <p style="text-align:center;color:#aaa;margin-bottom:20px;">
+                    直接设置各牌型的奖金金额（单位：元）
+                </p>
+                <div class="prize-grid" id="prize-config"></div>
+                <div style="text-align:center;margin-top:20px;">
+                    <button class="btn btn-check" onclick="game.savePrizes()">💾 保存设置</button>
+                    <button class="btn btn-reset" onclick="game.resetPrizes()">🔄 恢复默认</button>
+                </div>
+                <div class="expect-panel">
+                    <div class="title">📊 期望值分析（基于 DP 最优策略）</div>
+                    <div class="value" id="expect-net">+0.00 元</div>
+                    <div class="detail">
+                        平均成本：<span id="expect-cost">0.00 元</span> | 
+                        期望赢取：<span id="expect-win">0.00 元</span> | 
+                        RTP: <span id="expect-rtp">0.00%</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- DP 分析页面 -->
+        <div id="tab-analysis" class="tab-content">
+            <div class="panel">
+                <h3>📊 动态规划分析</h3>
+                <p style="text-align:center;color:#aaa;margin-bottom:20px;">
+                    基于剩余牌数和已翻开牌的期望值计算
+                </p>
+                <div class="stats-grid" id="dp-grid"></div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="message" id="message"></div>
+    
+    <script>
+        // 默认奖金（单位：元）
+        const DEFAULT_PRIZES = {
+            '3 对 - 大天使': 1450,
+            '2 对 - 小米兰': 250,
+            '7 顺 - 睡莲': 10000,
+            '6 顺 - 睡莲': 4000,
+            '5 顺 - 熊猫': 4000,
+            '3 顺 - 国王象棋': 750,
+            '3 顺 - 南瓜': 330,
+            '4 顺 - 可口可乐': 25,
+            '4 豹 - 情人节限定': 1000,
+            '3 豹 - IGO': 25,
+            '马卡龙': 100,
+            '妹宝烘培': 50,
+            '我是大 boos': 50,
+            '我爱吃果果': 50,
+            'MIGO': 25
+        };
+        
+        // 牌型基础分
+        const BASE_SCORES = {
+            'MIGO': 2.5,
+            '我爱吃果果': 5.0,
+            '我是大 boos': 5.0,
+            '马卡龙': 10.0,
+            '妹宝烘培': 5.0,
+            '3 顺 - 南瓜': 33.0,
+            '2 对 - 小米兰': 25.0,
+            '3 豹 - IGO': 2.5,
+            '3 对 - 大天使': 145.0,
+            '3 顺 - 国王象棋': 75.0,
+            '4 顺 - 可口可乐': 2.5,
+            '5 顺 - 熊猫': 400.0,
+            '6 顺 - 睡莲': 400.0,
+            '7 顺 - 睡莲': 1000.0,
+            '4 豹 - 情人节限定': 100.0
+        };
+        
+        let prizes = { ...DEFAULT_PRIZES };
+        
+        function switchTab(tab) {
+            document.querySelectorAll('.tab-content').forEach(e => e.classList.remove('active'));
+            document.querySelectorAll('.tab').forEach(e => e.classList.remove('active'));
+            document.getElementById('tab-' + tab).classList.add('active');
+            event.target.classList.add('active');
+            if (tab === 'analysis') game.updateDPAnalysis();
+        }
+        
+        function showMessage(text) {
+            const msg = document.getElementById('message');
+            msg.innerHTML = text.replace(/\n/g, '<br>');
+            msg.style.display = 'block';
+            setTimeout(() => msg.style.display = 'none', 2000);
+        }
+        
+        class Game {
+            constructor() {
+                this.tiles = [];
+                this.revealed = [];
+                this.selected = [];
+                this.balance = 1000;
+                this.totalWin = 0;
+                this.revealCount = 0;
+                this.combos = 0;
+                this.currentEV = 0;
+                this.init();
+                this.renderPrizeConfig();
+            }
+            
+            init() {
+                this.createTiles();
+                this.renderBoard();
+                this.updateInfo();
+                this.updateStrategy();
+            }
+            
+            createTiles() {
+                this.tiles = [];
+                let id = 0;
+                // 字牌 28 张
+                ['东','南','西','北','中','发','白'].forEach(v => {
+                    for (let i = 0; i < 4; i++) {
+                        this.tiles.push({ id: id++, value: v, label: v, type: 'word', num: 0, revealed: false, matched: false });
+                    }
+                });
+                // 筒子牌 36 张
+                ['一','二','三','四','五','六','七','八','九'].forEach((v, i) => {
+                    for (let j = 0; j < 4; j++) {
+                        this.tiles.push({ id: id++, value: v, label: (i+1)+'筒', type: 'bamboo', num: i+1, revealed: false, matched: false });
+                    }
+                });
+                this.shuffle();
+            }
+            
+            shuffle() {
+                for (let i = this.tiles.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [this.tiles[i], this.tiles[j]] = [this.tiles[j], this.tiles[i]];
+                }
+            }
+            
+            renderBoard() {
+                const board = document.getElementById('board');
+                board.innerHTML = '';
+                this.tiles.forEach((t, i) => {
+                    if (t.matched) return;
+                    const el = document.createElement('div');
+                    el.className = 'tile type-' + t.type + (t.revealed ? ' revealed' : '') + (this.selected.includes(i) ? ' selected' : '');
+                    if (!t.revealed) el.onclick = () => this.select(i);
+                    else el.onclick = () => this.select(i);
+                    el.innerHTML = '<div class="tile-content">' + t.value + '</div><div class="tile-label">' + t.label + '</div>';
+                    board.appendChild(el);
+                });
+            }
+            
+            // 动态规划核心：计算继续翻牌的期望收益
+            calculateEV() {
+                const available = this.tiles.filter(t => t.revealed && !t.matched);
+                const remaining = this.tiles.filter(t => !t.revealed && !t.matched).length;
+                
+                // 当前最佳组合
+                const currentBest = this.findBestCombo(available);
+                const currentPrize = currentBest ? prizes[currentBest.name] || 0 : 0;
+                
+                if (remaining === 0) {
+                    return currentPrize;
+                }
+                
+                // 继续翻一张牌的期望
+                const nextCost = this.revealCount === 0 ? 50 : 10;
+                const canAfford = this.balance >= nextCost;
+                
+                if (!canAfford) {
+                    return currentPrize;
+                }
+                
+                // 简化 DP：估计继续翻牌的期望收益
+                // 基于剩余牌数和当前牌型
+                const expectedImprovement = this.estimateImprovement(available, remaining);
+                const evContinue = expectedImprovement - nextCost;
+                
+                this.currentEV = Math.max(currentPrize, currentPrize + evContinue);
+                
+                return this.currentEV;
+            }
+            
+            // 估计继续翻牌的潜在收益
+            estimateImprovement(available, remaining) {
+                if (remaining === 0) return 0;
+                
+                // 统计当前牌型
+                const count = {};
+                available.forEach(t => {
+                    const key = t.value + t.type;
+                    count[key] = (count[key] || 0) + 1;
+                });
+                
+                let expectedGain = 0;
+                
+                // 计算形成对子的概率
+                Object.entries(count).forEach(([key, c]) => {
+                    if (c === 1) {
+                        // 已有 1 张，再翻到 1 张形成对子的概率
+                        const prob = 3 / remaining;
+                        expectedGain += prob * 0.5 * prizes['2 对 - 小米兰'];
+                    } else if (c === 2) {
+                        // 已有 2 张，再翻到 1 张形成刻子的概率
+                        const prob = 2 / remaining;
+                        expectedGain += prob * 0.5 * prizes['3 豹 - IGO'];
+                    }
+                });
+                
+                // 计算顺子潜力
+                const bamboo = available.filter(t => t.type === 'bamboo').map(t => t.num);
+                const bambooSet = new Set(bamboo);
+                
+                for (let num of bambooSet) {
+                    // 检查是否有顺子潜力
+                    if (!bambooSet.has(num + 1) && remaining > 0) {
+                        const prob = 4 / remaining;
+                        expectedGain += prob * 0.3 * prizes['3 顺 - 南瓜'];
+                    }
+                }
+                
+                // 特殊牌
+                const specialPrizes = {
+                    '5 筒': '马卡龙',
+                    '7 筒': '妹宝烘培',
+                    '红中': '我是大 boos',
+                    '北风': '我爱吃果果',
+                    '西风': 'MIGO',
+                    '白板': 'MIGO'
+                };
+                
+                const hasSpecial = available.some(t => specialPrizes[t.label]);
+                if (!hasSpecial && remaining > 0) {
+                    const prob = 6 / remaining;
+                    expectedGain += prob * 50;
+                }
+                
+                return expectedGain * Math.min(remaining, 10);
+            }
+            
+            // 找到当前最佳组合
+            findBestCombo(tiles) {
+                if (tiles.length < 2) return null;
+                
+                // 对子
+                const pairs = this.countPairs(tiles);
+                if (pairs >= 3) return { name: '3 对 - 大天使' };
+                if (pairs >= 2) return { name: '2 对 - 小米兰' };
+                
+                // 刻子
+                const trips = this.countTrips(tiles);
+                if (trips >= 4) return { name: '4 豹 - 情人节限定' };
+                if (trips >= 3) return { name: '3 豹 - IGO' };
+                
+                // 顺子
+                const seq = this.countSeq(tiles);
+                if (seq >= 7) return { name: '7 顺 - 睡莲' };
+                if (seq >= 6) return { name: '6 顺 - 睡莲' };
+                if (seq >= 5) return { name: '5 顺 - 熊猫' };
+                if (seq >= 4) return { name: '4 顺 - 可口可乐' };
+                if (seq >= 3) return { name: '3 顺 - 南瓜' };
+                
+                // 特殊牌
+                const special = this.checkSpecial(tiles);
+                if (special) return special;
+                
+                return null;
+            }
+            
+            countPairs(tiles) {
+                const cnt = {};
+                tiles.forEach(t => { const k = t.value + t.type; cnt[k] = (cnt[k] || 0) + 1; });
+                return Object.values(cnt).filter(c => c >= 2).length;
+            }
+            
+            countTrips(tiles) {
+                const cnt = {};
+                tiles.forEach(t => { const k = t.value + t.type; cnt[k] = (cnt[k] || 0) + 1; });
+                return Math.max(...Object.values(cnt), 0);
+            }
+            
+            countSeq(tiles) {
+                const nums = tiles.filter(t => t.type === 'bamboo').map(t => t.num);
+                if (nums.length < 3) return 0;
+                const unique = [...new Set(nums)].sort((a, b) => a - b);
+                let max = 1, cur = 1;
+                for (let i = 1; i < unique.length; i++) {
+                    if (unique[i] === unique[i-1] + 1) { cur++; max = Math.max(max, cur); }
+                    else cur = 1;
+                }
+                return max >= 3 ? max : 0;
+            }
+            
+            checkSpecial(tiles) {
+                const map = { '5 筒': '马卡龙', '7 筒': '妹宝烘培', '红中': '我是大 boos', '北风': '我爱吃果果', '西风': 'MIGO', '白板': 'MIGO' };
+                for (const t of tiles) {
+                    if (map[t.label]) return { name: map[t.label] };
+                }
+                return null;
+            }
+            
+            // 更新策略建议
+            updateStrategy() {
+                const ev = this.calculateEV();
+                const available = this.tiles.filter(t => t.revealed && !t.matched);
+                const remaining = this.tiles.filter(t => !t.revealed && !t.matched).length;
+                const nextCost = this.revealCount === 0 ? 50 : 10;
+                const currentBest = this.findBestCombo(available);
+                const currentPrize = currentBest ? prizes[currentBest.name] || 0 : 0;
+                
+                const actionEl = document.getElementById('strategy-action');
+                const evEl = document.getElementById('strategy-ev');
+                const reasonEl = document.getElementById('strategy-reason');
+                
+                if (remaining === 0) {
+                    actionEl.textContent = '✅ 游戏结束';
+                    actionEl.style.color = '#00ff88';
+                    evEl.textContent = `最终收益：${this.balance}元`;
+                    reasonEl.textContent = '';
+                } else if (available.length < 2) {
+                    actionEl.textContent = '👁️ 继续翻牌';
+                    actionEl.style.color = '#00bfff';
+                    evEl.textContent = `费用：${nextCost}元 | 期望：+${(ev - currentPrize).toFixed(1)}元`;
+                    reasonEl.textContent = '当前牌数不足，需要翻开更多牌';
+                } else {
+                    const continueEV = ev - currentPrize;
+                    if (continueEV > 0 && this.balance >= nextCost) {
+                        actionEl.textContent = '👁️ 继续翻牌';
+                        actionEl.style.color = '#00bfff';
+                        evEl.textContent = `期望收益：+${continueEV.toFixed(1)}元`;
+                        reasonEl.textContent = `继续翻牌的期望收益为正 (${(continueEV/nextCost*100).toFixed(0)}% 回报率)`;
+                    } else if (currentPrize > 0) {
+                        actionEl.textContent = '🎯 领取奖金';
+                        actionEl.style.color = '#00ff88';
+                        evEl.textContent = `当前奖金：${currentPrize}元`;
+                        reasonEl.textContent = `继续翻牌期望收益为负，建议落袋为安`;
+                    } else {
+                        actionEl.textContent = '👁️ 继续翻牌';
+                        actionEl.style.color = '#ff6b6b';
+                        evEl.textContent = `费用：${nextCost}元`;
+                        reasonEl.textContent = '当前无有效组合，需要继续翻牌寻找机会';
+                    }
+                }
+                
+                // 更新期望显示
+                document.getElementById('ev').textContent = ev.toFixed(0);
+                
+                // 更新按钮状态
+                document.getElementById('btn-auto').disabled = available.length < 2 || remaining === 0;
+            }
+            
+            reveal() {
+                const hidden = this.tiles.filter(t => !t.revealed && !t.matched);
+                if (!hidden.length) { showMessage('所有牌已翻开！'); return; }
+                
+                let count, cost;
+                if (this.revealCount === 0) {
+                    count = Math.min(3, hidden.length);
+                    cost = 50;
+                } else {
+                    count = Math.min(Math.floor(this.balance / 10), hidden.length);
+                    cost = count * 10;
+                }
+                
+                if (count === 0 || this.balance < cost) { showMessage('💸 余额不足！'); return; }
+                
+                this.balance -= cost;
+                this.revealCount += count;
+                hidden.slice(0, count).forEach(t => t.revealed = true);
+                
+                this.renderBoard();
+                this.updateInfo();
+                this.updateStrategy();
+                this.showComboHints();
+                
+                const avail = this.tiles.filter(t => t.revealed && !t.matched);
+                document.getElementById('btn-check').disabled = avail.length < 2;
+                
+                const nextCost = this.revealCount === 0 ? 50 : 10;
+                document.getElementById('btn-reveal').textContent = '👁️ 看牌 (' + nextCost + '元/' + (this.revealCount === 0 ? '3 张' : '1 张') + ')';
+                
+                showMessage('👁️ 翻开 ' + count + ' 张牌，花费 ' + cost + '元');
+            }
+            
+            select(i) {
+                const t = this.tiles[i];
+                if (!t.revealed || t.matched) return;
+                const pos = this.selected.indexOf(i);
+                if (pos > -1) this.selected.splice(pos, 1);
+                else if (this.selected.length < 7) this.selected.push(i);
+                this.renderBoard();
+            }
+            
+            check() {
+                const selected = this.selected.map(i => this.tiles[i]);
+                if (selected.length < 2) { showMessage('至少选 2 张！'); return; }
+                
+                const combo = this.evaluate(selected);
+                if (combo && combo.prize > 0) {
+                    this.balance += combo.prize;
+                    this.totalWin += combo.prize;
+                    this.combos++;
+                    this.selected.forEach(i => this.tiles[i].matched = true);
+                    showMessage('🎉 ' + combo.name + '\n💰 +' + combo.prize + '元!');
+                    this.selected = [];
+                    this.renderBoard();
+                    this.updateInfo();
+                    this.updateStrategy();
+                } else {
+                    showMessage('❌ 无有效组合！');
+                    this.selected = [];
+                    this.renderBoard();
+                }
+                
+                const avail = this.tiles.filter(t => t.revealed && !t.matched);
+                document.getElementById('btn-check').disabled = avail.length < 2;
+            }
+            
+            autoPlay() {
+                // AI 自动决策
+                const available = this.tiles.filter(t => t.revealed && !t.matched);
+                const remaining = this.tiles.filter(t => !t.revealed && !t.matched).length;
+                
+                if (remaining > 0) {
+                    // 继续翻牌
+                    this.reveal();
+                } else if (available.length >= 2) {
+                    // 自动选择最佳组合
+                    const combo = this.findBestCombo(available);
+                    if (combo) {
+                        // 自动选择参与组合的牌
+                        this.selected = [];
+                        const indices = this.tiles.map((t, i) => t.revealed && !t.matched ? i : -1).filter(i => i !== -1);
+                        this.selected = indices.slice(0, Math.min(7, indices.length));
+                        this.check();
+                    }
+                }
+            }
+            
+            evaluate(tiles) {
+                const pairs = this.countPairs(tiles);
+                if (pairs >= 3) return { name: '3 对 - 大天使', prize: prizes['3 对 - 大天使'] };
+                if (pairs >= 2) return { name: '2 对 - 小米兰', prize: prizes['2 对 - 小米兰'] };
+                
+                const trips = this.countTrips(tiles);
+                if (trips >= 4) return { name: '4 豹 - 情人节限定', prize: prizes['4 豹 - 情人节限定'] };
+                if (trips >= 3) return { name: '3 豹 - IGO', prize: prizes['3 豹 - IGO'] };
+                
+                const seq = this.countSeq(tiles);
+                if (seq >= 7) return { name: '7 顺 - 睡莲', prize: prizes['7 顺 - 睡莲'] };
+                if (seq >= 6) return { name: '6 顺 - 睡莲', prize: prizes['6 顺 - 睡莲'] };
+                if (seq >= 5) return { name: '5 顺 - 熊猫', prize: prizes['5 顺 - 熊猫'] };
+                if (seq >= 4) return { name: '4 顺 - 可口可乐', prize: prizes['4 顺 - 可口可乐'] };
+                if (seq >= 3) return { name: '3 顺 - 南瓜', prize: prizes['3 顺 - 南瓜'] };
+                
+                const special = this.checkSpecial(tiles);
+                if (special) return { name: special.name, prize: prizes[special.name] };
+                
+                return null;
+            }
+            
+            updateInfo() {
+                document.getElementById('balance').textContent = this.balance.toFixed(0);
+                document.getElementById('win').textContent = this.totalWin.toFixed(0);
+                document.getElementById('cost').textContent = this.revealCount === 0 ? 50 : 10;
+                document.getElementById('revealed').textContent = this.revealCount;
+                document.getElementById('combos').textContent = this.combos;
+                document.getElementById('remaining').textContent = this.tiles.filter(t => !t.revealed && !t.matched).length;
+                
+                const nextCost = this.revealCount === 0 ? 50 : 10;
+                const btn = document.getElementById('btn-reveal');
+                btn.textContent = '👁️ 看牌 (' + nextCost + '元/' + (this.revealCount === 0 ? '3 张' : '1 张') + ')';
+                btn.disabled = this.balance < nextCost;
+            }
+            
+            showComboHints() {
+                const available = this.tiles.filter(t => t.revealed && !t.matched);
+                const hintsEl = document.getElementById('combo-hints');
+                
+                const combo = this.findBestCombo(available);
+                if (combo) {
+                    const prize = prizes[combo.name] || 0;
+                    hintsEl.innerHTML = '<div class="combo-hint">🎯 发现组合：<strong>' + combo.name + '</strong> = ' + prize + '元</div>';
+                } else {
+                    hintsEl.innerHTML = '';
+                }
+            }
+            
+            newGame() {
+                this.tiles = [];
+                this.revealed = [];
+                this.selected = [];
+                this.balance = 1000;
+                this.totalWin = 0;
+                this.revealCount = 0;
+                this.combos = 0;
+                this.currentEV = 0;
+                this.createTiles();
+                this.renderBoard();
+                this.updateInfo();
+                this.updateStrategy();
+                document.getElementById('btn-check').disabled = true;
+                document.getElementById('combo-hints').innerHTML = '';
+                showMessage('🎮 新游戏开始！');
+            }
+            
+            renderPrizeConfig() {
+                const container = document.getElementById('prize-config');
+                container.innerHTML = Object.entries(prizes).map(([name, val]) => 
+                    '<div class="prize-item"><label>' + name + '</label>' +
+                    '<input type="number" id="prize-' + name.replace(/\s/g, '-') + '" value="' + val + '" step="10" min="0"></div>'
+                ).join('');
+            }
+            
+            savePrizes() {
+                Object.keys(prizes).forEach(name => {
+                    const input = document.getElementById('prize-' + name.replace(/\s/g, '-'));
+                    if (input) prizes[name] = parseFloat(input.value) || 0;
+                });
+                this.calcExpect();
+                this.updateStrategy();
+                showMessage('💾 设置已保存！');
+            }
+            
+            resetPrizes() {
+                prizes = { ...DEFAULT_PRIZES };
+                this.renderPrizeConfig();
+                this.calcExpect();
+                this.updateStrategy();
+                showMessage('🔄 已恢复默认！');
+            }
+            
+            calcExpect() {
+                // 简化的期望计算（基于概率估计）
+                const avgCost = 684;
+                let expectedWin = 0;
+                
+                // 基于基础分和当前倍率估算
+                Object.entries(BASE_SCORES).forEach(([name, score]) => {
+                    const mult = prizes[name] / (score * 10);
+                    const prob = score * 0.01;
+                    expectedWin += prob * prizes[name];
+                });
+                
+                expectedWin = Math.min(expectedWin, 2000);
+                const net = expectedWin - avgCost;
+                const rtp = (expectedWin / avgCost * 100);
+                
+                const el = document.getElementById('expect-net');
+                el.textContent = (net >= 0 ? '+' : '') + net.toFixed(2) + '元';
+                el.style.color = net >= 0 ? '#00ff88' : '#ff6b6b';
+                document.getElementById('expect-cost').textContent = avgCost.toFixed(2) + '元';
+                document.getElementById('expect-win').textContent = expectedWin.toFixed(2) + '元';
+                document.getElementById('expect-rtp').textContent = rtp.toFixed(2) + '%';
+            }
+            
+            updateDPAnalysis() {
+                const grid = document.getElementById('dp-grid');
+                const remaining = this.tiles.filter(t => !t.revealed && !t.matched).length;
+                const available = this.tiles.filter(t => t.revealed && !t.matched).length;
+                
+                let html = '<div class="stat-card"><div class="name">剩余牌数</div><div class="prob">' + remaining + '</div><div class="ev">张</div></div>';
+                html += '<div class="stat-card"><div class="name">已翻开牌</div><div class="prob">' + available + '</div><div class="ev">张</div></div>';
+                
+                const ev = this.currentEV;
+                const currentBest = this.findBestCombo(this.tiles.filter(t => t.revealed && !t.matched));
+                const currentPrize = currentBest ? prizes[currentBest.name] || 0 : 0;
+                
+                html += '<div class="stat-card"><div class="name">当前奖金</div><div class="prob">' + currentPrize.toFixed(0) + '</div><div class="ev">元</div></div>';
+                html += '<div class="stat-card"><div class="name">期望收益</div><div class="prob">' + ev.toFixed(0) + '</div><div class="ev">元</div></div>';
+                
+                const nextCost = this.revealCount === 0 ? 50 : 10;
+                const improvement = ev - currentPrize;
+                const roi = improvement > 0 ? (improvement / nextCost * 100) : 0;
+                
+                html += '<div class="stat-card"><div class="name">继续翻牌期望</div><div class="prob" style="color:' + (improvement >= 0 ? '#00ff88' : '#ff6b6b') + '">' + improvement.toFixed(1) + '</div><div class="ev">元 (ROI: ' + roi.toFixed(0) + '%)</div></div>';
+                
+                grid.innerHTML = html;
+            }
+        }
+        
+        const game = new Game();
+    </script>
+</body>
+</html>

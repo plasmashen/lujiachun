@@ -1,0 +1,64 @@
+{
+  "total_simulations": 10000,
+  "total_combos_found": 308329,
+  "avg_cost": 677.009,
+  "avg_win": 1880.816,
+  "avg_net_profit": 1203.807,
+  "win_rate": 1.0,
+  "combo_probs": {
+    "MIGO": {
+      "count": 98169,
+      "prob_per_game": 9.8169,
+      "prob_per_combo": 0.3183904206221277,
+      "avg_score": 2.5
+    },
+    "我爱吃果果": {
+      "count": 49449,
+      "prob_per_game": 4.9449,
+      "prob_per_combo": 0.1603773890876304,
+      "avg_score": 5.0
+    },
+    "我是大 boos": {
+      "count": 49065,
+      "prob_per_game": 4.9065,
+      "prob_per_combo": 0.15913196617898415,
+      "avg_score": 5.0
+    },
+    "妹宝烘培": {
+      "count": 47293,
+      "prob_per_game": 4.7293,
+      "prob_per_combo": 0.15338485838179347,
+      "avg_score": 5.0
+    },
+    "马卡龙": {
+      "count": 47289,
+      "prob_per_game": 4.7289,
+      "prob_per_combo": 0.15337188522649509,
+      "avg_score": 10.0
+    },
+    "3 顺 - 南瓜": {
+      "count": 8067,
+      "prob_per_game": 0.8067,
+      "prob_per_combo": 0.026163610948045757,
+      "avg_score": 33.0
+    },
+    "2 对 - 小米兰": {
+      "count": 6434,
+      "prob_per_game": 0.6434,
+      "prob_per_combo": 0.02086732029747445,
+      "avg_score": 25.0
+    },
+    "3 豹 - IGO": {
+      "count": 2033,
+      "prob_per_game": 0.2033,
+      "prob_per_combo": 0.006593606180411184,
+      "avg_score": 2.5
+    },
+    "4 顺 - 可口可乐": {
+      "count": 530,
+      "prob_per_game": 0.053,
+      "prob_per_combo": 0.0017189430770378396,
+      "avg_score": 2.5
+    }
+  }
+}
