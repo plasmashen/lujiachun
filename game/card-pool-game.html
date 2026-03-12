@@ -1,0 +1,944 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>卡池游戏</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Microsoft YaHei', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        h1 {
+            text-align: center;
+            color: #667eea;
+            margin-bottom: 10px;
+            font-size: 2.5em;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #999;
+            margin-bottom: 30px;
+            font-size: 0.9em;
+        }
+
+        .info-bar {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            border-radius: 15px;
+        }
+
+        .info-item {
+            text-align: center;
+        }
+
+        .info-item .label {
+            font-size: 0.9em;
+            color: #666;
+            margin-bottom: 5px;
+        }
+
+        .info-item .value {
+            font-size: 1.8em;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .info-item .value.gold {
+            color: #f39c12;
+        }
+
+        .mystery-number {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .mystery-number .label {
+            font-size: 1.2em;
+            color: #555;
+            margin-bottom: 10px;
+        }
+
+        .mystery-number .number {
+            font-size: 3em;
+            font-weight: bold;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .guess-section {
+            margin-bottom: 30px;
+        }
+
+        .guess-section h2 {
+            color: #555;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .guess-row {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+            margin-bottom: 15px;
+        }
+
+        .guess-input {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .guess-input input {
+            width: 60px;
+            height: 40px;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            font-size: 1.2em;
+            text-align: center;
+            transition: all 0.3s;
+        }
+
+        .guess-input input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 10px rgba(102, 126, 234, 0.3);
+        }
+
+        .guess-btn {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 25px;
+            font-size: 1em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .guess-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .guess-btn:active {
+            transform: translateY(0);
+        }
+
+        .guess-info {
+            text-align: center;
+            color: #666;
+            margin-top: 10px;
+        }
+
+        .lottery-section {
+            margin-top: 40px;
+            padding: 30px;
+            background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+            border-radius: 15px;
+        }
+
+        .lottery-section h2 {
+            text-align: center;
+            color: #e74c3c;
+            margin-bottom: 20px;
+        }
+
+        .expectation-info {
+            text-align: center;
+            padding: 10px;
+            margin-bottom: 15px;
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 10px;
+            font-size: 0.9em;
+            color: #666;
+        }
+
+        .expectation-info .highlight {
+            color: #e74c3c;
+            font-weight: bold;
+        }
+
+        .lottery-count {
+            text-align: center;
+            font-size: 1.5em;
+            color: #e74c3c;
+            margin-bottom: 20px;
+        }
+
+        .lottery-count span {
+            font-weight: bold;
+            font-size: 2em;
+        }
+
+        .lottery-btn {
+            display: block;
+            margin: 0 auto 20px;
+            padding: 20px 50px;
+            border: none;
+            border-radius: 30px;
+            font-size: 1.2em;
+            font-weight: bold;
+            cursor: pointer;
+            background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+            color: white;
+            transition: all 0.3s;
+        }
+
+        .lottery-btn:hover:not(:disabled) {
+            transform: scale(1.05);
+            box-shadow: 0 10px 30px rgba(231, 76, 60, 0.4);
+        }
+
+        .lottery-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .prize-display {
+            text-align: center;
+            font-size: 1.5em;
+            font-weight: bold;
+            color: #e74c3c;
+            min-height: 60px;
+        }
+
+        .prize-list {
+            margin-top: 20px;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.7);
+            border-radius: 10px;
+        }
+
+        .prize-list h3 {
+            text-align: center;
+            color: #555;
+            margin-bottom: 15px;
+        }
+
+        .prize-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 15px;
+            margin-bottom: 5px;
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 5px;
+        }
+
+        .prize-item .name {
+            font-weight: bold;
+        }
+
+        .prize-item .value {
+            color: #f39c12;
+            font-weight: bold;
+        }
+
+        .result-message {
+            text-align: center;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 10px;
+            font-weight: bold;
+        }
+
+        .result-message.success {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .result-message.fail {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .redeem-section {
+            margin-top: 30px;
+            padding: 20px;
+            background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+            border-radius: 15px;
+        }
+
+        .redeem-section h2 {
+            text-align: center;
+            color: #555;
+            margin-bottom: 15px;
+        }
+
+        .prizes-owned {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+        }
+
+        .prize-badge {
+            padding: 8px 15px;
+            background: white;
+            border-radius: 20px;
+            font-size: 0.9em;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .prize-badge .count {
+            background: #667eea;
+            color: white;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-weight: bold;
+        }
+
+        .settings-btn {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 20px;
+            background: rgba(255, 255, 255, 0.8);
+            cursor: pointer;
+            font-weight: bold;
+            color: #667eea;
+            transition: all 0.3s;
+        }
+
+        .settings-btn:hover {
+            background: white;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .settings-panel {
+            position: fixed;
+            top: 0;
+            right: -400px;
+            width: 350px;
+            height: 100%;
+            background: white;
+            box-shadow: -5px 0 30px rgba(0, 0, 0, 0.2);
+            padding: 30px;
+            transition: right 0.3s;
+            z-index: 1000;
+            overflow-y: auto;
+        }
+
+        .settings-panel.open {
+            right: 0;
+        }
+
+        .settings-panel h2 {
+            color: #667eea;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #eee;
+            padding-bottom: 10px;
+        }
+
+        .setting-item {
+            margin-bottom: 20px;
+        }
+
+        .setting-item label {
+            display: block;
+            margin-bottom: 8px;
+            color: #555;
+            font-weight: bold;
+        }
+
+        .setting-item input {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            font-size: 1em;
+        }
+
+        .setting-item input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .close-settings {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: none;
+            border: none;
+            font-size: 2em;
+            cursor: pointer;
+            color: #999;
+        }
+
+        .close-settings:hover {
+            color: #667eea;
+        }
+
+        .reset-game {
+            margin-top: 30px;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 10px;
+            background: #e74c3c;
+            color: white;
+            font-size: 1em;
+            font-weight: bold;
+            cursor: pointer;
+            width: 100%;
+            transition: all 0.3s;
+        }
+
+        .reset-game:hover {
+            background: #c0392b;
+            transform: scale(1.02);
+        }
+
+        @keyframes prizeReveal {
+            0% { transform: scale(0); opacity: 0; }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        .prize-animate {
+            animation: prizeReveal 0.5s ease-out;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 20px;
+            }
+
+            .info-bar {
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .guess-row {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            h1 {
+                font-size: 1.8em;
+            }
+
+            .mystery-number .number {
+                font-size: 2em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <button class="settings-btn" onclick="toggleSettings()">⚙️ 设置</button>
+
+    <div class="container">
+        <h1>🎰 卡池游戏</h1>
+        <div class="subtitle">运气与智慧的对决！</div>
+
+        <div class="info-bar">
+            <div class="info-item">
+                <div class="label">当前金币</div>
+                <div class="value gold" id="goldDisplay">200</div>
+            </div>
+            <div class="info-item">
+                <div class="label">本次抽奖机会</div>
+                <div class="value" id="drawChanceDisplay">0</div>
+            </div>
+            <div class="info-item">
+                <div class="label">累计获得奖品</div>
+                <div class="value" id="totalPrizesDisplay">0</div>
+            </div>
+        </div>
+
+        <div class="mystery-number">
+            <div class="label">当前神秘数字</div>
+            <div class="number" id="mysteryNumber">?????</div>
+        </div>
+
+        <div class="guess-section">
+            <h2>🔮 猜数字</h2>
+
+            <div class="guess-info">
+                a(x): 猜最后一位数字 | 费用: <span id="costA">40</span> | 期望: <span class="highlight" id="expectA">0.1</span> 次抽奖
+            </div>
+            <div class="guess-row">
+                <div class="guess-input">
+                    <label>a(</label>
+                    <input type="number" id="guessA" min="0" max="9">
+                    <label>)</label>
+                    <button class="guess-btn" onclick="guessA()">猜！</button>
+                </div>
+            </div>
+
+            <div class="guess-info">
+                b(x): 猜后两位中的数字 | 费用: <span id="costB">80</span> | 期望: <span class="highlight" id="expectB">0.2</span> 次抽奖
+            </div>
+            <div class="guess-row">
+                <div class="guess-input">
+                    <label>b(</label>
+                    <input type="number" id="guessB" min="0" max="9">
+                    <label>)</label>
+                    <button class="guess-btn" onclick="guessB()">猜！</button>
+                </div>
+            </div>
+
+            <div class="guess-info">
+                c(x): 猜后三位中的数字 | 费用: <span id="costC">120</span> | 期望: <span class="highlight" id="expectC">0.3</span> 次抽奖
+            </div>
+            <div class="guess-row">
+                <div class="guess-input">
+                    <label>c(</label>
+                    <input type="number" id="guessC" min="0" max="9">
+                    <label>)</label>
+                    <button class="guess-btn" onclick="guessC()">猜！</button>
+                </div>
+            </div>
+
+            <div class="result-message" id="resultMessage"></div>
+        </div>
+
+        <div class="lottery-section">
+            <h2>🎁 抽奖</h2>
+            <div class="expectation-info">
+                每次抽奖平均期望收益: <span class="highlight" id="lotteryExpectation">≈ 409.3</span> 金币
+            </div>
+            <div class="lottery-count">
+                可用抽奖机会: <span id="lotteryCount">0</span> 次
+            </div>
+            <button class="lottery-btn" id="lotteryBtn" onclick="drawPrize()" disabled>
+                🎲 开始抽奖
+            </button>
+            <div class="prize-display" id="prizeDisplay"></div>
+
+            <div class="prize-list">
+                <h3>🏆 奖品列表</h3>
+                <div class="prize-item">
+                    <span class="name">🌟 超级欧</span>
+                    <span class="value">价值 5500 (3个)</span>
+                </div>
+                <div class="prize-item">
+                    <span class="name">🎨 素描</span>
+                    <span class="value">价值 900 (8个)</span>
+                </div>
+                <div class="prize-item">
+                    <span class="name">✨ 闪闪</span>
+                    <span class="value">价值 600 (8个)</span>
+                </div>
+                <div class="prize-item">
+                    <span class="name">🏪 便利店</span>
+                    <span class="value">价值 280 (5个)</span>
+                </div>
+                <div class="prize-item">
+                    <span class="name">🌸 光之园</span>
+                    <span class="value">价值 120 (26个)</span>
+                </div>
+                <div class="prize-item">
+                    <span class="name">❄️ 冬日</span>
+                    <span class="value">价值 100 (30个)</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="redeem-section">
+            <h2>📦 我的奖品</h2>
+            <div class="prizes-owned" id="prizesOwned">
+                <p style="width: 100%; text-align: center; color: #888;">暂无奖品</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="settings-panel" id="settingsPanel">
+        <button class="close-settings" onclick="toggleSettings()">×</button>
+        <h2>⚙️ 游戏设置</h2>
+
+        <div class="setting-item">
+            <label>a(x) 猜测费用:</label>
+            <input type="number" id="settingCostA" value="40" min="1">
+        </div>
+
+        <div class="setting-item">
+            <label>b(x) 猜测费用:</label>
+            <input type="number" id="settingCostB" value="80" min="1">
+        </div>
+
+        <div class="setting-item">
+            <label>c(x) 猜测费用:</label>
+            <input type="number" id="settingCostC" value="120" min="1">
+        </div>
+
+        <div class="setting-item">
+            <label>初始金币:</label>
+            <input type="number" id="settingInitialGold" value="200" min="10">
+        </div>
+
+        <button class="reset-game" onclick="resetGame()">🔄 重新开始游戏</button>
+    </div>
+
+    <script>
+        // 游戏状态
+        let gameState = {
+            gold: 200,
+            drawChance: 0,
+            mysteryNumber: null,
+            totalPrizes: 0,
+            prizesOwned: {
+                '超级欧': 0,
+                '素描': 0,
+                '闪闪': 0,
+                '便利店': 0,
+                '光之园': 0,
+                '冬日': 0
+            },
+            costs: {
+                a: 40,
+                b: 80,
+                c: 120
+            },
+            initialGold: 200
+        };
+
+        // 奖品池 (总88个奖品)
+        const prizes = [
+            { name: '超级欧', value: 5500, count: 3 },
+            { name: '素描', value: 900, count: 8 },
+            { name: '闪闪', value: 600, count: 8 },
+            { name: '便利店', value: 280, count: 5 },
+            { name: '光之园', value: 120, count: 26 },
+            { name: '冬日', value: 100, count: 30 }
+        ];
+
+        // 从localStorage加载游戏状态
+        function loadGameState() {
+            const saved = localStorage.getItem('cardPoolGame');
+            if (saved) {
+                gameState = JSON.parse(saved);
+            }
+            updateUI();
+        }
+
+        // 保存游戏状态
+        function saveGameState() {
+            localStorage.setItem('cardPoolGame', JSON.stringify(gameState));
+        }
+
+        // 生成新的神秘数字
+        function generateMysteryNumber() {
+            let num = Math.floor(Math.random() * 90000) + 10000;
+            gameState.mysteryNumber = num.toString();
+        }
+
+        // 计算组合数 C(n,k)
+        function combination(n, k) {
+            if (k < 0 || k > n) return 0;
+            if (k === 0 || k === n) return 1;
+            let result = 1;
+            for (let i = 0; i < k; i++) {
+                result = result * (n - i) / (i + 1);
+            }
+            return result;
+        }
+
+        // 计算a(x)、b(x)、c(x)的期望抽奖次数
+        function calculateExpectations() {
+            // a(x): 猜最后一位，概率1/10，猜中得1次，不中得0次
+            const expectA = 1 * (1 / 10) + 0 * (9 / 10);
+
+            // b(x): 猜后两位中有什么数字
+            // 使用二项分布: P(X=k) = C(2,k) * (0.1)^k * (0.9)^(2-k)
+            let expectB = 0;
+            for (let k = 0; k <= 2; k++) {
+                expectB += k * combination(2, k) * Math.pow(0.1, k) * Math.pow(0.9, 2 - k);
+            }
+
+            // c(x): 猜后三位中有什么数字
+            // 使用二项分布: P(X=k) = C(3,k) * (0.1)^k * (0.9)^(3-k)
+            let expectC = 0;
+            for (let k = 0; k <= 3; k++) {
+                expectC += k * combination(3, k) * Math.pow(0.1, k) * Math.pow(0.9, 3 - k);
+            }
+
+            // 计算每次抽奖的期望收益
+            let totalValue = 0;
+            let totalCount = 0;
+            prizes.forEach(prize => {
+                totalValue += prize.value * prize.count;
+                totalCount += prize.count;
+            });
+            const lotteryExpectation = totalValue / totalCount;
+
+            return { expectA, expectB, expectC, lotteryExpectation };
+        }
+
+        // 更新UI
+        function updateUI() {
+            document.getElementById('goldDisplay').textContent = gameState.gold;
+            document.getElementById('drawChanceDisplay').textContent = gameState.drawChance;
+            document.getElementById('lotteryCount').textContent = gameState.drawChance;
+            document.getElementById('totalPrizesDisplay').textContent = gameState.totalPrizes;
+
+            // 更新费用显示
+            document.getElementById('costA').textContent = gameState.costs.a;
+            document.getElementById('costB').textContent = gameState.costs.b;
+            document.getElementById('costC').textContent = gameState.costs.c;
+
+            // 动态计算并显示期望值
+            const expectations = calculateExpectations();
+            document.getElementById('expectA').textContent = expectations.expectA.toFixed(2);
+            document.getElementById('expectB').textContent = expectations.expectB.toFixed(2);
+            document.getElementById('expectC').textContent = expectations.expectC.toFixed(2);
+            document.getElementById('lotteryExpectation').textContent = '≈ ' + expectations.lotteryExpectation.toFixed(1);
+
+            // 启用/禁用抽奖按钮
+            document.getElementById('lotteryBtn').disabled = gameState.drawChance <= 0;
+
+            // 更新奖品显示
+            updatePrizesOwned();
+        }
+
+        // 更新拥有的奖品显示
+        function updatePrizesOwned() {
+            const container = document.getElementById('prizesOwned');
+            const owned = gameState.prizesOwned;
+            const items = [];
+
+            if (owned['超级欧'] > 0) items.push(`<span class="prize-badge">🌟 超级欧 <span class="count">${owned['超级欧']}</span></span>`);
+            if (owned['素描'] > 0) items.push(`<span class="prize-badge">🎨 素描 <span class="count">${owned['素描']}</span></span>`);
+            if (owned['闪闪'] > 0) items.push(`<span class="prize-badge">✨ 闪闪 <span class="count">${owned['闪闪']}</span></span>`);
+            if (owned['便利店'] > 0) items.push(`<span class="prize-badge">🏪 便利店 <span class="count">${owned['便利店']}</span></span>`);
+            if (owned['光之园'] > 0) items.push(`<span class="prize-badge">🌸 光之园 <span class="count">${owned['光之园']}</span></span>`);
+            if (owned['冬日'] > 0) items.push(`<span class="prize-badge">❄️ 冬日 <span class="count">${owned['冬日']}</span></span>`);
+
+            if (items.length === 0) {
+                container.innerHTML = '<p style="width: 100%; text-align: center; color: #888;">暂无奖品</p>';
+            } else {
+                container.innerHTML = items.join('');
+            }
+        }
+
+        // 显示结果消息
+        function showMessage(message, type) {
+            const msgEl = document.getElementById('resultMessage');
+            msgEl.textContent = message;
+            msgEl.className = 'result-message ' + type;
+        }
+
+        // 猜a(x) - 最后一位
+        function guessA() {
+            const input = document.getElementById('guessA').value;
+            if (input === '') {
+                showMessage('请输入0-9的数字！', 'fail');
+                return;
+            }
+
+            const guess = parseInt(input);
+            if (isNaN(guess) || guess < 0 || guess > 9) {
+                showMessage('请输入0-9的数字！', 'fail');
+                return;
+            }
+
+            if (gameState.gold < gameState.costs.a) {
+                showMessage('金币不足！', 'fail');
+                return;
+            }
+
+            gameState.gold -= gameState.costs.a;
+            generateMysteryNumber();
+
+            const lastDigit = parseInt(gameState.mysteryNumber[4]);
+
+            if (guess === lastDigit) {
+                gameState.drawChance += 1;
+                showMessage(`猜对了！最后一位是 ${lastDigit}，获得1次抽奖机会！`, 'success');
+            } else {
+                showMessage(`猜错了！最后一位是 ${lastDigit}`, 'fail');
+            }
+
+            saveGameState();
+            updateUI();
+        }
+
+        // 猜b(x) - 后两位中的数字
+        function guessB() {
+            const input = document.getElementById('guessB').value;
+            if (input === '') {
+                showMessage('请输入0-9的数字！', 'fail');
+                return;
+            }
+
+            const guess = parseInt(input);
+            if (isNaN(guess) || guess < 0 || guess > 9) {
+                showMessage('请输入0-9的数字！', 'fail');
+                return;
+            }
+
+            if (gameState.gold < gameState.costs.b) {
+                showMessage('金币不足！', 'fail');
+                return;
+            }
+
+            gameState.gold -= gameState.costs.b;
+            generateMysteryNumber();
+
+            const lastTwo = gameState.mysteryNumber.substring(3);
+            let matches = 0;
+
+            if (lastTwo[0] === guess.toString()) matches++;
+            if (lastTwo[1] === guess.toString()) matches++;
+
+            if (matches > 0) {
+                gameState.drawChance += matches;
+                showMessage(`猜对了！后两位是 ${lastTwo}，其中有 ${matches} 个 ${guess}，获得 ${matches} 次抽奖机会！`, 'success');
+            } else {
+                showMessage(`猜错了！后两位是 ${lastTwo}，没有 ${guess}`, 'fail');
+            }
+
+            saveGameState();
+            updateUI();
+        }
+
+        // 猜c(x) - 后三位中的数字
+        function guessC() {
+            const input = document.getElementById('guessC').value;
+            if (input === '') {
+                showMessage('请输入0-9的数字！', 'fail');
+                return;
+            }
+
+            const guess = parseInt(input);
+            if (isNaN(guess) || guess < 0 || guess > 9) {
+                showMessage('请输入0-9的数字！', 'fail');
+                return;
+            }
+
+            if (gameState.gold < gameState.costs.c) {
+                showMessage('金币不足！', 'fail');
+                return;
+            }
+
+            gameState.gold -= gameState.costs.c;
+            generateMysteryNumber();
+
+            const lastThree = gameState.mysteryNumber.substring(2);
+            let matches = 0;
+
+            for (let i = 0; i < 3; i++) {
+                if (lastThree[i] === guess.toString()) matches++;
+            }
+
+            if (matches > 0) {
+                gameState.drawChance += matches;
+                showMessage(`猜对了！后三位是 ${lastThree}，其中有 ${matches} 个 ${guess}，获得 ${matches} 次抽奖机会！`, 'success');
+            } else {
+                showMessage(`猜错了！后三位是 ${lastThree}，没有 ${guess}`, 'fail');
+            }
+
+            saveGameState();
+            updateUI();
+        }
+
+        // 抽奖
+        function drawPrize() {
+            if (gameState.drawChance <= 0) {
+                return;
+            }
+
+            gameState.drawChance--;
+
+            // 构建奖品池
+            let pool = [];
+            prizes.forEach(prize => {
+                for (let i = 0; i < prize.count; i++) {
+                    pool.push(prize);
+                }
+            });
+
+            // 随机抽取
+            const wonPrize = pool[Math.floor(Math.random() * pool.length)];
+
+            // 添加金币奖励
+            gameState.gold += wonPrize.value;
+            gameState.prizesOwned[wonPrize.name]++;
+            gameState.totalPrizes++;
+
+            // 显示抽中奖品
+            const display = document.getElementById('prizeDisplay');
+            display.innerHTML = `🎉 恭喜获得 <span class="prize-animate">${wonPrize.name}</span>！<br>价值 ${wonPrize.value} 金币`;
+
+            saveGameState();
+            updateUI();
+        }
+
+        // 切换设置面板
+        function toggleSettings() {
+            const panel = document.getElementById('settingsPanel');
+            panel.classList.toggle('open');
+
+            // 加载当前设置
+            document.getElementById('settingCostA').value = gameState.costs.a;
+            document.getElementById('settingCostB').value = gameState.costs.b;
+            document.getElementById('settingCostC').value = gameState.costs.c;
+            document.getElementById('settingInitialGold').value = gameState.initialGold;
+        }
+
+        // 重置游戏
+        function resetGame() {
+            gameState.gold = parseInt(document.getElementById('settingInitialGold').value) || 200;
+            gameState.drawChance = 0;
+            gameState.totalPrizes = 0;
+            gameState.mysteryNumber = null;
+            gameState.prizesOwned = {
+                '超级欧': 0,
+                '素描': 0,
+                '闪闪': 0,
+                '便利店': 0,
+                '光之园': 0,
+                '冬日': 0
+            };
+            gameState.costs = {
+                a: parseInt(document.getElementById('settingCostA').value) || 40,
+                b: parseInt(document.getElementById('settingCostB').value) || 80,
+                c: parseInt(document.getElementById('settingCostC').value) || 120
+            };
+            gameState.initialGold = gameState.gold;
+
+            document.getElementById('prizeDisplay').innerHTML = '';
+            document.getElementById('resultMessage').innerHTML = '';
+
+            saveGameState();
+            updateUI();
+
+            toggleSettings();
+        }
+
+        // 初始化
+        loadGameState();
+    </script>
+</body>
+</html>
