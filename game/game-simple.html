@@ -351,7 +351,7 @@
             data.games.forEach(game => {
                 headerHTML += `<th>${game}</th>`;
             });
-            headerHTML += '<th>奖金</th><th>时间</th><th>操作</th></tr>';
+            headerHTML += '<th>奖金</th><th>备注</th><th>时间</th><th>操作</th></tr>';
             thead.innerHTML = headerHTML;
 
             // 渲染表格内容
@@ -380,6 +380,11 @@
                 // 奖金列
                 bodyHTML += `<td class="score-cell">
                     <input type="number" min="0" value="${record.bonus || ''}" oninput="updateRecord(${record.id}, 'bonus', this.value)">
+                </td>`;
+
+                // 备注列
+                bodyHTML += `<td class="note-cell">
+                    <input type="text" value="${record.note || ''}" oninput="updateRecord(${record.id}, 'note', this.value)" placeholder="备注">
                 </td>`;
 
                 // 时间列
@@ -413,6 +418,10 @@
                 <input type="number" min="0" id="new-bonus" placeholder="" oninput="handleNewRowChange()">
             </td>`;
 
+            bodyHTML += `<td class="note-cell">
+                <input type="text" id="new-note" placeholder="备注" oninput="handleNewRowChange()">
+            </td>`;
+
             bodyHTML += `<td class="time-cell">-</td>`;
 
             bodyHTML += `<td class="action-buttons">
@@ -439,6 +448,8 @@
                 record.scores[gameOrValue] = parseInt(value) || 0;
             } else if (field === 'bonus') {
                 record.bonus = parseInt(gameOrValue) || 0;
+            } else if (field === 'note') {
+                record.note = gameOrValue;
             }
 
             save();
@@ -468,6 +479,7 @@
             });
 
             const bonus = parseInt(document.getElementById('new-bonus').value) || 0;
+            const note = document.getElementById('new-note').value.trim();
 
             if (!hasValue && !bonus) {
                 alert('请至少填写游戏分数或奖金！');
@@ -479,6 +491,7 @@
                 player: player,
                 scores: scores,
                 bonus: bonus,
+                note: note,
                 time: new Date().toLocaleString()
             };
 
