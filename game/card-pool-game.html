@@ -746,7 +746,7 @@
             document.getElementById('drawChanceDisplay').textContent = gameState.drawChance;
             document.getElementById('lotteryCount').textContent = gameState.drawChance;
             document.getElementById('totalPrizesDisplay').textContent = gameState.totalPrizes;
-            document.getElementById('totalPrizeValueDisplay').textContent = gameState.totalPrizeValue;
+            document.getElementById('totalPrizeValueDisplay').textContent = Number(gameState.totalPrizeValue) || 0;
 
             // 更新费用显示
             document.getElementById('costA').textContent = gameState.costs.a;
@@ -771,11 +771,37 @@
         // 更新拥有的奖品显示
         function updatePrizesOwned() {
             const container = document.getElementById('prizesOwned');
-            const owned = gameState.prizesOwned;
+            if (!container) return;
+            
+            const owned = gameState.prizesOwned || {};
             const items = [];
-
-            // 根据当前奖品名称生成展示
-            if (owned['醒醒'] > 0) items.push(`<span class="prize-badge">🛎️ 醒醒 <span class="count">${owned['醒醒']}</span></span>`);
+            
+            console.log('更新奖品列表，当前拥有:', owned);
+            
+            // 遍历所有奖品
+            for (const [name, count] of Object.entries(owned)) {
+                const numCount = parseInt(count) || 0;
+                if (numCount > 0) {
+                    // 根据奖品名称添加图标
+                    let icon = '🎁';
+                    const icons = {
+                        '醒醒': '🛎️', '睡莲': '🌺', 'ROCK': '🎸', '国王': '🤴',
+                        '万圣节 MKK': '🎃', '南瓜': '🥧', '小米兰': '🍚',
+                        '光织园': '🌟', '心底密码': '🔐'
+                    };
+                    icon = icons[name] || icon;
+                    
+                    items.push('<span class="prize-badge">' + icon + ' ' + name + ' <span class="count">' + numCount + '</span></span>');
+                }
+            }
+            
+            if (items.length === 0) {
+                container.innerHTML = '<p style="width: 100%; text-align: center; color: #888;">暂无奖品</p>';
+            } else {
+                container.innerHTML = items.join('');
+                console.log('✓ 奖品列表已更新:', items.length, '个奖品');
+            }
+        }</span></span>`);
             if (owned['睡莲'] > 0) items.push(`<span class="prize-badge">🌺 睡莲 <span class="count">${owned['睡莲']}</span></span>`);
             if (owned['ROCK'] > 0) items.push(`<span class="prize-badge">🎸 ROCK <span class="count">${owned['ROCK']}</span></span>`);
             if (owned['国王'] > 0) items.push(`<span class="prize-badge">🤴 国王 <span class="count">${owned['国王']}</span></span>`);
@@ -927,20 +953,47 @@
             const wonPrize = pool[Math.floor(Math.random() * pool.length)];
 
             // 记录奖品及其价值
-            gameState.prizesOwned[wonPrize.name]++;
-            gameState.totalPrizes++;
-            gameState.totalPrizeValue += wonPrize.value;
-
-            // 立即更新拥有奖品的显示（防止首次之外未刷新）
-            updatePrizesOwned();
+            // 确保奖品对象存在
+            if (!gameState.prizesOwned) {
+                gameState.prizesOwned = {};
+            }
+            
+            // 确保当前奖品字段存在
+            if (typeof gameState.prizesOwned[wonPrize.name] === 'undefined') {
+                gameState.prizesOwned[wonPrize.name] = 0;
+            }
+            
+            // 增加奖品数量
+            gameState.prizesOwned[wonPrize.name] = parseInt(gameState.prizesOwned[wonPrize.name]) + 1;
+            
+            // 增加总奖品数
+            gameState.totalPrizes = (parseInt(gameState.totalPrizes) || 0) + 1;
+            
+            // 累加奖品价值 - 关键修复：确保是数字相加
+            const currentValue = parseFloat(gameState.totalPrizeValue) || 0;
+            const prizeValue = parseFloat(wonPrize.value) || 0;
+            gameState.totalPrizeValue = currentValue + prizeValue;
+            
+            // 调试输出
+            console.log('✓ 抽到奖品:', wonPrize.name);
+            console.log('✓ 奖品价值:', prizeValue);
+            console.log('✓ 累计价值:', gameState.totalPrizeValue);
+            console.log('✓ 奖品列表:', gameState.prizesOwned);
 
             // 显示抽中奖品
             const display = document.getElementById('prizeDisplay');
-            display.innerHTML = `🎉 恭喜获得 <span class="prize-animate">${wonPrize.name}</span>！<br>价值 ${wonPrize.value} 金币`;
+            display.innerHTML = '🎉 恭喜获得 <span class="prize-animate">' + wonPrize.name + '</span>！<br>价值 ' + wonPrize.value + ' 金币';
 
+            // 先更新奖品列表显示
+            updatePrizesOwned();
+            
+            // 保存状态
             saveGameState();
+            
+            // 最后更新所有 UI
             updateUI();
-        }
+            
+            console.log('✓ UI 更新完成');
 
         // 切换设置面板
         function toggleSettings() {
