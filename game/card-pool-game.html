@@ -333,6 +333,28 @@
         }
 
         .settings-btn:hover {
+                background: white;
+                box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+            }
+
+            .back-home {
+                position: fixed;
+                top: 20px;
+                left: 20px;
+                padding: 10px 20px;
+                border: none;
+                border-radius: 20px;
+                background: rgba(255, 255, 255, 0.8);
+                cursor: pointer;
+                font-weight: bold;
+                color: #667eea;
+                transition: all 0.3s;
+            }
+
+            .back-home:hover {
+                background: white;
+                box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+            }
             background: white;
             box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
         }
@@ -453,10 +475,23 @@
                 font-size: 2em;
             }
         }
-    </style>
+    @keyframes shake {
+    0% { transform: translateX(0); }
+    20% { transform: translateX(-5px); }
+    40% { transform: translateX(5px); }
+    60% { transform: translateX(-5px); }
+    80% { transform: translateX(5px); }
+    100% { transform: translateX(0); }
+}
+
+.shake {
+    animation: shake 0.5s;
+}
+</style>
 </head>
 <body>
     <button class="settings-btn" onclick="toggleSettings()">⚙️ 设置</button>
+    <button class="back-home" onclick="goHome()">← 返回首页</button>
 
     <div class="container">
         <h1>🎰 卡池游戏</h1>
@@ -464,8 +499,8 @@
 
         <div class="info-bar">
             <div class="info-item">
-                <div class="label">当前金币</div>
-                <div class="value gold" id="goldDisplay">200</div>
+                <div class="label">已消费金额</div>
+                <div class="value" id="consumptionDisplay">0</div>
             </div>
             <div class="info-item">
                 <div class="label">本次抽奖机会</div>
@@ -474,6 +509,10 @@
             <div class="info-item">
                 <div class="label">累计获得奖品</div>
                 <div class="value" id="totalPrizesDisplay">0</div>
+            </div>
+            <div class="info-item">
+                <div class="label">累计奖品价值</div>
+                <div class="value" id="totalPrizeValueDisplay">0</div>
             </div>
         </div>
 
@@ -539,30 +578,7 @@
 
             <div class="prize-list">
                 <h3>🏆 奖品列表</h3>
-                <div class="prize-item">
-                    <span class="name">🌟 超级欧</span>
-                    <span class="value">价值 5500 (3个)</span>
-                </div>
-                <div class="prize-item">
-                    <span class="name">🎨 素描</span>
-                    <span class="value">价值 900 (8个)</span>
-                </div>
-                <div class="prize-item">
-                    <span class="name">✨ 闪闪</span>
-                    <span class="value">价值 600 (8个)</span>
-                </div>
-                <div class="prize-item">
-                    <span class="name">🏪 便利店</span>
-                    <span class="value">价值 280 (5个)</span>
-                </div>
-                <div class="prize-item">
-                    <span class="name">🌸 光之园</span>
-                    <span class="value">价值 120 (26个)</span>
-                </div>
-                <div class="prize-item">
-                    <span class="name">❄️ 冬日</span>
-                    <span class="value">价值 100 (30个)</span>
-                </div>
+                <div id="prizeListContainer"></div>
             </div>
         </div>
 
@@ -593,45 +609,48 @@
             <input type="number" id="settingCostC" value="120" min="1">
         </div>
 
-        <div class="setting-item">
-            <label>初始金币:</label>
-            <input type="number" id="settingInitialGold" value="200" min="10">
-        </div>
-
+        
         <button class="reset-game" onclick="resetGame()">🔄 重新开始游戏</button>
     </div>
 
     <script>
         // 游戏状态
         let gameState = {
-            gold: 200,
+            // 记录累计中奖金额
+            totalPrizeValue: 0,
+            consumption: 0,
             drawChance: 0,
             mysteryNumber: null,
             totalPrizes: 0,
             prizesOwned: {
-                '超级欧': 0,
-                '素描': 0,
-                '闪闪': 0,
-                '便利店': 0,
-                '光之园': 0,
-                '冬日': 0
+                '醒醒': 0,
+                '睡莲': 0,
+                'ROCK': 0,
+                '国王': 0,
+                '万圣节MKK': 0,
+                '南瓜': 0,
+                '小米兰': 0,
+                '光织园': 0,
+                '心底密码': 0
             },
             costs: {
                 a: 40,
                 b: 80,
                 c: 120
-            },
-            initialGold: 200
+            }
         };
 
         // 奖品池 (总88个奖品)
         const prizes = [
-            { name: '超级欧', value: 5500, count: 3 },
-            { name: '素描', value: 900, count: 8 },
-            { name: '闪闪', value: 600, count: 8 },
-            { name: '便利店', value: 280, count: 5 },
-            { name: '光之园', value: 120, count: 26 },
-            { name: '冬日', value: 100, count: 30 }
+            { name: '醒醒', value: 1500, count: 2 },
+            { name: '睡莲', value: 800, count: 2 },
+            { name: 'ROCK', value: 500, count: 2 },
+            { name: '国王', value: 500, count: 2 },
+            { name: '万圣节MKK', value: 280, count: 2 },
+            { name: '南瓜', value: 200, count: 5 },
+            { name: '小米兰', value: 180, count: 5 },
+            { name: '光织园', value: 120, count: 20 },
+            { name: '心底密码', value: 90, count: 40 }
         ];
 
         // 从localStorage加载游戏状态
@@ -652,6 +671,13 @@
         function generateMysteryNumber() {
             let num = Math.floor(Math.random() * 90000) + 10000;
             gameState.mysteryNumber = num.toString();
+            // Update displayed mystery number with a reveal animation
+            const elem = document.getElementById('mysteryNumber');
+            if (elem) {
+                elem.textContent = gameState.mysteryNumber;
+                elem.classList.add('shake');
+                setTimeout(() => elem.classList.remove('shake'), 500);
+            }
         }
 
         // 计算组合数 C(n,k)
@@ -696,12 +722,31 @@
             return { expectA, expectB, expectC, lotteryExpectation };
         }
 
+        // 渲染奖品列表
+        function renderPrizeList() {
+            const container = document.getElementById('prizeListContainer');
+            if (!container) return;
+            const items = prizes.map(prize => {
+                return `<div class="prize-item">
+                    <span class="name">${prize.name}</span>
+                    <span class="value">价值 ${prize.value} (${prize.count}个)</span>
+                </div>`;
+            }).join('');
+            container.innerHTML = items;
+        }
+
         // 更新UI
         function updateUI() {
-            document.getElementById('goldDisplay').textContent = gameState.gold;
+            // Update displayed mystery number if known
+            const mysteryElem = document.getElementById('mysteryNumber');
+            if (mysteryElem) {
+                mysteryElem.textContent = gameState.mysteryNumber ? gameState.mysteryNumber : '?????';
+            }
+            document.getElementById('consumptionDisplay').textContent = gameState.consumption;
             document.getElementById('drawChanceDisplay').textContent = gameState.drawChance;
             document.getElementById('lotteryCount').textContent = gameState.drawChance;
             document.getElementById('totalPrizesDisplay').textContent = gameState.totalPrizes;
+            document.getElementById('totalPrizeValueDisplay').textContent = gameState.totalPrizeValue;
 
             // 更新费用显示
             document.getElementById('costA').textContent = gameState.costs.a;
@@ -720,6 +765,7 @@
 
             // 更新奖品显示
             updatePrizesOwned();
+            renderPrizeList();
         }
 
         // 更新拥有的奖品显示
@@ -728,12 +774,16 @@
             const owned = gameState.prizesOwned;
             const items = [];
 
-            if (owned['超级欧'] > 0) items.push(`<span class="prize-badge">🌟 超级欧 <span class="count">${owned['超级欧']}</span></span>`);
-            if (owned['素描'] > 0) items.push(`<span class="prize-badge">🎨 素描 <span class="count">${owned['素描']}</span></span>`);
-            if (owned['闪闪'] > 0) items.push(`<span class="prize-badge">✨ 闪闪 <span class="count">${owned['闪闪']}</span></span>`);
-            if (owned['便利店'] > 0) items.push(`<span class="prize-badge">🏪 便利店 <span class="count">${owned['便利店']}</span></span>`);
-            if (owned['光之园'] > 0) items.push(`<span class="prize-badge">🌸 光之园 <span class="count">${owned['光之园']}</span></span>`);
-            if (owned['冬日'] > 0) items.push(`<span class="prize-badge">❄️ 冬日 <span class="count">${owned['冬日']}</span></span>`);
+            // 根据当前奖品名称生成展示
+            if (owned['醒醒'] > 0) items.push(`<span class="prize-badge">🛎️ 醒醒 <span class="count">${owned['醒醒']}</span></span>`);
+            if (owned['睡莲'] > 0) items.push(`<span class="prize-badge">🌺 睡莲 <span class="count">${owned['睡莲']}</span></span>`);
+            if (owned['ROCK'] > 0) items.push(`<span class="prize-badge">🎸 ROCK <span class="count">${owned['ROCK']}</span></span>`);
+            if (owned['国王'] > 0) items.push(`<span class="prize-badge">🤴 国王 <span class="count">${owned['国王']}</span></span>`);
+            if (owned['万圣节MKK'] > 0) items.push(`<span class="prize-badge">🎃 万圣节MKK <span class="count">${owned['万圣节MKK']}</span></span>`);
+            if (owned['南瓜'] > 0) items.push(`<span class="prize-badge">🥧 南瓜 <span class="count">${owned['南瓜']}</span></span>`);
+            if (owned['小米兰'] > 0) items.push(`<span class="prize-badge">🍚 小米兰 <span class="count">${owned['小米兰']}</span></span>`);
+            if (owned['光织园'] > 0) items.push(`<span class="prize-badge">🌟 光织园 <span class="count">${owned['光织园']}</span></span>`);
+            if (owned['心底密码'] > 0) items.push(`<span class="prize-badge">🔐 心底密码 <span class="count">${owned['心底密码']}</span></span>`);
 
             if (items.length === 0) {
                 container.innerHTML = '<p style="width: 100%; text-align: center; color: #888;">暂无奖品</p>';
@@ -763,12 +813,12 @@
                 return;
             }
 
-            if (gameState.gold < gameState.costs.a) {
+            if (false) {
                 showMessage('金币不足！', 'fail');
                 return;
             }
 
-            gameState.gold -= gameState.costs.a;
+            gameState.consumption += gameState.costs.a;
             generateMysteryNumber();
 
             const lastDigit = parseInt(gameState.mysteryNumber[4]);
@@ -798,12 +848,9 @@
                 return;
             }
 
-            if (gameState.gold < gameState.costs.b) {
-                showMessage('金币不足！', 'fail');
-                return;
-            }
+            // No gold check; always allowed
 
-            gameState.gold -= gameState.costs.b;
+            gameState.consumption += gameState.costs.b;
             generateMysteryNumber();
 
             const lastTwo = gameState.mysteryNumber.substring(3);
@@ -837,12 +884,9 @@
                 return;
             }
 
-            if (gameState.gold < gameState.costs.c) {
-                showMessage('金币不足！', 'fail');
-                return;
-            }
+            // No gold check; always allowed
 
-            gameState.gold -= gameState.costs.c;
+            gameState.consumption += gameState.costs.c;
             generateMysteryNumber();
 
             const lastThree = gameState.mysteryNumber.substring(2);
@@ -882,10 +926,13 @@
             // 随机抽取
             const wonPrize = pool[Math.floor(Math.random() * pool.length)];
 
-            // 添加金币奖励
-            gameState.gold += wonPrize.value;
+            // 记录奖品及其价值
             gameState.prizesOwned[wonPrize.name]++;
             gameState.totalPrizes++;
+            gameState.totalPrizeValue += wonPrize.value;
+
+            // 立即更新拥有奖品的显示（防止首次之外未刷新）
+            updatePrizesOwned();
 
             // 显示抽中奖品
             const display = document.getElementById('prizeDisplay');
@@ -904,29 +951,36 @@
             document.getElementById('settingCostA').value = gameState.costs.a;
             document.getElementById('settingCostB').value = gameState.costs.b;
             document.getElementById('settingCostC').value = gameState.costs.c;
-            document.getElementById('settingInitialGold').value = gameState.initialGold;
+        }
+
+        // 返回首页函数
+        function goHome() {
+            // 假设 index 页面位于同目录下
+            window.location.href = 'index.html';
         }
 
         // 重置游戏
         function resetGame() {
-            gameState.gold = parseInt(document.getElementById('settingInitialGold').value) || 200;
+            gameState.consumption = 0;
             gameState.drawChance = 0;
             gameState.totalPrizes = 0;
             gameState.mysteryNumber = null;
             gameState.prizesOwned = {
-                '超级欧': 0,
-                '素描': 0,
-                '闪闪': 0,
-                '便利店': 0,
-                '光之园': 0,
-                '冬日': 0
+                '醒醒': 0,
+                '睡莲': 0,
+                'ROCK': 0,
+                '国王': 0,
+                '万圣节MKK': 0,
+                '南瓜': 0,
+                '小米兰': 0,
+                '光织园': 0,
+                '心底密码': 0
             };
             gameState.costs = {
                 a: parseInt(document.getElementById('settingCostA').value) || 40,
                 b: parseInt(document.getElementById('settingCostB').value) || 80,
                 c: parseInt(document.getElementById('settingCostC').value) || 120
             };
-            gameState.initialGold = gameState.gold;
 
             document.getElementById('prizeDisplay').innerHTML = '';
             document.getElementById('resultMessage').innerHTML = '';
