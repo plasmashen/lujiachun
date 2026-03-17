@@ -2,20 +2,49 @@
 layout: post
 ---
 
-<h1>Welcome to the Game</h1>
-    <a href="https://lujiachun.top/game/7x7lining.html">7x7连珠</a><br>
+<style>
+    .game-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        gap: 20px;
+        padding: 20px 0;
+    }
+    .game-card {
+        display: block;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 30px 20px;
+        border-radius: 12px;
+        text-decoration: none;
+        text-align: center;
+        font-size: 18px;
+        font-weight: 500;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    }
+    .game-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+    }
+    .game-card:nth-child(2) { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); }
+    .game-card:nth-child(3) { background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); }
+    .game-card:nth-child(4) { background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%); }
+    .game-card:nth-child(5) { background: linear-gradient(135deg, #fa709a 0%, #fee140 100%); }
+    .game-card:nth-child(6) { background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%); color: #333; }
+    .page-title {
+        text-align: center;
+        color: #333;
+        margin-bottom: 30px;
+    }
+</style>
 
-    <a href="https://lujiachun.top/game/21points.html">21点</a><br>
+<h1 class="page-title">🎮 游戏中心</h1>
 
-    <a href="https://lujiachun.top/game/spongebob-role-elimination.html">海绵宝宝碰碰</a><br>
-
-    <a href="https://lujiachun.top/game/catch_bad_guy_game.html">抓坏仔</a><br>
-
-    <a href="https://lujiachun.top/game/game-simple.html">记分工具</a><br>
-
-    <a href="https://lujiachun.top/game/card-pool-game.html">卡池游戏</a><br>
-
-
-
-
-
+<div class="game-grid">
+    <a class="game-card" href="https://lujiachun.top/game/7x7lining.html">7x7连珠</a>
+    <a class="game-card" href="https://lujiachun.top/game/21points.html">21点</a>
+    <a class="game-card" href="https://lujiachun.top/game/spongebob-role-elimination.html">海绵宝宝碰碰</a>
+    <a class="game-card" href="https://lujiachun.top/game/catch_bad_guy_game.html">抓坏仔</a>
+    <a class="game-card" href="https://lujiachun.top/game/game-simple.html">记分工具</a>
+    <a class="game-card" href="https://lujiachun.top/game/card-pool-game.html">卡池游戏</a>
+</div>
