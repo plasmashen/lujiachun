@@ -77,7 +77,7 @@
         }
 
         .card {
-            width: 80px;
+            width: 180px;
             height: 110px;
             background: linear-gradient(145deg, #ffffff, #e6e6e6);
             border-radius: 10px;
@@ -376,7 +376,7 @@
         }
 
         .hand-card {
-            width: 70px;
+            width: 150px;
             height: 90px;
             background: linear-gradient(145deg, #ffffff, #e6e6e6);
             border-radius: 8px;
@@ -553,6 +553,11 @@
             <div class="prize-table">
                 <h3>奖励表</h3>
                 <div class="prize-grid" id="prizeGrid"></div>
+                <button class="btn-primary" style="margin-top:10px;" onclick="togglePrizeEditor()">编辑奖励表</button>
+                <div id="prizeEditor" style="display:none; margin-top:10px; background:#f9f9f9; padding:10px; border-radius:5px;">
+                    <div id="customPrizeContainer"></div>
+                    <button class="btn-success" onclick="applyCustomPrizes()">保存自定义奖励</button>
+                </div>
             </div>
 
             <div class="rules">
@@ -595,22 +600,81 @@
         const MAX_ELIMINATIONS = 13;
 
         // 奖励映射表
-        const prizeMap = {
-            0: 500,
-            1: 200,
-            2: 100,
+        let prizeMap = {
+            0: 570,
+            1: 189,
+            2: 150,
             3: 5,
             4: 5,
             5: 5,
             6: 5,
-            7: 75,
-            8: 75,
-            9: 75,
-            10: 75,
-            11: 187.5,
-            12: 187.5,
-            13: 500
+            7: 189,
+            8: 85,
+            9: 85,
+            10: 85,
+            11: 85,
+            12: 300,
+            13: 300,
+            14: 760
         };
+
+        // Load custom prize map from localStorage if available
+        function loadCustomPrizeMap() {
+            const stored = localStorage.getItem('customPrizeMap');
+            if (stored) {
+                try {
+                    const parsed = JSON.parse(stored);
+                    // Ensure parsed is an object with numeric keys
+                    if (typeof parsed === 'object' && parsed !== null) {
+                        prizeMap = parsed;
+                    }
+                } catch (e) {
+                    console.error('Failed to parse customPrizeMap:', e);
+                }
+            }
+        }
+
+        // Save current prizeMap to localStorage
+        function saveCustomPrizeMap() {
+            localStorage.setItem('customPrizeMap', JSON.stringify(prizeMap));
+        }
+
+        // Populate custom prize inputs
+        function populatePrizeInputs() {
+            const container = document.getElementById('customPrizeContainer');
+            if (!container) return;
+            container.innerHTML = '';
+            for (let elim = 0; elim <= MAX_ELIMINATIONS; elim++) {
+                const value = prizeMap[elim] !== undefined ? prizeMap[elim] : 0;
+                const div = document.createElement('div');
+                div.style.marginBottom = '4px';
+                div.innerHTML = `<label>消除 ${elim} 次奖励: <input type="number" min="0" value="${value}" data-elim="${elim}" style="width:80px;"></label>`;
+                container.appendChild(div);
+            }
+        }
+
+        // Apply custom prizes from inputs
+        function applyCustomPrizes() {
+            const inputs = document.querySelectorAll('#customPrizeContainer input[data-elim]');
+            inputs.forEach(inp => {
+                const elim = parseInt(inp.getAttribute('data-elim'));
+                const val = parseInt(inp.value) || 0;
+                prizeMap[elim] = val;
+            });
+            saveCustomPrizeMap();
+            initPrizeTable();
+        }
+
+        // Toggle custom prize editor visibility
+        function togglePrizeEditor() {
+            const editor = document.getElementById('prizeEditor');
+            if (editor.style.display === 'none') {
+                populatePrizeInputs();
+                editor.style.display = 'block';
+            } else {
+                editor.style.display = 'none';
+            }
+        }
 
         let deck = [];
         let hand = [];
@@ -701,6 +765,16 @@
 
             // 发初始 9 张牌
             hand = deck.splice(0, INITIAL_HAND_SIZE);
+
+            // 检查是否全部不同（没有重复）
+            const uniqueCount = new Set(hand).size;
+            if (uniqueCount === hand.length) {
+                // 所有牌都不相同，直接记为 0 次碰碰，结束游戏
+                eliminationCount = 0;
+                updateDisplay();
+                endGame();
+                return;
+            }
 
             // 统计许愿角色出现次数
             const n = hand.filter(card => card === targetRole).length;
@@ -1090,6 +1164,7 @@
         // 初始化游戏
         initDeck();
         initRoleSelection();
+        loadCustomPrizeMap();
         initPrizeTable();
         updateDisplay();
     </script>
