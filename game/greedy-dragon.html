@@ -1,0 +1,842 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>贪吃龙</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: Arial, "PingFang SC", "Microsoft YaHei", sans-serif;
+            padding: 20px;
+            background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+            min-height: 100vh;
+            color: #fff;
+        }
+
+        .container { max-width: 900px; margin: 0 auto; }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 16px;
+            font-size: 32px;
+            text-shadow: 2px 2px 6px rgba(0,0,0,.4);
+        }
+
+        /* ---------- screens ---------- */
+        .screen { display: none; }
+        .screen.active { display: block; }
+
+        /* ---------- start screen ---------- */
+        #start-screen { text-align: center; }
+        .rules-box {
+            background: rgba(255,255,255,.1);
+            backdrop-filter: blur(6px);
+            border-radius: 14px;
+            padding: 24px 28px;
+            margin: 20px auto;
+            max-width: 560px;
+            text-align: left;
+            line-height: 1.8;
+            font-size: 15px;
+        }
+        .rules-box strong { color: #ffd54f; }
+        .rules-box .example {
+            background: rgba(0,0,0,.25);
+            border-radius: 8px;
+            padding: 10px 14px;
+            margin: 10px 0;
+            font-size: 14px;
+            line-height: 1.7;
+        }
+
+        /* ---------- buttons ---------- */
+        .btn {
+            display: inline-block;
+            padding: 14px 40px;
+            border: none;
+            border-radius: 10px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform .15s, box-shadow .15s;
+            color: #fff;
+        }
+        .btn:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0,0,0,.35); }
+        .btn:active { transform: translateY(0); }
+        .btn-primary { background: linear-gradient(135deg, #f7971e, #ffd200); color: #333; }
+        .btn-auto { background: linear-gradient(135deg, #43e97b, #38f9d7); color: #333; }
+        .btn-small {
+            padding: 8px 18px;
+            font-size: 14px;
+            border-radius: 8px;
+            background: rgba(255,255,255,.15);
+            border: 1px solid rgba(255,255,255,.25);
+        }
+        .btn:disabled { opacity: .4; cursor: not-allowed; transform: none; box-shadow: none; }
+
+        /* ---------- stats bar ---------- */
+        .stats-bar {
+            display: flex;
+            justify-content: space-around;
+            flex-wrap: wrap;
+            gap: 8px;
+            background: rgba(255,255,255,.08);
+            border-radius: 12px;
+            padding: 12px 8px;
+            margin-bottom: 16px;
+        }
+        .stat { text-align: center; min-width: 60px; }
+        .stat .label { font-size: 12px; opacity: .7; margin-bottom: 2px; }
+        .stat .value { font-size: 22px; font-weight: bold; }
+
+        /* ---------- table area ---------- */
+        .section-label {
+            font-size: 13px;
+            opacity: .55;
+            margin-bottom: 6px;
+            letter-spacing: 1px;
+            text-align: center;
+        }
+        .table-area {
+            background: rgba(255,255,255,.06);
+            border-radius: 14px;
+            padding: 16px;
+            margin-bottom: 16px;
+            min-height: 120px;
+        }
+        .table-cards {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            justify-content: center;
+            min-height: 88px;
+            align-items: center;
+        }
+        .table-empty { opacity: .3; font-size: 14px; user-select: none; }
+
+        /* ---------- log area ---------- */
+        .log-area {
+            background: rgba(0,0,0,.2);
+            border-radius: 10px;
+            padding: 10px 14px;
+            margin-bottom: 16px;
+            min-height: 36px;
+            font-size: 14px;
+            line-height: 1.7;
+            max-height: 90px;
+            overflow-y: auto;
+        }
+        .log-area .log-line { opacity: .75; }
+        .log-area .log-line:last-child { opacity: 1; }
+        .log-eat { color: #ffd54f; font-weight: bold; }
+
+        /* ---------- hand area ---------- */
+        .hand-area { padding: 4px 0; }
+        .hand-cards {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+            min-height: 94px;
+            align-items: center;
+        }
+        .hand-empty { opacity: .3; font-size: 14px; user-select: none; }
+
+        /* ---------- card ---------- */
+        .card {
+            width: 56px;
+            height: 80px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            font-weight: bold;
+            color: #fff;
+            position: relative;
+            transition: transform .18s, box-shadow .18s;
+            user-select: none;
+            flex-shrink: 0;
+            text-shadow: 1px 1px 3px rgba(0,0,0,.3);
+            box-shadow: 0 3px 10px rgba(0,0,0,.3);
+        }
+        .card::after {
+            content: "\1F432";
+            position: absolute;
+            bottom: 4px;
+            right: 5px;
+            font-size: 12px;
+            opacity: .5;
+        }
+
+        .hand-cards .card.next-card {
+            transform: translateY(-8px);
+            box-shadow: 0 0 16px 4px rgba(255,213,79,.55), 0 4px 12px rgba(0,0,0,.3);
+        }
+        .hand-cards .card:not(.next-card) { opacity: .6; }
+
+        .card-1 { background: linear-gradient(135deg, #e74c3c, #c0392b); }
+        .card-2 { background: linear-gradient(135deg, #e67e22, #d35400); }
+        .card-3 { background: linear-gradient(135deg, #f1c40f, #d4ac0d); color: #5d4e00; text-shadow: none; }
+        .card-4 { background: linear-gradient(135deg, #2ecc71, #27ae60); }
+        .card-5 { background: linear-gradient(135deg, #3498db, #2980b9); }
+        .card-6 { background: linear-gradient(135deg, #9b59b6, #8e44ad); }
+        .card-7 { background: linear-gradient(135deg, #e91e63, #c2185b); }
+        .card-8 { background: linear-gradient(135deg, #00bcd4, #00838f); }
+        .card-9 { background: linear-gradient(135deg, #607d8b, #455a64); }
+
+        .card.collecting {
+            animation: collectPulse .5s ease;
+            box-shadow: 0 0 20px 6px rgba(255,213,79,.7);
+        }
+        @keyframes collectPulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.15); }
+        }
+        .card.eaten {
+            animation: eatShrink .35s ease forwards;
+        }
+        @keyframes eatShrink {
+            to { transform: scale(0) rotate(20deg); opacity: 0; }
+        }
+        .card.card-new {
+            animation: cardAppear .3s ease;
+        }
+        @keyframes cardAppear {
+            from { transform: scale(0) translateY(30px); opacity: 0; }
+            to { transform: scale(1) translateY(0); opacity: 1; }
+        }
+        .card.card-played {
+            animation: cardSlideIn .25s ease;
+        }
+        @keyframes cardSlideIn {
+            from { transform: translateY(40px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        /* ---------- action buttons ---------- */
+        .action-bar {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            margin: 16px 0;
+            flex-wrap: wrap;
+        }
+
+        /* ---------- game over ---------- */
+        #gameover-screen { text-align: center; }
+        .result-box {
+            background: rgba(255,255,255,.1);
+            backdrop-filter: blur(6px);
+            border-radius: 14px;
+            padding: 30px;
+            margin: 20px auto;
+            max-width: 440px;
+        }
+        .result-main { margin: 16px 0; }
+        .result-main .result-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            font-size: 17px;
+            border-bottom: 1px solid rgba(255,255,255,.1);
+        }
+        .result-main .result-row:last-child { border-bottom: none; }
+        .result-main .result-row .val { font-weight: bold; font-size: 20px; }
+        .result-total {
+            font-size: 24px;
+            font-weight: bold;
+            margin-top: 14px;
+            padding: 14px;
+            border-radius: 10px;
+            background: rgba(255,255,255,.08);
+        }
+        .result-total .val { color: #ffd54f; font-size: 32px; }
+        .result-detail {
+            margin-top: 16px;
+            font-size: 15px;
+            line-height: 2;
+            opacity: .85;
+        }
+
+        .controls { text-align: center; margin-top: 12px; }
+
+        /* ---------- simulation ---------- */
+        .sim-controls {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .sim-controls label { font-size: 15px; margin-right: 6px; }
+        .sim-controls input {
+            width: 110px;
+            padding: 8px 10px;
+            border: 1px solid rgba(255,255,255,.3);
+            border-radius: 8px;
+            background: rgba(255,255,255,.1);
+            color: #fff;
+            font-size: 16px;
+            text-align: center;
+            margin-right: 10px;
+        }
+        .sim-stats {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px 20px;
+            justify-content: center;
+            margin-bottom: 18px;
+            padding: 14px;
+            background: rgba(255,255,255,.06);
+            border-radius: 10px;
+            font-size: 14px;
+        }
+        .sim-stats span { opacity: .65; }
+        .sim-stats strong { color: #ffd54f; }
+        .histogram {
+            max-height: 520px;
+            overflow-y: auto;
+            padding-right: 4px;
+        }
+        .hist-row {
+            display: flex;
+            align-items: center;
+            margin-bottom: 3px;
+            gap: 8px;
+        }
+        .hist-label {
+            width: 30px;
+            text-align: right;
+            font-size: 13px;
+            opacity: .8;
+            flex-shrink: 0;
+        }
+        .hist-bar-bg {
+            flex: 1;
+            height: 22px;
+            background: rgba(255,255,255,.05);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        .hist-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #f7971e, #ffd200);
+            border-radius: 4px;
+            min-width: 2px;
+            transition: width .3s;
+        }
+        .hist-val {
+            width: 58px;
+            text-align: right;
+            font-size: 12px;
+            opacity: .7;
+            flex-shrink: 0;
+        }
+        .hist-prize {
+            flex-shrink: 0;
+            width: 76px;
+        }
+        .hist-prize input {
+            width: 100%;
+            padding: 3px 6px;
+            border: 1px solid rgba(255,255,255,.18);
+            border-radius: 4px;
+            background: rgba(255,255,255,.08);
+            color: #fff;
+            font-size: 12px;
+            text-align: right;
+        }
+        .hist-prize input:focus {
+            outline: none;
+            border-color: #ffd54f;
+            background: rgba(255,255,255,.14);
+        }
+        .hist-header {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 6px;
+            font-size: 11px;
+            opacity: .5;
+        }
+        .hist-header span:nth-child(1) { width: 76px; text-align: center; }
+        .hist-header span:nth-child(2) { width: 30px; text-align: right; }
+        .hist-header span:nth-child(3) { flex: 1; }
+        .hist-header span:nth-child(4) { width: 58px; text-align: right; }
+        .expected-box {
+            margin-top: 18px;
+            padding: 16px 20px;
+            background: rgba(255,213,79,.1);
+            border: 1px solid rgba(255,213,79,.25);
+            border-radius: 10px;
+            text-align: center;
+            font-size: 17px;
+        }
+        .expected-box .ev {
+            color: #ffd54f;
+            font-size: 30px;
+            font-weight: bold;
+        }
+        .sim-status {
+            text-align: center;
+            margin: 12px 0;
+            font-size: 14px;
+            opacity: .7;
+        }
+
+        @media (max-width: 500px) {
+            body { padding: 10px; }
+            .card { width: 46px; height: 66px; font-size: 22px; border-radius: 8px; }
+            .card::after { font-size: 10px; bottom: 2px; right: 3px; }
+            .hand-cards, .table-cards { gap: 6px; }
+            .rules-box { padding: 16px; font-size: 14px; }
+            h1 { font-size: 26px; }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>🐲 贪吃龙</h1>
+
+    <!-- ======== Start Screen ======== -->
+    <div id="start-screen" class="screen active">
+        <div class="rules-box">
+            <p>共 <strong>9 种角色</strong>（数字 1–9），每种 <strong>7 张</strong>，共 63 张牌。</p>
+            <p>开局随机发 <strong>8 张</strong>手牌，按固定顺序依次翻开打到场上。</p>
+            <p>如果翻出的牌与场上某张牌<strong>角色相同</strong>，龙会<strong>吃掉</strong>两张相同牌之间（含自身）的所有牌，并从牌堆补充 <strong>（吃掉数 − 1）</strong>张新手牌到队尾。</p>
+            <div class="example">
+                例：场上依次为 <strong>1 2 3</strong>，翻出 <strong>2</strong><br>
+                → 龙吃掉 <strong>2 3 2</strong>（3 张），补充 <strong>2</strong> 张新手牌<br>
+                → 场上只剩 <strong>1</strong>
+            </div>
+            <p>手牌全部翻完则游戏结束。统计 <strong>收掉的牌 + 场上的牌</strong> 总数。</p>
+        </div>
+        <button class="btn btn-primary" onclick="startGame()">开始游戏</button>
+        <div style="margin-top:14px">
+            <button class="btn btn-small" onclick="showScreen('sim-screen')">蒙特卡洛模拟</button>
+        </div>
+    </div>
+
+    <!-- ======== Game Screen ======== -->
+    <div id="game-screen" class="screen">
+        <div class="stats-bar">
+            <div class="stat"><div class="label">牌堆</div><div class="value" id="stat-deck">0</div></div>
+            <div class="stat"><div class="label">手牌</div><div class="value" id="stat-hand">0</div></div>
+            <div class="stat"><div class="label">场上</div><div class="value" id="stat-table">0</div></div>
+            <div class="stat"><div class="label">已吃</div><div class="value" id="stat-eaten">0</div></div>
+            <div class="stat"><div class="label">合计</div><div class="value" id="stat-total">0</div></div>
+        </div>
+
+        <div class="section-label">— 场上 —</div>
+        <div class="table-area">
+            <div class="table-cards" id="table-cards"></div>
+        </div>
+
+        <div class="log-area" id="log-area"></div>
+
+        <div class="section-label">— 手牌（按顺序翻出）—</div>
+        <div class="hand-area">
+            <div class="hand-cards" id="hand-cards"></div>
+        </div>
+
+        <div class="action-bar">
+            <button class="btn btn-primary" id="btn-next" onclick="playNext()">翻牌</button>
+            <button class="btn btn-auto" id="btn-auto" onclick="toggleAuto()">自动播放</button>
+        </div>
+
+        <div class="controls">
+            <button class="btn btn-small" onclick="stopAuto(); showScreen('start-screen')">返回</button>
+            <button class="btn btn-small" onclick="stopAuto(); startGame()">重新开始</button>
+        </div>
+    </div>
+
+    <!-- ======== Simulation Screen ======== -->
+    <div id="sim-screen" class="screen">
+        <div class="sim-controls">
+            <label>模拟次数</label>
+            <input type="number" id="sim-count" value="100000" min="1000" max="1000000" step="10000">
+            <button class="btn btn-primary" id="btn-sim" onclick="runSim()">开始模拟</button>
+        </div>
+        <div id="sim-status" class="sim-status"></div>
+        <div id="sim-results" style="display:none">
+            <div id="sim-stats" class="sim-stats"></div>
+            <div class="section-label">— 牌数分布（收掉 + 场上）—</div>
+            <div id="sim-histogram" class="histogram"></div>
+            <div id="sim-expected" class="expected-box" style="display:none">
+                期望奖金 = <span class="ev" id="ev-value">0.00</span>
+            </div>
+        </div>
+        <div class="controls" style="margin-top:16px">
+            <button class="btn btn-small" onclick="showScreen('start-screen')">返回</button>
+        </div>
+    </div>
+
+    <!-- ======== Game Over Screen ======== -->
+    <div id="gameover-screen" class="screen">
+        <div class="result-box">
+            <div style="font-size:18px;opacity:.8">游戏结束</div>
+            <div class="result-main">
+                <div class="result-row"><span>场上剩余</span><span class="val" id="res-table">0</span></div>
+                <div class="result-row"><span>龙吃掉（<span id="res-eat-times">0</span> 次）</span><span class="val" id="res-eaten">0</span></div>
+            </div>
+            <div class="result-total">合计 <span class="val" id="res-total">0</span> 张</div>
+            <div class="result-detail" id="result-detail"></div>
+        </div>
+        <button class="btn btn-primary" onclick="startGame()" style="margin-top:14px">再来一局</button>
+        <button class="btn btn-small" onclick="showScreen('start-screen')" style="margin-top:14px;margin-left:8px">返回首页</button>
+    </div>
+</div>
+
+<script>
+let deck = [];
+let hand = [];
+let table = [];
+let totalEaten = 0;
+let eatCount = 0;
+let animating = false;
+let autoTimer = null;
+let logs = [];
+let lastSimCounts = null;
+let lastSimRuns = 0;
+
+function shuffle(arr) {
+    for (let i = arr.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [arr[i], arr[j]] = [arr[j], arr[i]];
+    }
+    return arr;
+}
+
+function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+function showScreen(id) {
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+}
+
+/* ====== rendering ====== */
+function renderStats() {
+    document.getElementById('stat-deck').textContent = deck.length;
+    document.getElementById('stat-hand').textContent = hand.length;
+    document.getElementById('stat-table').textContent = table.length;
+    document.getElementById('stat-eaten').textContent = totalEaten;
+    document.getElementById('stat-total').textContent = totalEaten + table.length;
+}
+
+function renderTable() {
+    const el = document.getElementById('table-cards');
+    if (table.length === 0) {
+        el.innerHTML = '<span class="table-empty">空</span>';
+    } else {
+        el.innerHTML = table.map(v =>
+            `<div class="card card-${v}">${v}</div>`
+        ).join('');
+    }
+}
+
+function renderHand() {
+    const el = document.getElementById('hand-cards');
+    if (hand.length === 0) {
+        el.innerHTML = '<span class="hand-empty">无手牌</span>';
+        return;
+    }
+    el.innerHTML = hand.map((v, i) =>
+        `<div class="card card-${v}${i === 0 ? ' next-card' : ''}">${v}</div>`
+    ).join('');
+}
+
+function addLog(text, cls) {
+    logs.push({ text, cls: cls || '' });
+    if (logs.length > 5) logs.shift();
+    const el = document.getElementById('log-area');
+    el.innerHTML = logs.map(l =>
+        `<div class="log-line ${l.cls}">${l.text}</div>`
+    ).join('');
+    el.scrollTop = el.scrollHeight;
+}
+
+function setButtons(enabled) {
+    document.getElementById('btn-next').disabled = !enabled;
+}
+
+/* ====== game logic ====== */
+function drawCards(n) {
+    let drawn = 0;
+    while (drawn < n && deck.length > 0) {
+        hand.push(deck.pop());
+        drawn++;
+    }
+    return drawn;
+}
+
+function startGame() {
+    stopAuto();
+    deck = [];
+    for (let i = 1; i <= 9; i++)
+        for (let j = 0; j < 7; j++) deck.push(i);
+    shuffle(deck);
+
+    hand = [];
+    table = [];
+    totalEaten = 0;
+    eatCount = 0;
+    animating = false;
+    logs = [];
+
+    drawCards(8);
+
+    showScreen('game-screen');
+    renderStats();
+    renderTable();
+    renderHand();
+    setButtons(true);
+    addLog('游戏开始，发了 8 张手牌。');
+}
+
+async function playNext() {
+    if (animating || hand.length === 0) return;
+    animating = true;
+    setButtons(false);
+
+    const card = hand.shift();
+    table.push(card);
+
+    addLog(`翻出 ${card}`);
+    renderHand();
+    renderTable();
+    renderStats();
+
+    const tableEl = document.getElementById('table-cards');
+    const lastCard = tableEl.children[tableEl.children.length - 1];
+    if (lastCard) lastCard.classList.add('card-played');
+
+    await sleep(280);
+
+    let matchIndex = -1;
+    for (let i = 0; i < table.length - 1; i++) {
+        if (table[i] === card) { matchIndex = i; break; }
+    }
+
+    if (matchIndex !== -1) {
+        const count = table.length - matchIndex;
+
+        for (let i = matchIndex; i < table.length; i++)
+            tableEl.children[i].classList.add('collecting');
+        await sleep(500);
+
+        for (let i = matchIndex; i < table.length; i++) {
+            tableEl.children[i].classList.remove('collecting');
+            tableEl.children[i].classList.add('eaten');
+        }
+        await sleep(350);
+
+        table.splice(matchIndex);
+        totalEaten += count;
+        eatCount++;
+
+        const drawn = drawCards(count - 1);
+        addLog(`🐲 吃掉 ${count} 张牌！补充 ${drawn} 张`, 'log-eat');
+
+        renderTable();
+        renderStats();
+        renderHand();
+
+        const handEl = document.getElementById('hand-cards');
+        const kids = handEl.children;
+        for (let i = kids.length - drawn; i < kids.length; i++)
+            if (kids[i]) kids[i].classList.add('card-new');
+        await sleep(300);
+    }
+
+    renderStats();
+
+    if (hand.length === 0) {
+        animating = false;
+        stopAuto();
+        await sleep(500);
+        endGame();
+        return;
+    }
+
+    animating = false;
+    setButtons(true);
+}
+
+/* ====== auto play ====== */
+function toggleAuto() {
+    if (autoTimer) {
+        stopAuto();
+    } else {
+        document.getElementById('btn-auto').textContent = '暂停';
+        autoStep();
+    }
+}
+
+async function autoStep() {
+    if (hand.length === 0) { stopAuto(); return; }
+    await playNext();
+    if (hand.length > 0 && autoTimer !== null) {
+        autoTimer = setTimeout(autoStep, 200);
+    }
+}
+
+function stopAuto() {
+    if (autoTimer) { clearTimeout(autoTimer); }
+    autoTimer = null;
+    document.getElementById('btn-auto').textContent = '自动播放';
+}
+
+/* ====== game over ====== */
+function endGame() {
+    const onTable = table.length;
+    const total = totalEaten + onTable;
+
+    document.getElementById('res-table').textContent = onTable;
+    document.getElementById('res-eaten').textContent = totalEaten;
+    document.getElementById('res-eat-times').textContent = eatCount;
+    document.getElementById('res-total').textContent = total;
+
+    document.getElementById('result-detail').innerHTML =
+        `共翻出 <strong>${total}</strong> 张牌，龙吃了 <strong>${eatCount}</strong> 次`;
+
+    showScreen('gameover-screen');
+}
+/* ====== Monte Carlo simulation ====== */
+function simulateOneGame() {
+    const dk = [];
+    for (let i = 1; i <= 9; i++)
+        for (let j = 0; j < 7; j++) dk.push(i);
+    for (let i = 62; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        const t = dk[i]; dk[i] = dk[j]; dk[j] = t;
+    }
+
+    let di = 62;
+    const hd = [];
+    for (let i = 0; i < 8; i++) hd.push(dk[di--]);
+
+    const tb = [];
+    let eaten = 0;
+    let hi = 0;
+
+    while (hi < hd.length) {
+        const card = hd[hi++];
+        tb.push(card);
+
+        let mi = -1;
+        for (let i = tb.length - 2; i >= 0; i--) {
+            if (tb[i] === card) { mi = i; break; }
+        }
+
+        if (mi !== -1) {
+            const cnt = tb.length - mi;
+            tb.length = mi;
+            eaten += cnt;
+            const draw = cnt - 1;
+            for (let d = 0; d < draw && di >= 0; d++)
+                hd.push(dk[di--]);
+        }
+    }
+
+    return eaten + tb.length;
+}
+
+async function runSim() {
+    const numRuns = Math.max(1000, Math.min(1000000,
+        parseInt(document.getElementById('sim-count').value) || 100000));
+    document.getElementById('sim-count').value = numRuns;
+
+    const statusEl = document.getElementById('sim-status');
+    const resultsEl = document.getElementById('sim-results');
+    document.getElementById('btn-sim').disabled = true;
+    resultsEl.style.display = 'none';
+    statusEl.textContent = '模拟中...';
+    await sleep(30);
+
+    const counts = {};
+    const chunk = 10000;
+    for (let start = 0; start < numRuns; start += chunk) {
+        const end = Math.min(start + chunk, numRuns);
+        for (let i = start; i < end; i++) {
+            const v = simulateOneGame();
+            counts[v] = (counts[v] || 0) + 1;
+        }
+        statusEl.textContent = `模拟中... ${end.toLocaleString()} / ${numRuns.toLocaleString()}`;
+        await sleep(0);
+    }
+
+    displaySimResults(counts, numRuns);
+    statusEl.textContent = `完成 ${numRuns.toLocaleString()} 次模拟`;
+    document.getElementById('btn-sim').disabled = false;
+}
+
+function defaultPrize(v) {
+    if (v === 8 || v >= 25) return 340;
+    if (v === 9 || v === 23 || v === 24) return 237;
+    if ((v >= 10 && v <= 11) || (v >= 18 && v <= 22)) return 90;
+    if (v >= 12 && v <= 17) return 5;
+    return 0;
+}
+
+function displaySimResults(counts, numRuns) {
+    lastSimCounts = counts;
+    lastSimRuns = numRuns;
+    const vals = Object.keys(counts).map(Number).sort((a, b) => a - b);
+
+    let sum = 0, mode = vals[0], modeN = 0;
+    for (const v of vals) {
+        sum += v * counts[v];
+        if (counts[v] > modeN) { modeN = counts[v]; mode = v; }
+    }
+    const mean = sum / numRuns;
+
+    let varSum = 0;
+    for (const v of vals) varSum += counts[v] * (v - mean) ** 2;
+    const std = Math.sqrt(varSum / numRuns);
+
+    let cum = 0, median = vals[0];
+    for (const v of vals) {
+        cum += counts[v];
+        if (cum >= numRuns / 2) { median = v; break; }
+    }
+
+    document.getElementById('sim-stats').innerHTML =
+        `<div><span>平均值 </span><strong>${mean.toFixed(2)}</strong></div>` +
+        `<div><span>中位数 </span><strong>${median}</strong></div>` +
+        `<div><span>众数 </span><strong>${mode}</strong></div>` +
+        `<div><span>标准差 </span><strong>${std.toFixed(2)}</strong></div>` +
+        `<div><span>范围 </span><strong>${vals[0]} ~ ${vals[vals.length - 1]}</strong></div>`;
+
+    const maxN = Math.max(...vals.map(v => counts[v]));
+    let html = '<div class="hist-header"><span>奖金</span><span>牌数</span><span></span><span>概率</span></div>';
+    for (const v of vals) {
+        const n = counts[v];
+        const pct = (n / numRuns * 100).toFixed(2);
+        const w = (n / maxN * 100).toFixed(1);
+        const prize = defaultPrize(v);
+        html += `<div class="hist-row">` +
+            `<div class="hist-prize"><input id="prize-${v}" type="number" value="${prize}" oninput="calcExpected()"></div>` +
+            `<div class="hist-label">${v}</div>` +
+            `<div class="hist-bar-bg"><div class="hist-bar" style="width:${w}%"></div></div>` +
+            `<div class="hist-val">${pct}%</div>` +
+            `</div>`;
+    }
+    document.getElementById('sim-histogram').innerHTML = html;
+    document.getElementById('sim-results').style.display = 'block';
+    calcExpected();
+}
+
+function calcExpected() {
+    if (!lastSimCounts) return;
+    let ev = 0;
+    const vals = Object.keys(lastSimCounts).map(Number);
+    for (const v of vals) {
+        const prob = lastSimCounts[v] / lastSimRuns;
+        const prize = parseFloat(document.getElementById('prize-' + v).value) || 0;
+        ev += prob * prize;
+    }
+    document.getElementById('ev-value').textContent = ev.toFixed(2);
+    document.getElementById('sim-expected').style.display = 'block';
+}
+</script>
+</body>
+</html>
