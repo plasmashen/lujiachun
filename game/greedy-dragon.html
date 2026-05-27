@@ -132,6 +132,21 @@
         .log-area .log-line:last-child { opacity: 1; }
         .log-eat { color: #ffd54f; font-weight: bold; }
 
+        .play-row {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 16px;
+            align-items: stretch;
+        }
+        .play-row .table-area { flex: 1; margin-bottom: 0; }
+        .play-row .log-area {
+            width: 190px;
+            flex-shrink: 0;
+            margin-bottom: 0;
+            max-height: none;
+            font-size: 13px;
+        }
+
         /* ---------- hand area ---------- */
         .hand-area { padding: 4px 0; }
         .hand-cards {
@@ -186,6 +201,10 @@
         .card-7 { background: linear-gradient(135deg, #e91e63, #c2185b); }
         .card-8 { background: linear-gradient(135deg, #00bcd4, #00838f); }
         .card-9 { background: linear-gradient(135deg, #607d8b, #455a64); }
+        .card-back {
+            background: repeating-linear-gradient(45deg, #3a4a5c, #3a4a5c 7px, #2c3a47 7px, #2c3a47 14px);
+            color: rgba(255,255,255,.45);
+        }
 
         .card.collecting {
             animation: collectPulse .5s ease;
@@ -390,6 +409,8 @@
             .hand-cards, .table-cards { gap: 6px; }
             .rules-box { padding: 16px; font-size: 14px; }
             h1 { font-size: 26px; }
+            .play-row { flex-direction: column; }
+            .play-row .log-area { width: 100%; max-height: 64px; }
         }
     </style>
 </head>
@@ -413,6 +434,7 @@
         <button class="btn btn-primary" onclick="startGame()">开始游戏</button>
         <div style="margin-top:14px">
             <button class="btn btn-small" onclick="showScreen('sim-screen')">蒙特卡洛模拟</button>
+            <button class="btn btn-small" onclick="location.href='index.html'">返回游戏中心</button>
         </div>
     </div>
 
@@ -427,11 +449,12 @@
         </div>
 
         <div class="section-label">— 场上 —</div>
-        <div class="table-area">
-            <div class="table-cards" id="table-cards"></div>
+        <div class="play-row">
+            <div class="table-area">
+                <div class="table-cards" id="table-cards"></div>
+            </div>
+            <div class="log-area" id="log-area"></div>
         </div>
-
-        <div class="log-area" id="log-area"></div>
 
         <div class="section-label">— 手牌（按顺序翻出）—</div>
         <div class="hand-area">
@@ -444,6 +467,7 @@
         </div>
 
         <div class="controls">
+            <button class="btn btn-small" id="btn-hand" onclick="toggleHand()">隐藏手牌</button>
             <button class="btn btn-small" onclick="stopAuto(); showScreen('start-screen')">返回</button>
             <button class="btn btn-small" onclick="stopAuto(); startGame()">重新开始</button>
         </div>
@@ -494,6 +518,8 @@ let totalEaten = 0;
 let eatCount = 0;
 let animating = false;
 let autoTimer = null;
+let autoOn = false;
+let handVisible = true;
 let logs = [];
 let lastSimCounts = null;
 let lastSimRuns = 0;
@@ -539,9 +565,21 @@ function renderHand() {
         el.innerHTML = '<span class="hand-empty">无手牌</span>';
         return;
     }
-    el.innerHTML = hand.map((v, i) =>
-        `<div class="card card-${v}${i === 0 ? ' next-card' : ''}">${v}</div>`
-    ).join('');
+    if (handVisible) {
+        el.innerHTML = hand.map((v, i) =>
+            `<div class="card card-${v}${i === 0 ? ' next-card' : ''}">${v}</div>`
+        ).join('');
+    } else {
+        el.innerHTML = hand.map((v, i) =>
+            `<div class="card card-back${i === 0 ? ' next-card' : ''}">?</div>`
+        ).join('');
+    }
+}
+
+function toggleHand() {
+    handVisible = !handVisible;
+    document.getElementById('btn-hand').textContent = handVisible ? '隐藏手牌' : '显示手牌';
+    renderHand();
 }
 
 function addLog(text, cls) {
@@ -619,8 +657,10 @@ async function playNext() {
     if (matchIndex !== -1) {
         const count = table.length - matchIndex;
 
-        for (let i = matchIndex; i < table.length; i++)
+        for (let i = matchIndex; i < table.length; i++) {
+            tableEl.children[i].classList.remove('card-played');
             tableEl.children[i].classList.add('collecting');
+        }
         await sleep(500);
 
         for (let i = matchIndex; i < table.length; i++) {
@@ -663,23 +703,25 @@ async function playNext() {
 
 /* ====== auto play ====== */
 function toggleAuto() {
-    if (autoTimer) {
+    if (autoOn) {
         stopAuto();
     } else {
+        autoOn = true;
         document.getElementById('btn-auto').textContent = '暂停';
         autoStep();
     }
 }
 
 async function autoStep() {
-    if (hand.length === 0) { stopAuto(); return; }
+    if (!autoOn || hand.length === 0) { stopAuto(); return; }
     await playNext();
-    if (hand.length > 0 && autoTimer !== null) {
+    if (autoOn && hand.length > 0) {
         autoTimer = setTimeout(autoStep, 200);
     }
 }
 
 function stopAuto() {
+    autoOn = false;
     if (autoTimer) { clearTimeout(autoTimer); }
     autoTimer = null;
     document.getElementById('btn-auto').textContent = '自动播放';
