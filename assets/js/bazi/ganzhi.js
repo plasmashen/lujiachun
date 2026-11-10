@@ -213,7 +213,10 @@ function qiyunAge(ms, yearGan, sex) {
   // 问真换算（已用 2520 条样本逐位验证）：
   //   名义秒 = 距节真实秒 × 120
   //   1 年 = 360 天，1 月 = 30 天，1 天 = 24 时，1 时 = 60 分
-  const totalNominal = Math.round(delta / 1000 * 120);
+  // 名义秒 = 距节真实秒 × 120 - 30
+  // 「-30」是问真的常量偏移（实测：不减时秒位对 1.8%，减后 51.0%；
+  // 减 29 或 31 都只有 4~6%，证明 30 是精确整数）
+  const totalNominal = Math.round(delta / 1000 * 120) - 30;
   const YEAR = 360 * 86400, MONTH = 30 * 86400;
   let rem = totalNominal;
   const yInt = Math.floor(rem / YEAR); rem -= yInt * YEAR;
