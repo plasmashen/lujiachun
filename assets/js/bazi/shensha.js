@@ -315,10 +315,6 @@ var BZ_YUE_DE={"申子辰":"壬","寅午戌":"丙","巳酉丑":"庚","亥卯未"
 var BZ_TIAN_DE={"寅":"丁","卯":"申","辰":"壬","巳":"辛","午":"亥",
   "未":"甲","申":"癸","酉":"寅","戌":"丙","亥":"乙",
   "子":"巳","丑":"庚"};
-var BZ_JINYU={"甲":"辰","乙":"巳","丙":"未","丁":"申","戊":"未",
-  "己":"申","庚":"戌","辛":"亥","壬":"丑","癸":"寅"};
-var BZ_TIANCHU={"甲":"巳","乙":"午","丙":"巳","丁":"午","戊":"申",
-  "己":"酉","庚":"亥","辛":"子","壬":"寅","癸":"卯"};
 var BZ_FUXING={"甲":"寅子","乙":"丑卯","丙":"寅子","丁":"亥","戊":"申",
   "己":"未","庚":"午","辛":"巳","壬":"辰","癸":"丑卯"};
 var BZ_GAN_STR="甲乙丙丁戊己庚辛壬癸";
@@ -368,13 +364,17 @@ function bzShenshaFormula(pillars, sex){
   var yc=BZ_ZHI_STR.charAt((BZ_ZHI_STR.indexOf(step)+6)%12);
   for (i=1;i<4;i++) if (pillars[i].charAt(1)===yc) out[i].push("元辰");
 
-  // 金舆 / 天厨贵人 / 福星贵人：日干 ∪ 年干 → 地支
-  var trio=[["金舆",BZ_JINYU],["天厨贵人",BZ_TIANCHU],["福星贵人",BZ_FUXING]];
-  for (var t=0;t<trio.length;t++){
-    var nm=trio[t][0], tab=trio[t][1];
-    var allow=(tab[riGan]||"")+(tab[nianGan]||"");
-    for (i=0;i<4;i++) if (allow.indexOf(pillars[i].charAt(1))>=0) out[i].push(nm);
+  // 金舆 = 禄+2，天厨贵人 = 食神之禄（两者都是代数式）
+  for (i=0;i<4;i++){
+    var pz=pillars[i].charAt(1);
+    if (pz===BZ_ZHI_STR.charAt(bzJinyu2(riGan)) ||
+        pz===BZ_ZHI_STR.charAt(bzJinyu2(nianGan))) out[i].push("金舆");
+    if (pz===BZ_ZHI_STR.charAt(bzTianchu2(riGan)) ||
+        pz===BZ_ZHI_STR.charAt(bzTianchu2(nianGan))) out[i].push("天厨贵人");
   }
+  // 福星贵人：仅此一项保留小表（无代数式）
+  var allowFx=(BZ_FUXING[riGan]||"")+(BZ_FUXING[nianGan]||"");
+  for (i=0;i<4;i++) if (allowFx.indexOf(pillars[i].charAt(1))>=0) out[i].push("福星贵人");
 
   // 德秀贵人：柱干 ∈ 月支三合局的德/秀天干集
   var DEXIU={"申子辰":"壬癸戊己丙辛甲己","寅午戌":"丙丁戊癸",
