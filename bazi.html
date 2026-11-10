@@ -746,7 +746,11 @@ title: 八字排盘
     if (y < 1900 || y > 2100) { err('仅支持 1900–2100 年'); return; }
 
     try {
-      var chart = paipan(cstMs(y, mo, d, hh, mi, 0), sex, true);
+      // 第 4 参数传「今天」的 00:00，用于胎对八字（tdbz）
+      var today = new Date();
+      var todayMs = cstMs(today.getFullYear(), today.getMonth() + 1,
+                          today.getDate(), 0, 0, 0);
+      var chart = paipan(cstMs(y, mo, d, hh, mi, 0), sex, true, todayMs);
       window.__bz = chart;
       render(chart, dv + ' ' + tv);
     } catch (e) {

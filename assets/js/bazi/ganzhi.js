@@ -315,7 +315,7 @@ function wuxingScore(p) {
 }
 
 // ── 主入口 ──
-function paipan(ms, sex = 1, lateZiAdvance = true) {
+function paipan(ms, sex = 1, lateZiAdvance = true, todayMs) {
   const p = fourPillars(ms, lateZiAdvance);
   const pillars = [p.year, p.month, p.day, p.hour];
   const dg = p.day[0];
@@ -342,16 +342,24 @@ function paipan(ms, sex = 1, lateZiAdvance = true) {
   // sex 必须传入——元辰依赖「阳男阴女进、阴男阳女退」的性别判定
   const shensha = bzAllShensha(pillars, sex);
 
-  // 大运神煞：把大运干支当作「时柱」再取该柱神煞
+  // 大运神煞：把大运干支代入时柱，用完整实现（含公式型神煞）
+  const nayinYear = bzNayinWuxing(pillars[0]);
   const dyshensha = dayun.map(function (gz) {
     const tmp = pillars.slice();
     tmp[3] = gz;
-    return [gz, bzShenshaForPillar(tmp, 3, sex)];
+    let lst = bzAllShensha(tmp, sex)[3].slice();
+    // 金神判的是原局日柱/时柱，不是大运代入位置
+    const gi = lst.indexOf('金神');
+    if (gi >= 0) lst.splice(gi, 1);
+    // 天罗地网判的是大运地支本身
+    if ('戌亥'.indexOf(gz[1]) >= 0 && nayinYear === '火' && lst.indexOf('天罗') < 0) lst.push('天罗');
+    if ('辰巳'.indexOf(gz[1]) >= 0 && '土水'.indexOf(nayinYear) >= 0 && lst.indexOf('地网') < 0) lst.push('地网');
+    return [gz, lst];
   });
 
-  // 胎对八字 = 今天的四柱
+  // 胎对八字 = today 那天 00:00 的四柱（缺省用今天）
   const nowMs = Date.now();
-  const tdbz = tdbzOf(nowMs);
+  const tdbz = tdbzOf(todayMs === undefined ? nowMs : todayMs);
 
   return {
     ms, sex,
