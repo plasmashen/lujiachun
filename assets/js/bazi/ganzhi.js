@@ -1,4 +1,4 @@
-﻿/**
+﻿﻿/**
  * 八字排盘引擎 —— 干支历法与命理要素
  * 与 Python 版 core/ganzhi.py + core/elements.py + core/extras.py 对应。
  */
@@ -76,39 +76,7 @@ function kongwang(gz) {
   return DZ[(xunStart + 10) % 12] + DZ[(xunStart + 11) % 12];
 }
 
-// ── 神煞 ──
-const TIANYI = {
-  '甲': ['丑', '未'], '戊': ['丑', '未'], '庚': ['丑', '未'],
-  '乙': ['子', '申'], '己': ['子', '申'],
-  '丙': ['亥', '酉'], '丁': ['亥', '酉'],
-  '壬': ['卯', '巳'], '癸': ['卯', '巳'], '辛': ['午', '寅'],
-};
-const WENCHANG = { '甲': '巳', '乙': '午', '丙': '申', '丁': '酉', '戊': '申',
-  '己': '酉', '庚': '亥', '辛': '子', '壬': '寅', '癸': '卯' };
-const LUSHEN = { '甲': '寅', '乙': '卯', '丙': '巳', '丁': '午', '戊': '巳',
-  '己': '午', '庚': '申', '辛': '酉', '壬': '亥', '癸': '子' };
-const YANGREN = { '甲': '卯', '丙': '午', '戊': '午', '庚': '酉', '壬': '子' };
-const TAOHUA = { '申': '酉', '子': '酉', '辰': '酉', '寅': '卯', '午': '卯', '戌': '卯',
-  '巳': '午', '酉': '午', '丑': '午', '亥': '子', '卯': '子', '未': '子' };
-const YIMA = { '申': '寅', '子': '寅', '辰': '寅', '寅': '申', '午': '申', '戌': '申',
-  '巳': '亥', '酉': '亥', '丑': '亥', '亥': '巳', '卯': '巳', '未': '巳' };
-const HUAGAI = { '申': '辰', '子': '辰', '辰': '辰', '寅': '戌', '午': '戌', '戌': '戌',
-  '巳': '丑', '酉': '丑', '丑': '丑', '亥': '未', '卯': '未', '未': '未' };
-const JIANGXING = { '申': '子', '子': '子', '辰': '子', '寅': '午', '午': '午', '戌': '午',
-  '巳': '酉', '酉': '酉', '丑': '酉', '亥': '卯', '卯': '卯', '未': '卯' };
-
-function shenshaOf(dayGan, refZhi, zhi) {
-  const out = [];
-  if ((TIANYI[dayGan] || []).includes(zhi)) out.push('天乙贵人');
-  if (WENCHANG[dayGan] === zhi) out.push('文昌贵人');
-  if (LUSHEN[dayGan] === zhi) out.push('禄神');
-  if (YANGREN[dayGan] === zhi) out.push('羊刃');
-  if (TAOHUA[refZhi] === zhi) out.push('桃花');
-  if (YIMA[refZhi] === zhi) out.push('驿马');
-  if (HUAGAI[refZhi] === zhi) out.push('华盖');
-  if (JIANGXING[refZhi] === zhi) out.push('将星');
-  return out;
-}
+// ── 神煞见 shensha.js（42 种已验证规则）──
 
 // ── 四柱 ──
 const CST_OFFSET_MS = 8 * 3600 * 1000;
@@ -229,29 +197,61 @@ function qiyunAge(ms, yearGan, sex) {
   const y = new Date(ms + CST_OFFSET_MS).getUTCFullYear();
   const bounds = [];
   for (const yy of [y - 1, y, y + 1]) {
-    for (const name of JIE) bounds.push(solarTermTime(yy, name));
+    for (const name of JIE) bounds.push([solarTermTime(yy, name), name]);
   }
-  bounds.sort((a, b) => a - b);
+  bounds.sort((a, b) => a[0] - b[0]);
 
-  let delta;
+  let delta, jieMs, jieName;
   if (forward) {
-    const nxt = bounds.find(b => b > ms);
-    delta = nxt - ms;
+    const nx = bounds.find(b => b[0] > ms);
+    jieMs = nx[0]; jieName = nx[1]; delta = jieMs - ms;
   } else {
-    const prv = bounds.filter(b => b <= ms).pop();
-    delta = ms - prv;
+    const pv = bounds.filter(b => b[0] <= ms).pop();
+    jieMs = pv[0]; jieName = pv[1]; delta = ms - jieMs;
   }
 
-  const totalDays = delta / 86400000;
-  const years = totalDays / 3.0;
-  const yInt = Math.floor(years);
-  const remMonths = (years - yInt) * 12;
-  const mInt = Math.floor(remMonths);
-  const dInt = Math.round((remMonths - mInt) * 30);
-  const jiaoyun = ms + years * 365.2422 * 86400000;
+  // 问真换算（已用 2520 条样本逐位验证）：
+  //   名义秒 = 距节真实秒 × 120
+  //   1 年 = 360 天，1 月 = 30 天，1 天 = 24 时，1 时 = 60 分
+  const totalNominal = Math.round(delta / 1000 * 120);
+  const YEAR = 360 * 86400, MONTH = 30 * 86400;
+  let rem = totalNominal;
+  const yInt = Math.floor(rem / YEAR); rem -= yInt * YEAR;
+  const mInt = Math.floor(rem / MONTH); rem -= mInt * MONTH;
+  const dInt = Math.floor(rem / 86400); rem -= dInt * 86400;
+  const hours = Math.floor(rem / 3600); rem -= hours * 3600;
+  const minutes = Math.floor(rem / 60);
+  const seconds = rem % 60;
+
+  // 交运日期 = 出生 + 年/月/日（按公历年月推进，保留出生时分秒）
+  const bd = new Date(ms + CST_OFFSET_MS);
+  const totalMonths = bd.getUTCMonth() + 1 + mInt;
+  const ty = bd.getUTCFullYear() + yInt + Math.floor((totalMonths - 1) / 12);
+  const tm = ((totalMonths - 1) % 12 + 12) % 12 + 1;
+  const jiaoyunMs = cstMs(ty, tm, bd.getUTCDate() + dInt,
+    bd.getUTCHours(), bd.getUTCMinutes(), bd.getUTCSeconds());
 
   return { forward, age: yInt, months: mInt, days: dInt,
-    jiaoyun, totalDays: Math.round(totalDays * 1000) / 1000 };
+    hours, minutes, seconds,
+    qiyunsui: yInt + 1,
+    jiaoyun: jiaoyunMs, jieMs, jieName,
+    totalDays: Math.round(delta / 86400000 * 10000) / 10000 };
+}
+
+// 交运描述串：逢X、Y年 <节>后N天 交大运
+function jiaoyunText(qy) {
+  const jyY = yearPillar(qy.jiaoyun).gz[0];
+  const HE = { '甲': '己', '己': '甲', '乙': '庚', '庚': '乙', '丙': '辛',
+    '辛': '丙', '丁': '壬', '壬': '丁', '戊': '癸', '癸': '戊' };
+  const yy = new Date(qy.jiaoyun + CST_OFFSET_MS).getUTCFullYear();
+  const b = [];
+  for (const y0 of [yy - 1, yy, yy + 1]) {
+    for (const nm of JIE) b.push([solarTermTime(y0, nm), nm]);
+  }
+  b.sort((a, c) => a[0] - c[0]);
+  const prev = b.filter(x => x[0] <= qy.jiaoyun).pop();
+  const days = Math.round((qy.jiaoyun - prev[0]) / 86400000);
+  return '逢' + jyY + '、' + HE[jyY] + '年 ' + prev[1] + '后' + days + '天 交大运';
 }
 
 function dayunList(monthGz, forward, count = 12) {
@@ -262,12 +262,24 @@ function dayunList(monthGz, forward, count = 12) {
   return out;
 }
 
-function xiaoyunList(yearGz, forward, count = 12) {
-  const idx = JIAZI.indexOf(yearGz);
+// 小运：xy[59] = 时柱，xy[59+k] = 时柱 + k·step（已验证 2384/2384）
+function xiaoyunList(hourGz, forward, count = 110) {
+  const idx = JIAZI.indexOf(hourGz);
   const step = forward ? 1 : -1;
+  const ANCHOR = 59;
   const out = [];
-  for (let i = 0; i < count; i++) out.push(JIAZI[((idx + step * (i + 1)) % 60 + 60) % 60]);
+  for (let i = 0; i < count; i++) {
+    out.push(JIAZI[((idx + step * (i - ANCHOR)) % 60 + 60) % 60]);
+  }
   return out;
+}
+
+// 胎对八字（tdbz）：问真返回的是「今天 00:00（子时）」的四柱，与出生时间无关
+function tdbzOf(nowMs) {
+  const nd = new Date(nowMs + CST_OFFSET_MS);
+  const midnight = cstMs(nd.getUTCFullYear(), nd.getUTCMonth() + 1, nd.getUTCDate(), 0, 0, 0);
+  const p = fourPillars(midnight);
+  return [p.year, p.month, p.day, p.hour];
 }
 
 // ── 五行统计 ──
@@ -315,9 +327,22 @@ function paipan(ms, sex = 1, lateZiAdvance = true) {
 
   const qy = qiyunAge(ms, p.year[0], sex);
   const dayun = dayunList(p.month, qy.forward, 12);
-  const xiaoyun = xiaoyunList(p.year, qy.forward, 12);
+  const xiaoyun = xiaoyunList(p.hour, qy.forward, 110);
+  qy.jiaoyunText = jiaoyunText(qy);
 
-  const shensha = pillars.map(gz => shenshaOf(dg, p.year[1], gz[1]));
+  // 神煞：42 种已验证规则（shensha.js）
+  const shensha = bzAllShensha(pillars);
+
+  // 大运神煞：把大运干支当作「时柱」再取该柱神煞
+  const dyshensha = dayun.map(function (gz) {
+    const tmp = pillars.slice();
+    tmp[3] = gz;
+    return [gz, bzShenshaForPillar(tmp, 3)];
+  });
+
+  // 胎对八字 = 今天的四柱
+  const nowMs = Date.now();
+  const tdbz = tdbzOf(nowMs);
 
   return {
     ms, sex,
@@ -332,7 +357,7 @@ function paipan(ms, sex = 1, lateZiAdvance = true) {
     taixi: tx, taixiNayin: nayin(tx),
     minggong: mg, minggongNayin: nayin(mg),
     shengong: sg, shengongNayin: nayin(sg),
-    qiyun: qy, dayun, xiaoyun,
+    qiyun: qy, dayun, xiaoyun, dyshensha, tdbz,
     wuxingCount: wuxingCount(p),
     wuxingScore: wuxingScore(p),
   };

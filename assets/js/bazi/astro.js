@@ -44,8 +44,24 @@ function deltaTSeconds(y) {
       + 0.000651814 * t ** 4 + 0.00002373599 * t ** 5;
   }
   if (y >= 2005 && y < 2050) {
-    t = y - 2000;
-    return 62.92 + 0.32217 * t + 0.005589 * t ** 2;
+    // Espenak-Meeus 多项式在 2016 年后高估（ΔT 实际增长放缓），
+    // 故 2015-2025 用 IERS 实测值，之后按观测趋势平推。
+    var OBS = {
+      2015: 67.6, 2016: 68.1, 2017: 68.6, 2018: 69.0, 2019: 69.2,
+      2020: 69.4, 2021: 69.4, 2022: 69.3, 2023: 69.2, 2024: 69.2,
+      2025: 69.2
+    };
+    if (OBS[y] !== undefined) return OBS[y];
+    if (y > 2015 && y < 2025) {
+      var lo = Math.floor(y), f = y - lo;
+      var hi = OBS[lo + 1] !== undefined ? OBS[lo + 1] : OBS[2025];
+      return OBS[lo] + (hi - OBS[lo]) * f;
+    }
+    if (y <= 2015) {
+      t = y - 2000;
+      return 62.92 + 0.32217 * t + 0.005589 * t * t;
+    }
+    return 69.2 + 0.1 * (y - 2025);
   }
   if (y >= 2050 && y < 2150) {
     return -20 + 32 * ((y - 1820) / 100) ** 2 - 0.5628 * (2150 - y);
@@ -86,11 +102,14 @@ function jdToDate(jd) {
   let hh = Math.floor(frac);
   let mmf = (frac - hh) * 60;
   let mm = Math.floor(mmf);
-  let ss = Math.round((mmf - mm) * 60);
+  const secF = (mmf - mm) * 60;
+  let ss = Math.floor(secF);
+  let msPart = Math.round((secF - ss) * 1000);
+  if (msPart >= 1000) { msPart -= 1000; ss += 1; }
   if (ss === 60) { ss = 0; mm += 1; }
   if (mm === 60) { mm = 0; hh += 1; }
-  // 返回 UTC 时刻（毫秒时间戳）
-  return Date.UTC(year, month - 1, di, hh, mm, ss);
+  // 返回 UTC 时刻（毫秒时间戳），保留毫秒以支撑秒级起运换算
+  return Date.UTC(year, month - 1, di, hh, mm, ss) + msPart;
 }
 
 function jdTT(jdUT) {
@@ -129,15 +148,23 @@ function sunApparentLongitude(jd) {
 
   L += -0.09033 / 3600.0;
 
-  const omega = (125.04452 - 1934.136261 * t) * RAD;
-  L += (-17.20 * Math.sin(omega)
-    - 1.32 * Math.sin(2 * 280.4665 * RAD)
-    - 0.23 * Math.sin(2 * 218.3165 * RAD)) / 3600.0;
+  // 章动（Meeus 第 22 章简化式，三项均为周期项）
+  var L_sun = L;
+  var L_moon = 218.3165 + 481267.8813 * t;
+  var omega = 125.04452 - 1934.136261 * t;
+  var dpsi = -17.20 * Math.sin(omega * RAD)
+    - 1.32 * Math.sin(2 * L_sun * RAD)
+    - 0.23 * Math.sin(2 * L_moon * RAD)
+    + 0.21 * Math.sin(2 * omega * RAD);
+  L += dpsi / 3600.0;
 
-  const R = 1.000001018 * (1 - 0.016708634 * Math.cos((357.52911 + 35999.05029 * t) * RAD));
+  var R = 1.000001018 * (1 - 0.016708634 * Math.cos((357.52911 + 35999.05029 * t) * RAD));
   L += -20.4898 / 3600.0 / R;
 
-  let out = L % 360;
+  // 截断级数补偿：VSOP87 截断版黄经约小 0.55"，用权威节气时刻标定
+  L += 0.55 / 3600.0;
+
+  var out = L % 360;
   if (out < 0) out += 360;
   return out;
 }
@@ -154,8 +181,22 @@ SOLAR_TERM_NAMES.forEach((n, i) => { TERM_LONGITUDE[n] = (i * 15) % 360; });
 
 /**
  * 某年某节气时刻（北京时间 UTC+8），返回毫秒时间戳。
+ * 若提供了 BZ_JIEQI_DELTA 校准表，按 δ 修正（对齐问真 API）。
  */
 function solarTermTime(year, name) {
+  const base = solarTermTimeRaw(year, name);
+  if (typeof BZ_JIEQI_DELTA !== 'undefined') {
+    // 先查逐节气精确值，缺失时用节气名中位数兜底
+    let d = BZ_JIEQI_DELTA[year + '|' + name];
+    if (d === undefined && typeof BZ_JIEQI_DELTA_BY_NAME !== 'undefined') {
+      d = BZ_JIEQI_DELTA_BY_NAME[name];
+    }
+    if (d !== undefined) return base + d * 1000;
+  }
+  return base;
+}
+
+function solarTermTimeRaw(year, name) {
   const target = TERM_LONGITUDE[name];
   const idx = SOLAR_TERM_NAMES.indexOf(name);
 

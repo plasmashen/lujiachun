@@ -4,314 +4,437 @@ title: 八字排盘
 ---
 
 <style>
-.bazi-wrap { max-width: 1100px; margin: 0 auto;
-  font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Hiragino Sans GB",
-    "Microsoft YaHei", "Source Han Sans SC", "Noto Sans CJK SC", sans-serif; }
-.bazi-card { background: #fff; border-radius: 14px; padding: 26px; margin-bottom: 22px;
-  box-shadow: 0 2px 14px rgba(0,0,0,.07); border: 1px solid rgba(0,0,0,.05); }
-.bazi-card h2 { margin: 0 0 18px; font-size: 19px; font-weight: 600; color: #1a1a2e;
-  padding-bottom: 12px; border-bottom: 2px solid #f0f0f5; }
+:root{
+  --bg:#f6f7fb; --card:#fff; --ink:#1a1a2e; --ink2:#5a5f72; --ink3:#9aa0b4;
+  --line:#e8eaf2; --brand:#5b6ef5; --brand2:#8b5cf6;
+  --gan:#c0392b; --ok:#10b981; --warn:#f59e0b;
+  --mu:#4caf50; --huo:#e53935; --tu:#d4a017; --jin:#8a8f9e; --shui:#2196f3;
+  --r:16px; --sh:0 1px 3px rgba(20,25,60,.06),0 8px 24px rgba(20,25,60,.05);
+}
+*{box-sizing:border-box}
+.bz-wrap{max-width:1180px;margin:0 auto;padding:8px 0 40px;
+  font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB",
+  "Microsoft YaHei","Source Han Sans SC","Noto Sans CJK SC",sans-serif;
+  color:var(--ink);-webkit-font-smoothing:antialiased}
 
-/* 输入区 */
-.bz-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-  gap: 14px; margin-bottom: 16px; }
-.bz-field label { display: block; font-size: 13px; color: #666; margin-bottom: 6px; font-weight: 500; }
-.bz-field input, .bz-field select { width: 100%; padding: 10px 12px; font-size: 15px;
-  border: 1px solid #dcdfe6; border-radius: 8px; box-sizing: border-box;
-  transition: border-color .2s; background: #fff; color: #333; }
-.bz-field input:focus, .bz-field select:focus { outline: none; border-color: #667eea; }
-.bz-actions { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; }
-.btn { padding: 11px 26px; font-size: 15px; font-weight: 600; border: none; border-radius: 8px;
-  cursor: pointer; transition: all .2s; }
-.btn-primary { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #fff; }
-.btn-primary:hover { transform: translateY(-2px); box-shadow: 0 6px 16px rgba(102,126,234,.35); }
-.btn-ghost { background: #f5f5f8; color: #555; }
-.btn-ghost:hover { background: #ebebf2; }
+/* ── 卡片 ── */
+.card{background:var(--card);border-radius:var(--r);padding:22px;margin-bottom:18px;
+  box-shadow:var(--sh);border:1px solid rgba(20,25,60,.04)}
+.card-h{display:flex;align-items:center;gap:10px;margin:0 0 18px;padding-bottom:14px;
+  border-bottom:1px solid var(--line)}
+.card-h h2{margin:0;font-size:16px;font-weight:650;letter-spacing:.2px}
+.card-h .dot{width:4px;height:16px;border-radius:2px;
+  background:linear-gradient(180deg,var(--brand),var(--brand2))}
+.card-h .sub{margin-left:auto;font-size:12px;color:var(--ink3);font-weight:400}
 
-/* 四柱表 */
-.pillar-table { width: 100%; border-collapse: separate; border-spacing: 8px; table-layout: fixed; }
-.pillar-table th { font-size: 13px; color: #888; font-weight: 500; padding: 4px 0; }
-.pillar-table td { text-align: center; padding: 10px 4px; }
-.pillar-table .col-label { text-align: right; font-size: 13px; color: #888; padding-right: 10px;
-  width: 82px; font-weight: 500; }
-.gz-big { font-size: 30px; font-weight: 700; letter-spacing: 4px; line-height: 1.25;
-  color: #1a1a2e; font-family: "Songti SC", "STSong", "SimSun", "Source Han Serif SC", "Noto Serif CJK SC", "Times New Roman", serif; }
-.gz-gan { color: #c0392b; }
-.gz-cell { background: #fafafc; border-radius: 10px; padding: 12px 6px; }
-.gz-cell.dm { background: linear-gradient(135deg,#fff5f7,#ffeef2); border: 1.5px solid #f8d0da; }
-.cg-line { font-size: 13px; color: #666; line-height: 1.7; }
-.tag { display: inline-block; font-size: 11px; padding: 1px 7px; border-radius: 4px;
-  background: #eef1ff; color: #5a6acf; margin: 1px 2px; }
-.tag.wx-木 { background:#e8f5e9; color:#2e7d32; }
-.tag.wx-火 { background:#ffeaea; color:#c62828; }
-.tag.wx-土 { background:#fff6e5; color:#a06a00; }
-.tag.wx-金 { background:#f0f0f5; color:#555; }
-.tag.wx-水 { background:#e7f2fb; color:#1565c0; }
+/* ── 输入区 ── */
+.in-row{display:grid;grid-template-columns:1.3fr 1fr 1fr;gap:14px;margin-bottom:14px}
+@media(max-width:720px){.in-row{grid-template-columns:1fr}}
+.fld label{display:block;font-size:12px;color:var(--ink2);margin-bottom:6px;font-weight:550;
+  letter-spacing:.3px}
+.fld input,.fld select{width:100%;padding:11px 13px;font-size:15px;color:var(--ink);
+  border:1.5px solid var(--line);border-radius:10px;background:#fbfbfe;
+  transition:border-color .15s,background .15s;font-family:inherit}
+.fld input:focus,.fld select:focus{outline:none;border-color:var(--brand);background:#fff}
 
-/* 信息网格 */
-.info-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; }
-.info-item { background: #fafafc; border-radius: 9px; padding: 12px 14px; }
-.info-item .k { font-size: 12px; color: #999; margin-bottom: 5px; }
-.info-item .v { font-size: 16px; font-weight: 600; color: #1a1a2e;
-  font-family: "Songti SC", "STSong", "SimSun", "Source Han Serif SC", "Noto Serif CJK SC", "Times New Roman", serif; }
+/* ── 快调按钮组 ── */
+.quick{margin:14px 0 0}
+.quick-t{font-size:11px;color:var(--ink3);margin-bottom:8px;font-weight:550;
+  letter-spacing:.5px;text-transform:uppercase}
+.qbtns{display:flex;flex-wrap:wrap;gap:7px}
+.qb{padding:7px 13px;font-size:13px;border-radius:9px;cursor:pointer;
+  background:#f4f5fa;color:var(--ink2);border:1px solid transparent;
+  transition:all .14s;font-family:inherit;font-weight:500}
+.qb:hover{background:#eaecf7;color:var(--ink)}
+.qb:active{transform:scale(.96)}
+.qb.on{background:linear-gradient(135deg,var(--brand),var(--brand2));color:#fff}
+.qb.minus{background:#fef4f4;color:#c0392b}
+.qb.minus:hover{background:#fde8e8}
+.qb.plus{background:#f0fbf6;color:#0d9668}
+.qb.plus:hover{background:#e4f7ee}
 
-/* 五行条 */
-.wx-bars { display: grid; gap: 10px; }
-.wx-bar-row { display: grid; grid-template-columns: 46px 1fr 54px; align-items: center; gap: 10px; }
-.wx-bar-label { font-size: 14px; font-weight: 600; }
-.wx-bar-track { height: 20px; background: #f0f0f5; border-radius: 10px; overflow: hidden; }
-.wx-bar-fill { height: 100%; border-radius: 10px; transition: width .5s ease; }
-.wx-bar-val { font-size: 13px; color: #666; text-align: right; }
+/* ── 主按钮 ── */
+.acts{display:flex;gap:10px;flex-wrap:wrap;margin-top:18px;align-items:center}
+.btn{padding:11px 24px;font-size:14px;font-weight:600;border:none;border-radius:10px;
+  cursor:pointer;transition:all .16s;font-family:inherit}
+.btn-p{background:linear-gradient(135deg,var(--brand),var(--brand2));color:#fff;
+  box-shadow:0 4px 14px rgba(91,110,245,.28)}
+.btn-p:hover{transform:translateY(-1px);box-shadow:0 7px 20px rgba(91,110,245,.36)}
+.btn-g{background:#f4f5fa;color:var(--ink2)}
+.btn-g:hover{background:#eaecf7}
+.btn:active{transform:scale(.97)}
 
-/* 大运 */
-.dayun-scroll { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 10px; }
-.dayun-item { flex: 0 0 auto; min-width: 92px; text-align: center; background: #fafafc;
-  border-radius: 10px; padding: 12px 10px; border: 1px solid #eee; }
-.dayun-item.active { background: linear-gradient(135deg,#667eea,#764ba2); color:#fff; border-color:transparent; }
-.dayun-item .dy-gz { font-size: 19px; font-weight: 700; letter-spacing: 2px;
-  font-family: "Songti SC", "STSong", "SimSun", "Source Han Serif SC", "Noto Serif CJK SC", "Times New Roman", serif; margin-bottom: 4px; }
-.dayun-item .dy-age { font-size: 11px; opacity: .75; }
+/* ── 四柱表 ── */
+.pillars{display:grid;grid-template-columns:72px repeat(4,1fr);gap:6px}
+.pl-head{text-align:center;font-size:12px;color:var(--ink3);padding:7px 0 10px;font-weight:550}
+.pl-head.day{color:var(--gan)}
+.pl-lab{font-size:12px;color:var(--ink3);display:flex;align-items:center;
+  justify-content:flex-end;padding-right:10px;font-weight:500}
+.pl-cell{background:#fafbfe;border-radius:12px;padding:14px 6px;text-align:center;
+  min-height:52px;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.pl-cell.day{background:linear-gradient(180deg,#fff7f9,#fef2f5);border:1.5px solid #f8dde4}
+.gz{font-size:31px;font-weight:700;line-height:1.15;letter-spacing:3px;
+  font-family:"Songti SC","STSong","SimSun","Source Han Serif SC","Noto Serif CJK SC",serif}
+.gz .g{color:var(--gan)}
+.gz .z{color:var(--ink)}
+.pl-sm{font-size:13px;color:var(--ink2);line-height:1.65}
+.pl-sm.em{color:var(--gan);font-weight:650}
+.pl-tags{display:flex;flex-wrap:wrap;gap:3px;justify-content:center;margin-top:2px}
+.tg{font-size:10.5px;padding:2px 6px;border-radius:5px;background:#eef0fb;
+  color:#5560c4;line-height:1.5;white-space:nowrap}
 
-/* 流年 */
-.liunian-grid { display: flex; flex-wrap: wrap; gap: 8px; }
-.ln-item { padding: 7px 12px; border-radius: 8px; background: #fafafc; font-size: 13px;
-  border: 1px solid #eee; cursor: pointer; transition: all .15s; }
-.ln-item:hover { border-color: #667eea; }
-.ln-item.cur { background: #667eea; color: #fff; border-color: transparent; }
+/* ── 信息格 ── */
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(155px,1fr));gap:10px}
+.info{background:#fafbfe;border-radius:11px;padding:12px 14px}
+.info .k{font-size:11px;color:var(--ink3);margin-bottom:5px;font-weight:500}
+.info .v{font-size:15px;font-weight:650;color:var(--ink);
+  font-family:"Songti SC","STSong","SimSun",serif}
 
-.bz-hint { font-size: 12px; color: #999; margin-top: 10px; line-height: 1.7; }
-.bz-error { color: #c62828; font-size: 14px; margin-top: 10px; }
-.section-hidden { display: none; }
-.god-col { font-size: 13px; }
-@media (max-width: 640px) {
-  .gz-big { font-size: 23px; letter-spacing: 2px; }
-  .pillar-table .col-label { width: 56px; font-size: 12px; }
-  .bazi-card { padding: 18px; }
+/* ── 五行 ── */
+.wx{display:grid;gap:9px}
+.wx-r{display:grid;grid-template-columns:38px 1fr 76px;align-items:center;gap:11px}
+.wx-l{font-size:14px;font-weight:700}
+.wx-t{height:18px;background:#f1f2f8;border-radius:9px;overflow:hidden}
+.wx-f{height:100%;border-radius:9px;transition:width .6s cubic-bezier(.4,0,.2,1)}
+.wx-v{font-size:12px;color:var(--ink2);text-align:right;font-variant-numeric:tabular-nums}
+
+/* ── 大运 ── */
+.dy{display:flex;gap:8px;overflow-x:auto;padding:2px 0 10px;scrollbar-width:thin}
+.dy-item{flex:0 0 auto;min-width:86px;text-align:center;background:#fafbfe;
+  border-radius:11px;padding:11px 9px;border:1.5px solid transparent;transition:all .16s}
+.dy-item:hover{border-color:#dfe3f5}
+.dy-item.on{background:linear-gradient(135deg,var(--brand),var(--brand2));color:#fff;
+  border-color:transparent;box-shadow:0 5px 16px rgba(91,110,245,.3)}
+.dy-gz{font-size:18px;font-weight:700;letter-spacing:2px;margin-bottom:3px;
+  font-family:"Songti SC","STSong","SimSun",serif}
+.dy-age{font-size:10.5px;opacity:.72;font-variant-numeric:tabular-nums}
+.dy-ss{font-size:9.5px;opacity:.62;margin-top:4px;line-height:1.4}
+
+/* ── 流年 ── */
+.ln{display:flex;flex-wrap:wrap;gap:6px}
+.ln-i{padding:7px 11px;border-radius:8px;background:#fafbfe;font-size:12.5px;
+  border:1.5px solid transparent;cursor:pointer;transition:all .14s;
+  font-variant-numeric:tabular-nums}
+.ln-i:hover{border-color:#dfe3f5}
+.ln-i.on{background:#eef0fb;border-color:var(--brand);color:var(--brand);font-weight:600}
+
+.hint{font-size:11.5px;color:var(--ink3);margin-top:12px;line-height:1.75}
+.err{color:#c0392b;font-size:13.5px;margin-top:12px;padding:10px 13px;
+  background:#fef4f4;border-radius:9px}
+.hide{display:none!important}
+
+@media(max-width:640px){
+  .bz-wrap{padding:0 0 30px}
+  .card{padding:17px;border-radius:13px}
+  .pillars{grid-template-columns:52px repeat(4,1fr);gap:4px}
+  .gz{font-size:23px;letter-spacing:1px}
+  .pl-cell{padding:10px 3px;border-radius:9px}
+  .pl-lab{font-size:11px;padding-right:6px}
+  .pl-sm{font-size:11.5px}
+  .tg{font-size:9.5px;padding:1px 4px}
 }
 </style>
 
-<div class="bazi-wrap">
+<div class="bz-wrap">
 
-  <div class="bazi-card">
-    <h2>出生信息</h2>
-    <div class="bz-row">
-      <div class="bz-field">
-        <label>出生日期（公历）</label>
-        <input type="date" id="bzDate" value="1990-05-15">
-      </div>
-      <div class="bz-field">
-        <label>出生时间</label>
-        <input type="time" id="bzTime" value="10:30">
-      </div>
-      <div class="bz-field">
-        <label>性别</label>
-        <select id="bzSex">
-          <option value="1">男</option>
-          <option value="2">女</option>
-        </select>
+  <!-- 输入 -->
+  <div class="card">
+    <div class="card-h"><span class="dot"></span><h2>出生信息</h2>
+      <span class="sub">北京时间 · 立春分年</span></div>
+
+    <div class="in-row">
+      <div class="fld"><label>出生日期（公历）</label>
+        <input type="date" id="bzDate" value="1990-05-15"></div>
+      <div class="fld"><label>出生时间</label>
+        <input type="time" id="bzTime" value="10:30"></div>
+      <div class="fld"><label>性别</label>
+        <select id="bzSex"><option value="1">男</option><option value="2">女</option></select></div>
+    </div>
+
+    <div class="quick">
+      <div class="quick-t">日期快调</div>
+      <div class="qbtns">
+        <button class="qb minus" data-d="-365">−1年</button>
+        <button class="qb minus" data-d="-30">−1月</button>
+        <button class="qb minus" data-d="-7">−7天</button>
+        <button class="qb minus" data-d="-1">−1天</button>
+        <button class="qb" id="qbToday">今天</button>
+        <button class="qb plus" data-d="1">+1天</button>
+        <button class="qb plus" data-d="7">+7天</button>
+        <button class="qb plus" data-d="30">+1月</button>
+        <button class="qb plus" data-d="365">+1年</button>
       </div>
     </div>
-    <div class="bz-actions">
-      <button class="btn btn-primary" id="bzGo">开始排盘</button>
-      <button class="btn btn-ghost" id="bzNow">用现在时间</button>
-      <button class="btn btn-ghost" id="bzCopy">复制结果</button>
+
+    <div class="quick">
+      <div class="quick-t">时辰快选</div>
+      <div class="qbtns" id="qbHours"></div>
     </div>
-    <div class="bz-hint">
-      按北京时间排盘，年柱以立春为界、月柱以十二节为界。23:00 后出生按次日子时计（晚子时换日）。
+
+    <div class="acts">
+      <button class="btn btn-p" id="bzGo">开始排盘</button>
+      <button class="btn btn-g" id="bzCopy">复制结果</button>
     </div>
-    <div class="bz-error section-hidden" id="bzErr"></div>
+
+    <div class="hint">
+      年柱以立春为界、月柱以十二节为界。23:00 后出生按次日子时计（晚子时换日）。
+      起运换算采用问真口径（名义秒 = 距节真实秒 × 120，1 年 = 360 天）。
+    </div>
+    <div class="err hide" id="bzErr"></div>
   </div>
 
-  <div id="bzResult" class="section-hidden">
+  <div id="bzResult" class="hide">
 
-    <div class="bazi-card">
-      <h2>四柱命盘</h2>
-      <table class="pillar-table" id="bzPillars"></table>
+    <div class="card">
+      <div class="card-h"><span class="dot"></span><h2>四柱命盘</h2>
+        <span class="sub" id="bzBirth"></span></div>
+      <div class="pillars" id="bzPillars"></div>
     </div>
 
-    <div class="bazi-card">
-      <h2>基本信息</h2>
-      <div class="info-grid" id="bzInfo"></div>
+    <div class="card">
+      <div class="card-h"><span class="dot"></span><h2>基本信息</h2></div>
+      <div class="grid" id="bzInfo"></div>
     </div>
 
-    <div class="bazi-card">
-      <h2>五行分布</h2>
-      <div class="wx-bars" id="bzWuxing"></div>
+    <div class="card">
+      <div class="card-h"><span class="dot"></span><h2>五行分布</h2>
+        <span class="sub" id="bzWxSub"></span></div>
+      <div class="wx" id="bzWx"></div>
     </div>
 
-    <div class="bazi-card">
-      <h2>大运</h2>
-      <div class="dayun-scroll" id="bzDayun"></div>
-      <div class="bz-hint" id="bzQiyun"></div>
+    <div class="card">
+      <div class="card-h"><span class="dot"></span><h2>大运</h2>
+        <span class="sub" id="bzQy"></span></div>
+      <div class="dy" id="bzDy"></div>
+      <div class="hint" id="bzJy"></div>
     </div>
 
-    <div class="bazi-card">
-      <h2>流年（未来 12 年）</h2>
-      <div class="liunian-grid" id="bzLiunian"></div>
+    <div class="card">
+      <div class="card-h"><span class="dot"></span><h2>流年</h2>
+        <span class="sub">点选查看对应大运</span></div>
+      <div class="ln" id="bzLn"></div>
     </div>
 
   </div>
 </div>
 
 <script src="/assets/js/bazi/vsop-data.js"></script>
+<script src="/assets/js/bazi/jieqi-delta.js"></script>
 <script src="/assets/js/bazi/astro.js"></script>
 <script src="/assets/js/bazi/ganzhi.js"></script>
+<script src="/assets/js/bazi/shensha.js"></script>
 <script>
 (function () {
   'use strict';
 
-  var WX_COLOR = { '木': '#4caf50', '火': '#e53935', '土': '#d4a017', '金': '#9e9e9e', '水': '#2196f3' };
+  var WXC = { '木':'var(--mu)', '火':'var(--huo)', '土':'var(--tu)', '金':'var(--jin)', '水':'var(--shui)' };
+  var WXHEX = { '木':'#4caf50', '火':'#e53935', '土':'#d4a017', '金':'#8a8f9e', '水':'#2196f3' };
   var $ = function (id) { return document.getElementById(id); };
-
-  function el(tag, cls, text) {
+  function el(tag, cls, txt) {
     var e = document.createElement(tag);
     if (cls) e.className = cls;
-    if (text !== undefined && text !== null) e.textContent = text;
+    if (txt !== undefined && txt !== null) e.textContent = txt;
     return e;
   }
+  function pad(n) { return n < 10 ? '0' + n : '' + n; }
 
-  function showErr(msg) {
-    var b = $('bzErr');
-    b.textContent = msg;
-    b.classList.remove('section-hidden');
+  // ── 时辰快选按钮 ──
+  var HOURS = [
+    ['子', 0], ['丑', 2], ['寅', 4], ['卯', 6], ['辰', 8], ['巳', 10],
+    ['午', 12], ['未', 14], ['申', 16], ['酉', 18], ['戌', 20], ['亥', 22]
+  ];
+  (function buildHours() {
+    var box = $('qbHours');
+    HOURS.forEach(function (h) {
+      var b = el('button', 'qb', h[0] + '时');
+      b.setAttribute('data-h', h[1]);
+      box.appendChild(b);
+    });
+  })();
+
+  function dateShift(days) {
+    var v = $('bzDate').value;
+    if (!v) return;
+    var p = v.split('-');
+    var d = new Date(Date.UTC(+p[0], +p[1] - 1, +p[2]));
+    d.setUTCDate(d.getUTCDate() + days);
+    $('bzDate').value = d.getUTCFullYear() + '-' + pad(d.getUTCMonth() + 1) + '-' + pad(d.getUTCDate());
+    run();
   }
-  function clearErr() { $('bzErr').classList.add('section-hidden'); }
 
+  // ── 事件 ──
+  document.querySelectorAll('.qb[data-d]').forEach(function (b) {
+    b.addEventListener('click', function () { dateShift(parseInt(b.getAttribute('data-d'), 10)); });
+  });
+  $('qbToday').addEventListener('click', function () {
+    var n = new Date(Date.now() + 8 * 3600 * 1000);
+    $('bzDate').value = n.getUTCFullYear() + '-' + pad(n.getUTCMonth() + 1) + '-' + pad(n.getUTCDate());
+    $('bzTime').value = pad(n.getUTCHours()) + ':' + pad(n.getUTCMinutes());
+    run();
+  });
+  $('qbHours').addEventListener('click', function (e) {
+    var b = e.target.closest('.qb');
+    if (!b || !b.hasAttribute('data-h')) return;
+    $('bzTime').value = pad(parseInt(b.getAttribute('data-h'), 10)) + ':00';
+    document.querySelectorAll('#qbHours .qb').forEach(function (x) { x.classList.remove('on'); });
+    b.classList.add('on');
+    run();
+  });
+  $('bzGo').addEventListener('click', run);
+  ['bzDate', 'bzTime', 'bzSex'].forEach(function (id) {
+    $(id).addEventListener('change', run);
+  });
+
+  function showErr(m) {
+    var b = $('bzErr');
+    b.textContent = m;
+    b.classList.remove('hide');
+  }
+  function clearErr() { $('bzErr').classList.add('hide'); }
+
+  // ── 渲染 ──
   function render(c, dateStr) {
     var p = c.pillars;
+    var pl = c.pillarList;
 
-    // ── 四柱表 ──
-    var t = $('bzPillars');
-    t.innerHTML = '';
-    var head = el('tr');
-    head.appendChild(el('th', '', ''));
-    ['年柱', '月柱', '日柱', '时柱'].forEach(function (x, i) {
-      var th = el('th', '', x);
-      if (i === 2) th.style.color = '#c0392b';
-      head.appendChild(th);
+    // 四柱表
+    var box = $('bzPillars');
+    box.innerHTML = '';
+    box.appendChild(el('div', 'pl-lab', ''));
+    ['年柱', '月柱', '日柱', '时柱'].forEach(function (t, i) {
+      var h = el('div', 'pl-head' + (i === 2 ? ' day' : ''), t);
+      box.appendChild(h);
     });
-    t.appendChild(head);
 
-    var rows = [
-      ['天干地支', c.pillarList, 'gz'],
+    var ROWS = [
       ['十神', c.tenGods, 'god'],
-      ['藏干', c.canggan.map(function (a) { return a.join(' '); }), 'text'],
-      ['藏干十神', c.cangganGods.map(function (a) { return a.join(' '); }), 'text'],
-      ['纳音', c.nayin, 'text'],
-      ['星运', c.xingyun, 'text'],
-      ['自坐', c.zizuo, 'text'],
-      ['空亡', c.kongwang, 'text'],
-      ['神煞', c.shensha.map(function (a) { return a.length ? a.join('·') : '—'; }), 'text'],
+      ['藏干', c.canggan.map(function (a) { return a.join(' '); }), 'txt'],
+      ['藏干十神', c.cangganGods.map(function (a) { return a.join(' '); }), 'txt'],
+      ['纳音', c.nayin, 'txt'],
+      ['星运', c.xingyun, 'txt'],
+      ['自坐', c.zizuo, 'txt'],
+      ['空亡', c.kongwang, 'txt'],
+      ['神煞', c.shensha.map(function (a) { return a.length ? a.join('·') : '—'; }), 'sha']
     ];
 
-    rows.forEach(function (row) {
-      var tr = el('tr');
-      tr.appendChild(el('td', 'col-label', row[0]));
-      row[1].forEach(function (val, i) {
-        var td = el('td');
-        var cell = el('div', 'gz-cell' + (i === 2 ? ' dm' : ''));
-        if (row[2] === 'gz') {
-          var big = el('div', 'gz-big');
-          var g = el('span', 'gz-gan', val[0]);
-          var z = el('span', '', val[1]);
-          big.appendChild(g); big.appendChild(z);
-          cell.appendChild(big);
-        } else if (row[2] === 'god') {
-          cell.appendChild(el('div', '', val));
-          cell.firstChild.style.fontSize = '15px';
-          cell.firstChild.style.fontWeight = '600';
-          cell.firstChild.style.color = (val === '日主') ? '#c0392b' : '#333';
-        } else {
-          var d = el('div', 'cg-line', val);
-          cell.appendChild(d);
-        }
-        td.appendChild(cell);
-        tr.appendChild(td);
-      });
-      t.appendChild(tr);
+    // 干支行（大字）
+    box.appendChild(el('div', 'pl-lab', '干支'));
+    pl.forEach(function (gz, i) {
+      var cell = el('div', 'pl-cell' + (i === 2 ? ' day' : ''));
+      var big = el('div', 'gz');
+      var g = el('span', 'g', gz[0]);
+      var z = el('span', 'z', gz[1]);
+      big.appendChild(g); big.appendChild(z);
+      cell.appendChild(big);
+      box.appendChild(cell);
     });
 
-    // ── 基本信息 ──
+    ROWS.forEach(function (row) {
+      box.appendChild(el('div', 'pl-lab', row[0]));
+      row[1].forEach(function (val, i) {
+        var cell = el('div', 'pl-cell' + (i === 2 ? ' day' : ''));
+        if (row[2] === 'god') {
+          var d = el('div', 'pl-sm' + (val === '日主' ? ' em' : ''), val);
+          d.style.fontWeight = '650';
+          cell.appendChild(d);
+        } else if (row[2] === 'sha') {
+          var tags = el('div', 'pl-tags');
+          var arr = c.shensha[i];
+          if (!arr.length) {
+            tags.appendChild(el('span', 'tg', '—'));
+          } else {
+            arr.forEach(function (s) { tags.appendChild(el('span', 'tg', s)); });
+          }
+          cell.appendChild(tags);
+        } else {
+          cell.appendChild(el('div', 'pl-sm', val));
+        }
+        box.appendChild(cell);
+      });
+    });
+
+    $('bzBirth').textContent = dateStr + ' · ' + (c.sex === 1 ? '男' : '女');
+
+    // 基本信息
     var info = $('bzInfo');
     info.innerHTML = '';
-    var items = [
+    [
       ['日主', c.dayMaster],
       ['日主五行', c.dayMasterWuxing + ' · ' + c.dayMasterYinyang],
       ['胎元', c.taiyuan + '（' + c.taiyuanNayin + '）'],
       ['胎息', c.taixi + '（' + c.taixiNayin + '）'],
       ['命宫', c.minggong + '（' + c.minggongNayin + '）'],
       ['身宫', c.shengong + '（' + c.shengongNayin + '）'],
-      ['出生', dateStr],
-    ];
-    items.forEach(function (it) {
-      var box = el('div', 'info-item');
-      box.appendChild(el('div', 'k', it[0]));
-      box.appendChild(el('div', 'v', it[1]));
-      info.appendChild(box);
+      ['起运', c.qiyun.age + ' 岁 ' + c.qiyun.months + ' 月 ' + c.qiyun.days + ' 天'],
+      ['胎对八字', c.tdbz.join(' ')]
+    ].forEach(function (it) {
+      var b = el('div', 'info');
+      b.appendChild(el('div', 'k', it[0]));
+      b.appendChild(el('div', 'v', it[1]));
+      info.appendChild(b);
     });
 
-    // ── 五行 ──
-    var wx = $('bzWuxing');
+    // 五行
+    var wx = $('bzWx');
     wx.innerHTML = '';
-    var wxKeys = ['木', '火', '土', '金', '水'];
-    var maxScore = 0;
-    wxKeys.forEach(function (key) {
-      if (c.wuxingScore[key] > maxScore) maxScore = c.wuxingScore[key];
-    });
-    wxKeys.forEach(function (key) {
-      var row = el('div', 'wx-bar-row');
-      var lab = el('div', 'wx-bar-label', key);
-      lab.style.color = WX_COLOR[key];
-      row.appendChild(lab);
-
-      var track = el('div', 'wx-bar-track');
-      var fill = el('div', 'wx-bar-fill');
-      var pct = maxScore > 0 ? (c.wuxingScore[key] / maxScore) * 100 : 0;
-      fill.style.width = pct + '%';
-      fill.style.background = WX_COLOR[key];
+    var keys = ['木', '火', '土', '金', '水'];
+    var mx = 0;
+    keys.forEach(function (k) { if (c.wuxingScore[k] > mx) mx = c.wuxingScore[k]; });
+    var tot = 0;
+    keys.forEach(function (k) { tot += c.wuxingCount[k]; });
+    keys.forEach(function (k) {
+      var r = el('div', 'wx-r');
+      var lab = el('div', 'wx-l', k);
+      lab.style.color = WXHEX[k];
+      r.appendChild(lab);
+      var track = el('div', 'wx-t');
+      var fill = el('div', 'wx-f');
+      fill.style.width = (mx > 0 ? (c.wuxingScore[k] / mx) * 100 : 0) + '%';
+      fill.style.background = WXHEX[k];
       track.appendChild(fill);
-      row.appendChild(track);
-
-      row.appendChild(el('div', 'wx-bar-val',
-        c.wuxingCount[key] + ' 个 / ' + Number(c.wuxingScore[key]).toFixed(1)));
-      wx.appendChild(row);
+      r.appendChild(track);
+      r.appendChild(el('div', 'wx-v', c.wuxingCount[k] + '个 / ' + Number(c.wuxingScore[k]).toFixed(1)));
+      wx.appendChild(r);
     });
+    $('bzWxSub').textContent = '共 ' + tot + ' 字';
 
-    // ── 大运 ──
-    var dy = $('bzDayun');
+    // 大运
+    var dy = $('bzDy');
     dy.innerHTML = '';
     c.dayun.forEach(function (gz, i) {
-      var item = el('div', 'dayun-item');
+      var item = el('div', 'dy-item');
       item.appendChild(el('div', 'dy-gz', gz));
-      var age = c.qiyun.age + i * 10;
-      item.appendChild(el('div', 'dy-age', age + '岁起'));
+      item.appendChild(el('div', 'dy-age', (c.qiyun.age + i * 10) + '岁'));
+      var ss = (c.dyshensha[i] || [null, []])[1];
+      if (ss && ss.length) {
+        item.appendChild(el('div', 'dy-ss', ss.slice(0, 2).join('·')));
+      }
       dy.appendChild(item);
     });
 
-    $('bzQiyun').textContent =
-      '起运：' + c.qiyun.age + ' 岁 ' + c.qiyun.months + ' 个月 ' + c.qiyun.days + ' 天'
-      + '（' + (c.qiyun.forward ? '顺行' : '逆行') + '）　交运：'
-      + formatDate(c.qiyun.jiaoyun);
+    $('bzQy').textContent = '起运 ' + c.qiyun.age + '岁' +
+      c.qiyun.months + '月' + c.qiyun.days + '天' +
+      '（' + (c.qiyun.forward ? '顺行' : '逆行') + '）';
+    $('bzJy').textContent = '交运：' + (c.qiyun.jiaoyunText || '') +
+      '　交运日期 ' + fmtDate(c.qiyun.jiaoyun);
 
-    // ── 流年 ──
-    var ln = $('bzLiunian');
+    // 流年
+    var ln = $('bzLn');
     ln.innerHTML = '';
-    var nowYear = new Date().getFullYear();
-    for (var y = nowYear; y < nowYear + 12; y++) {
+    var nowY = new Date().getFullYear();
+    for (var y = nowY - 2; y < nowY + 22; y++) {
       var gz = JIAZI[((y - 1984) % 60 + 60) % 60];
-      var item = el('div', 'ln-item');
-      item.textContent = y + ' ' + gz;
-      if (y === nowYear) item.classList.add('cur');
-      ln.appendChild(item);
+      var it = el('div', 'ln-i', y + ' ' + gz);
+      if (y === nowY) it.classList.add('on');
+      ln.appendChild(it);
     }
 
-    $('bzResult').classList.remove('section-hidden');
+    $('bzResult').classList.remove('hide');
   }
 
-  function formatDate(ms) {
+  function fmtDate(ms) {
     var d = new Date(ms + 8 * 3600 * 1000);
-    var p = function (n) { return n < 10 ? '0' + n : '' + n; };
-    return d.getUTCFullYear() + '-' + p(d.getUTCMonth() + 1) + '-' + p(d.getUTCDate());
+    return d.getUTCFullYear() + '-' + pad(d.getUTCMonth() + 1) + '-' + pad(d.getUTCDate());
   }
 
   function run() {
@@ -319,13 +442,11 @@ title: 八字排盘
     var dv = $('bzDate').value;
     var tv = $('bzTime').value || '12:00';
     var sex = parseInt($('bzSex').value, 10);
-
     if (!dv) { showErr('请选择出生日期'); return; }
-    var ym = dv.split('-');
-    var tm = tv.split(':');
-    var y = parseInt(ym[0], 10), mo = parseInt(ym[1], 10), d = parseInt(ym[2], 10);
-    var hh = parseInt(tm[0], 10), mi = parseInt(tm[1], 10);
 
+    var ym = dv.split('-'), tm = tv.split(':');
+    var y = +ym[0], mo = +ym[1], d = +ym[2];
+    var hh = +tm[0], mi = +tm[1];
     if (y < 1900 || y > 2100) { showErr('仅支持 1900–2100 年'); return; }
 
     try {
@@ -335,35 +456,28 @@ title: 八字排盘
       window.__bzChart = chart;
     } catch (e) {
       showErr('排盘失败：' + e.message);
-      console.error(e);
+      if (window.console) console.error(e);
     }
   }
 
-  $('bzGo').addEventListener('click', run);
-  $('bzNow').addEventListener('click', function () {
-    var n = new Date(Date.now() + 8 * 3600 * 1000);
-    var p = function (x) { return x < 10 ? '0' + x : '' + x; };
-    $('bzDate').value = n.getUTCFullYear() + '-' + p(n.getUTCMonth() + 1) + '-' + p(n.getUTCDate());
-    $('bzTime').value = p(n.getUTCHours()) + ':' + p(n.getUTCMinutes());
-    run();
-  });
   $('bzCopy').addEventListener('click', function () {
     if (!window.__bzChart) { showErr('请先排盘'); return; }
     var c = window.__bzChart;
-    var txt = '四柱：' + c.pillarList.join(' ')
+    var t = '四柱：' + c.pillarList.join(' ')
       + '\n日主：' + c.dayMaster + '（' + c.dayMasterWuxing + '）'
       + '\n十神：' + c.tenGods.join(' ')
       + '\n纳音：' + c.nayin.join(' ')
+      + '\n神煞：' + c.shensha.map(function (a) { return a.join('·') || '—'; }).join(' | ')
+      + '\n起运：' + c.qiyun.age + '岁' + c.qiyun.months + '月' + c.qiyun.days + '天'
+      + '\n交运：' + (c.qiyun.jiaoyunText || '')
       + '\n大运：' + c.dayun.slice(0, 8).join(' ');
-    navigator.clipboard.writeText(txt).then(function () {
-      var b = $('bzCopy');
-      var old = b.textContent;
+    navigator.clipboard.writeText(t).then(function () {
+      var b = $('bzCopy'), o = b.textContent;
       b.textContent = '已复制';
-      setTimeout(function () { b.textContent = old; }, 1500);
+      setTimeout(function () { b.textContent = o; }, 1400);
     }).catch(function () { showErr('复制失败，请手动选择文本'); });
   });
 
-  // 首次自动排盘
   run();
 })();
 </script>
