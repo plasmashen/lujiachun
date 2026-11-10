@@ -7,7 +7,7 @@ title: 八字排盘
 :root{
   --bg:#f6f7fb; --card:#fff; --ink:#1a1a2e; --ink2:#5a5f72; --ink3:#9aa0b4;
   --line:#e8eaf2; --brand:#5b6ef5; --brand2:#8b5cf6;
-  --gan:#c0392b; --ok:#10b981; --warn:#f59e0b;
+  --gan:#c0392b; --ok:#10b981; --warn:#f59e0b; --bad:#e05252;
   --mu:#4caf50; --huo:#e53935; --tu:#d4a017; --jin:#8a8f9e; --shui:#2196f3;
   --r:16px; --sh:0 1px 3px rgba(20,25,60,.06),0 8px 24px rgba(20,25,60,.05);
 }
@@ -17,17 +17,15 @@ title: 八字排盘
   "Microsoft YaHei","Source Han Sans SC","Noto Sans CJK SC",sans-serif;
   color:var(--ink);-webkit-font-smoothing:antialiased}
 
-/* ── 卡片 ── */
 .card{background:var(--card);border-radius:var(--r);padding:22px;margin-bottom:18px;
   box-shadow:var(--sh);border:1px solid rgba(20,25,60,.04)}
 .card-h{display:flex;align-items:center;gap:10px;margin:0 0 18px;padding-bottom:14px;
-  border-bottom:1px solid var(--line)}
+  border-bottom:1px solid var(--line);flex-wrap:wrap}
 .card-h h2{margin:0;font-size:16px;font-weight:650;letter-spacing:.2px}
 .card-h .dot{width:4px;height:16px;border-radius:2px;
   background:linear-gradient(180deg,var(--brand),var(--brand2))}
 .card-h .sub{margin-left:auto;font-size:12px;color:var(--ink3);font-weight:400}
 
-/* ── 输入区 ── */
 .in-row{display:grid;grid-template-columns:1.3fr 1fr 1fr;gap:14px;margin-bottom:14px}
 @media(max-width:720px){.in-row{grid-template-columns:1fr}}
 .fld label{display:block;font-size:12px;color:var(--ink2);margin-bottom:6px;font-weight:550;
@@ -37,7 +35,6 @@ title: 八字排盘
   transition:border-color .15s,background .15s;font-family:inherit}
 .fld input:focus,.fld select:focus{outline:none;border-color:var(--brand);background:#fff}
 
-/* ── 快调按钮组 ── */
 .quick{margin:14px 0 0}
 .quick-t{font-size:11px;color:var(--ink3);margin-bottom:8px;font-weight:550;
   letter-spacing:.5px;text-transform:uppercase}
@@ -53,7 +50,6 @@ title: 八字排盘
 .qb.plus{background:#f0fbf6;color:#0d9668}
 .qb.plus:hover{background:#e4f7ee}
 
-/* ── 主按钮 ── */
 .acts{display:flex;gap:10px;flex-wrap:wrap;margin-top:18px;align-items:center}
 .btn{padding:11px 24px;font-size:14px;font-weight:600;border:none;border-radius:10px;
   cursor:pointer;transition:all .16s;font-family:inherit}
@@ -64,10 +60,9 @@ title: 八字排盘
 .btn-g:hover{background:#eaecf7}
 .btn:active{transform:scale(.97)}
 
-/* ── 四柱表 ── */
-.pillars{display:grid;grid-template-columns:72px repeat(4,1fr);gap:6px}
+.pillars{display:grid;grid-template-columns:76px repeat(4,1fr);gap:6px}
 .pl-head{text-align:center;font-size:12px;color:var(--ink3);padding:7px 0 10px;font-weight:550}
-.pl-head.day{color:var(--gan)}
+.pl-head.day{color:var(--gan);font-weight:700}
 .pl-lab{font-size:12px;color:var(--ink3);display:flex;align-items:center;
   justify-content:flex-end;padding-right:10px;font-weight:500}
 .pl-cell{background:#fafbfe;border-radius:12px;padding:14px 6px;text-align:center;
@@ -77,30 +72,49 @@ title: 八字排盘
   font-family:"Songti SC","STSong","SimSun","Source Han Serif SC","Noto Serif CJK SC",serif}
 .gz .g{color:var(--gan)}
 .gz .z{color:var(--ink)}
+.pl-lab .qh{display:inline-flex;align-items:center;justify-content:center;
+  width:13px;height:13px;border-radius:50%;background:#e8eaf2;color:#8a90a8;
+  font-size:9px;margin-left:3px;cursor:help;font-weight:700;flex:0 0 auto}
+.pl-lab:hover .qh{background:var(--brand);color:#fff}
 .pl-sm{font-size:13px;color:var(--ink2);line-height:1.65}
 .pl-sm.em{color:var(--gan);font-weight:650}
 .pl-tags{display:flex;flex-wrap:wrap;gap:3px;justify-content:center;margin-top:2px}
 .tg{font-size:10.5px;padding:2px 6px;border-radius:5px;background:#eef0fb;
   color:#5560c4;line-height:1.5;white-space:nowrap}
+.tg.bad{background:#fdeeee;color:#c0392b}
+.tg.good{background:#eaf7f0;color:#0d9668}
 
-/* ── 信息格 ── */
+/* 解读板块 */
+.read{display:grid;gap:12px}
+.read-item{background:#fafbfe;border-radius:12px;padding:16px 18px;
+  border-left:3px solid var(--brand)}
+.read-item h3{margin:0 0 12px;font-size:14px;font-weight:650;color:var(--ink)}
+.read-kv{display:grid;gap:7px;margin-bottom:10px}
+.read-kv .row{display:grid;grid-template-columns:132px 1fr;gap:12px;font-size:13px;
+  align-items:baseline}
+.read-kv .row .k{color:var(--ink3);font-weight:500}
+.read-kv .row .v{color:var(--ink);font-weight:550;line-height:1.6}
+.read-text{font-size:13.5px;line-height:1.85;color:var(--ink2);
+  background:#fff;padding:12px 14px;border-radius:9px;border:1px solid var(--line)}
+.read-text strong{color:var(--ink);font-weight:650}
+@media(max-width:640px){.read-kv .row{grid-template-columns:1fr;gap:2px}}
+
 .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(155px,1fr));gap:10px}
 .info{background:#fafbfe;border-radius:11px;padding:12px 14px}
 .info .k{font-size:11px;color:var(--ink3);margin-bottom:5px;font-weight:500}
 .info .v{font-size:15px;font-weight:650;color:var(--ink);
   font-family:"Songti SC","STSong","SimSun",serif}
 
-/* ── 五行 ── */
 .wx{display:grid;gap:9px}
-.wx-r{display:grid;grid-template-columns:38px 1fr 76px;align-items:center;gap:11px}
-.wx-l{font-size:14px;font-weight:700}
+.wx-r{display:grid;grid-template-columns:66px 1fr 64px;align-items:center;gap:11px}
+.wx-l{font-size:13px;font-weight:700}
+.wx-l .sm{font-size:10px;font-weight:500;color:var(--ink3);display:block;margin-top:1px}
 .wx-t{height:18px;background:#f1f2f8;border-radius:9px;overflow:hidden}
 .wx-f{height:100%;border-radius:9px;transition:width .6s cubic-bezier(.4,0,.2,1)}
 .wx-v{font-size:12px;color:var(--ink2);text-align:right;font-variant-numeric:tabular-nums}
 
-/* ── 大运 ── */
-.dy{display:flex;gap:8px;overflow-x:auto;padding:2px 0 10px;scrollbar-width:thin}
-.dy-item{flex:0 0 auto;min-width:86px;text-align:center;background:#fafbfe;
+.dy{display:flex;gap:8px;overflow-x:auto;padding:2px 0 10px}
+.dy-item{flex:0 0 auto;min-width:88px;text-align:center;background:#fafbfe;
   border-radius:11px;padding:11px 9px;border:1.5px solid transparent;transition:all .16s}
 .dy-item:hover{border-color:#dfe3f5}
 .dy-item.on{background:linear-gradient(135deg,var(--brand),var(--brand2));color:#fff;
@@ -110,34 +124,53 @@ title: 八字排盘
 .dy-age{font-size:10.5px;opacity:.72;font-variant-numeric:tabular-nums}
 .dy-ss{font-size:9.5px;opacity:.62;margin-top:4px;line-height:1.4}
 
-/* ── 流年 ── */
 .ln{display:flex;flex-wrap:wrap;gap:6px}
-.ln-i{padding:7px 11px;border-radius:8px;background:#fafbfe;font-size:12.5px;
+.ln-i{padding:8px 12px;border-radius:9px;background:#fafbfe;font-size:12.5px;
   border:1.5px solid transparent;cursor:pointer;transition:all .14s;
-  font-variant-numeric:tabular-nums}
-.ln-i:hover{border-color:#dfe3f5}
-.ln-i.on{background:#eef0fb;border-color:var(--brand);color:var(--brand);font-weight:600}
+  font-variant-numeric:tabular-nums;line-height:1.35;text-align:center;min-width:64px}
+.ln-i:hover{border-color:#dfe3f5;background:#f4f5fa}
+.ln-i.on{background:#eef0fb;border-color:var(--brand);color:var(--brand);font-weight:650}
+.ln-i .y{display:block;font-size:10px;opacity:.6}
+
+.ln-detail{margin-top:16px;padding:16px 18px;border-radius:12px;
+  background:linear-gradient(135deg,#f7f8ff,#fbf9ff);border:1px solid #e4e7f8}
+.ln-detail .hd{display:flex;gap:10px;align-items:baseline;flex-wrap:wrap;margin-bottom:12px}
+.ln-detail .hd .big{font-size:22px;font-weight:700;letter-spacing:1px;
+  font-family:"Songti SC","STSong","SimSun",serif;color:var(--ink)}
+.ln-detail .hd .tag{font-size:12px;padding:3px 9px;border-radius:6px;
+  background:#fff;border:1px solid var(--line);color:var(--ink2);font-weight:600}
+.ln-detail .hd .tag.god{background:#eef0fb;color:#5560c4;border-color:transparent}
+.ln-detail .rel{font-size:12.5px;color:var(--ink2);margin-bottom:10px;line-height:1.9}
+.ln-detail .rel .r{display:inline-block;background:#fff;border:1px solid var(--line);
+  border-radius:6px;padding:2px 8px;margin:0 6px 6px 0}
+.ln-detail .adv{font-size:13.5px;line-height:1.85;color:var(--ink)}
+.ln-detail .adv strong{color:var(--brand2);font-weight:650}
+.ln-detail .note{font-size:11.5px;color:var(--ink3);margin-top:10px;line-height:1.7}
 
 .hint{font-size:11.5px;color:var(--ink3);margin-top:12px;line-height:1.75}
 .err{color:#c0392b;font-size:13.5px;margin-top:12px;padding:10px 13px;
   background:#fef4f4;border-radius:9px}
 .hide{display:none!important}
+.legend{display:flex;gap:14px;flex-wrap:wrap;font-size:11.5px;color:var(--ink3);margin-top:12px}
+.legend span{display:flex;align-items:center;gap:5px}
+.legend i{width:9px;height:9px;border-radius:3px;display:inline-block}
 
 @media(max-width:640px){
   .bz-wrap{padding:0 0 30px}
   .card{padding:17px;border-radius:13px}
-  .pillars{grid-template-columns:52px repeat(4,1fr);gap:4px}
+  .pillars{grid-template-columns:54px repeat(4,1fr);gap:4px}
   .gz{font-size:23px;letter-spacing:1px}
   .pl-cell{padding:10px 3px;border-radius:9px}
   .pl-lab{font-size:11px;padding-right:6px}
   .pl-sm{font-size:11.5px}
   .tg{font-size:9.5px;padding:1px 4px}
+  .read-item{padding:14px}
+  .read-kv .row{font-size:12.5px}
 }
 </style>
 
 <div class="bz-wrap">
 
-  <!-- 输入 -->
   <div class="card">
     <div class="card-h"><span class="dot"></span><h2>出生信息</h2>
       <span class="sub">北京时间 · 立春分年</span></div>
@@ -177,8 +210,8 @@ title: 八字排盘
     </div>
 
     <div class="hint">
-      年柱以立春为界、月柱以十二节为界。23:00 后出生按次日子时计（晚子时换日）。
-      起运换算采用问真口径（名义秒 = 距节真实秒 × 120，1 年 = 360 天）。
+      年柱以立春为界、月柱以十二节为界。23:00 后出生按次日子时计。
+      解读由传统命理规则自动生成，仅供了解与参考。
     </div>
     <div class="err hide" id="bzErr"></div>
   </div>
@@ -189,6 +222,19 @@ title: 八字排盘
       <div class="card-h"><span class="dot"></span><h2>四柱命盘</h2>
         <span class="sub" id="bzBirth"></span></div>
       <div class="pillars" id="bzPillars"></div>
+      <div class="legend">
+        <span><i style="background:#c0392b"></i>天干</span>
+        <span><i style="background:#1a1a2e"></i>地支</span>
+        <span><i style="background:#f8dde4"></i>日柱＝你自己</span>
+        <span><i style="background:#eaf7f0"></i>吉神</span>
+        <span><i style="background:#fdeeee"></i>凶煞</span>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-h"><span class="dot"></span><h2>命盘解读</h2>
+        <span class="sub">按传统规则自动生成</span></div>
+      <div class="read" id="bzRead"></div>
     </div>
 
     <div class="card">
@@ -211,8 +257,9 @@ title: 八字排盘
 
     <div class="card">
       <div class="card-h"><span class="dot"></span><h2>流年</h2>
-        <span class="sub">点选查看对应大运</span></div>
+        <span class="sub">点任意年份查看详解</span></div>
       <div class="ln" id="bzLn"></div>
+      <div id="bzLnDetail"></div>
     </div>
 
   </div>
@@ -223,11 +270,12 @@ title: 八字排盘
 <script src="/assets/js/bazi/astro.js"></script>
 <script src="/assets/js/bazi/ganzhi.js"></script>
 <script src="/assets/js/bazi/shensha.js"></script>
+<script src="/assets/js/bazi/interpret-data.js"></script>
+<script src="/assets/js/bazi/interpret.js"></script>
 <script>
 (function () {
   'use strict';
 
-  var WXC = { '木':'var(--mu)', '火':'var(--huo)', '土':'var(--tu)', '金':'var(--jin)', '水':'var(--shui)' };
   var WXHEX = { '木':'#4caf50', '火':'#e53935', '土':'#d4a017', '金':'#8a8f9e', '水':'#2196f3' };
   var $ = function (id) { return document.getElementById(id); };
   function el(tag, cls, txt) {
@@ -238,12 +286,9 @@ title: 八字排盘
   }
   function pad(n) { return n < 10 ? '0' + n : '' + n; }
 
-  // ── 时辰快选按钮 ──
-  var HOURS = [
-    ['子', 0], ['丑', 2], ['寅', 4], ['卯', 6], ['辰', 8], ['巳', 10],
-    ['午', 12], ['未', 14], ['申', 16], ['酉', 18], ['戌', 20], ['亥', 22]
-  ];
-  (function buildHours() {
+  var HOURS = [['子',0],['丑',2],['寅',4],['卯',6],['辰',8],['巳',10],
+               ['午',12],['未',14],['申',16],['酉',18],['戌',20],['亥',22]];
+  (function () {
     var box = $('qbHours');
     HOURS.forEach(function (h) {
       var b = el('button', 'qb', h[0] + '时');
@@ -262,7 +307,6 @@ title: 八字排盘
     run();
   }
 
-  // ── 事件 ──
   document.querySelectorAll('.qb[data-d]').forEach(function (b) {
     b.addEventListener('click', function () { dateShift(parseInt(b.getAttribute('data-d'), 10)); });
   });
@@ -285,77 +329,170 @@ title: 八字排盘
     $(id).addEventListener('change', run);
   });
 
-  function showErr(m) {
-    var b = $('bzErr');
-    b.textContent = m;
-    b.classList.remove('hide');
-  }
+  function showErr(m) { var b = $('bzErr'); b.textContent = m; b.classList.remove('hide'); }
   function clearErr() { $('bzErr').classList.add('hide'); }
 
-  // ── 渲染 ──
-  function render(c, dateStr) {
-    var p = c.pillars;
-    var pl = c.pillarList;
-
-    // 四柱表
+  function renderPillars(c) {
     var box = $('bzPillars');
     box.innerHTML = '';
     box.appendChild(el('div', 'pl-lab', ''));
     ['年柱', '月柱', '日柱', '时柱'].forEach(function (t, i) {
-      var h = el('div', 'pl-head' + (i === 2 ? ' day' : ''), t);
-      box.appendChild(h);
+      box.appendChild(el('div', 'pl-head' + (i === 2 ? ' day' : ''), t));
     });
 
-    var ROWS = [
-      ['十神', c.tenGods, 'god'],
-      ['藏干', c.canggan.map(function (a) { return a.join(' '); }), 'txt'],
-      ['藏干十神', c.cangganGods.map(function (a) { return a.join(' '); }), 'txt'],
-      ['纳音', c.nayin, 'txt'],
-      ['星运', c.xingyun, 'txt'],
-      ['自坐', c.zizuo, 'txt'],
-      ['空亡', c.kongwang, 'txt'],
-      ['神煞', c.shensha.map(function (a) { return a.length ? a.join('·') : '—'; }), 'sha']
-    ];
-
-    // 干支行（大字）
     box.appendChild(el('div', 'pl-lab', '干支'));
-    pl.forEach(function (gz, i) {
+    c.pillarList.forEach(function (gz, i) {
       var cell = el('div', 'pl-cell' + (i === 2 ? ' day' : ''));
       var big = el('div', 'gz');
-      var g = el('span', 'g', gz[0]);
-      var z = el('span', 'z', gz[1]);
-      big.appendChild(g); big.appendChild(z);
+      big.appendChild(el('span', 'g', gz[0]));
+      big.appendChild(el('span', 'z', gz[1]));
       cell.appendChild(big);
       box.appendChild(cell);
     });
 
+    var ROWS = [
+      ['十神', c.tenGods, 'god',
+        '其他天干与日主的关系：比肩/劫财=同类，食神/伤官=我所生（才华），正财/偏财=我所克（收入），正官/七杀=克我（责任压力），正印/偏印=生我（庇护学习）'],
+      ['藏干', c.canggan.map(function (a) { return a.join(' '); }), 'txt',
+        '地支里暗含的天干，相当于"地支的内心戏"，决定这个地支真正起什么作用'],
+      ['藏干十神', c.cangganGods.map(function (a) { return a.join(' '); }), 'txt',
+        '把藏干换算成十神，看出这个地支在做什么事'],
+      ['纳音', c.nayin, 'txt',
+        '六十甲子配五行的古法，传统用来辅助判断，现代多作参考'],
+      ['星运', c.xingyun, 'txt',
+        '十二长生：日主在各柱地支的"生命力状态"，从长生（最强）到绝（最弱）循环'],
+      ['自坐', c.zizuo, 'txt',
+        '本柱天干坐在自己地支上的状态，看这一柱自身有没有底气'],
+      ['空亡', c.kongwang, 'txt',
+        '这一柱落在六十甲子的"空位"上，力量会打折'],
+      ['神煞', null, 'sha',
+        '古人对特定干支组合的标签，绿色为吉神、红色为凶煞，鼠标悬停看解释']
+    ];
+
     ROWS.forEach(function (row) {
-      box.appendChild(el('div', 'pl-lab', row[0]));
-      row[1].forEach(function (val, i) {
+      var lab = el('div', 'pl-lab');
+      lab.appendChild(document.createTextNode(row[0]));
+      if (row[3]) {
+        var q = el('span', 'qh', '?');
+        q.title = row[3];
+        lab.appendChild(q);
+      }
+      box.appendChild(lab);
+      for (var i = 0; i < 4; i++) {
         var cell = el('div', 'pl-cell' + (i === 2 ? ' day' : ''));
         if (row[2] === 'god') {
-          var d = el('div', 'pl-sm' + (val === '日主' ? ' em' : ''), val);
+          var v = row[1][i];
+          var d = el('div', 'pl-sm' + (v === '日主' ? ' em' : ''), v);
           d.style.fontWeight = '650';
           cell.appendChild(d);
         } else if (row[2] === 'sha') {
           var tags = el('div', 'pl-tags');
           var arr = c.shensha[i];
-          if (!arr.length) {
-            tags.appendChild(el('span', 'tg', '—'));
-          } else {
-            arr.forEach(function (s) { tags.appendChild(el('span', 'tg', s)); });
-          }
+          if (!arr.length) tags.appendChild(el('span', 'tg', '—'));
+          else arr.forEach(function (s) {
+            var info = BZ_SHENSHA_INFO[s];
+            var cls = 'tg';
+            if (info) cls += info.lvl === '凶' ? ' bad' : (info.lvl === '吉' || info.lvl === '大吉') ? ' good' : '';
+            var t = el('span', cls, s);
+            if (info) t.title = info.desc;
+            tags.appendChild(t);
+          });
           cell.appendChild(tags);
         } else {
-          cell.appendChild(el('div', 'pl-sm', val));
+          cell.appendChild(el('div', 'pl-sm', row[1][i]));
         }
         box.appendChild(cell);
-      });
+      }
     });
+  }
+
+  function renderRead(c) {
+    var box = $('bzRead');
+    box.innerHTML = '';
+    bzAnalyze(c).forEach(function (sec) {
+      var item = el('div', 'read-item');
+      item.appendChild(el('h3', '', sec.title));
+
+      if (sec.items && sec.items.length) {
+        var kv = el('div', 'read-kv');
+        sec.items.forEach(function (it) {
+          var row = el('div', 'row');
+          row.appendChild(el('div', 'k', it.k));
+          row.appendChild(el('div', 'v', it.v));
+          kv.appendChild(row);
+        });
+        item.appendChild(kv);
+      }
+      if (sec.text) item.appendChild(el('div', 'read-text', sec.text));
+      box.appendChild(item);
+    });
+  }
+
+  var curYear = null;
+
+  function renderLiunian(c) {
+    var box = $('bzLn');
+    box.innerHTML = '';
+    var nowY = new Date().getFullYear();
+    curYear = nowY;
+    for (var y = nowY - 2; y < nowY + 22; y++) {
+      var gz = JIAZI[((y - 1984) % 60 + 60) % 60];
+      var it = el('div', 'ln-i');
+      it.appendChild(el('span', 'y', String(y)));
+      it.appendChild(document.createTextNode(gz));
+      it.setAttribute('data-y', y);
+      if (y === nowY) it.classList.add('on');
+      box.appendChild(it);
+    }
+    box.onclick = function (e) {
+      var it = e.target.closest('.ln-i');
+      if (!it) return;
+      var y = parseInt(it.getAttribute('data-y'), 10);
+      box.querySelectorAll('.ln-i').forEach(function (x) { x.classList.remove('on'); });
+      it.classList.add('on');
+      showLiunian(c, y);
+    };
+    showLiunian(c, nowY);
+  }
+
+  function showLiunian(c, year) {
+    var d = bzLiunianDetail(c, year);
+    var box = $('bzLnDetail');
+    box.innerHTML = '';
+
+    var wrap = el('div', 'ln-detail');
+    var hd = el('div', 'hd');
+    hd.appendChild(el('span', 'big', String(year)));
+    hd.appendChild(el('span', 'tag', d.gz));
+    hd.appendChild(el('span', 'tag', d.age + ' 岁'));
+    hd.appendChild(el('span', 'tag god', d.god + '年'));
+    wrap.appendChild(hd);
+
+    wrap.appendChild(el('div', 'rel', d.summary));
+
+    if (d.relations.length) {
+      var rel = el('div', 'rel');
+      rel.appendChild(document.createTextNode('与原局关系：'));
+      d.relations.forEach(function (r) { rel.appendChild(el('span', 'r', r)); });
+      wrap.appendChild(rel);
+    }
+
+    var adv = el('div', 'adv');
+    adv.innerHTML = '<strong>' + d.god + '运 · ' + (d.godTopic || '') + '</strong>　' + d.advice;
+    wrap.appendChild(adv);
+
+    wrap.appendChild(el('div', 'note',
+      '流年十神看的是这一年最突出的主题，吉凶还要结合大运与此前积累。把"压力"当作信息看，比当作判决看更有用。'));
+
+    box.appendChild(wrap);
+  }
+
+  function render(c, dateStr) {
+    renderPillars(c);
+    renderRead(c);
 
     $('bzBirth').textContent = dateStr + ' · ' + (c.sex === 1 ? '男' : '女');
 
-    // 基本信息
     var info = $('bzInfo');
     info.innerHTML = '';
     [
@@ -366,7 +503,7 @@ title: 八字排盘
       ['命宫', c.minggong + '（' + c.minggongNayin + '）'],
       ['身宫', c.shengong + '（' + c.shengongNayin + '）'],
       ['起运', c.qiyun.age + ' 岁 ' + c.qiyun.months + ' 月 ' + c.qiyun.days + ' 天'],
-      ['胎对八字', c.tdbz.join(' ')]
+      ['今日干支', c.tdbz.join(' ')]
     ].forEach(function (it) {
       var b = el('div', 'info');
       b.appendChild(el('div', 'k', it[0]));
@@ -374,18 +511,19 @@ title: 八字排盘
       info.appendChild(b);
     });
 
-    // 五行
     var wx = $('bzWx');
     wx.innerHTML = '';
     var keys = ['木', '火', '土', '金', '水'];
-    var mx = 0;
-    keys.forEach(function (k) { if (c.wuxingScore[k] > mx) mx = c.wuxingScore[k]; });
-    var tot = 0;
-    keys.forEach(function (k) { tot += c.wuxingCount[k]; });
+    var mx = 0, tot = 0;
+    keys.forEach(function (k) {
+      if (c.wuxingScore[k] > mx) mx = c.wuxingScore[k];
+      tot += c.wuxingCount[k];
+    });
     keys.forEach(function (k) {
       var r = el('div', 'wx-r');
       var lab = el('div', 'wx-l', k);
       lab.style.color = WXHEX[k];
+      lab.appendChild(el('span', 'sm', String(c.wuxingCount[k]) + '字'));
       r.appendChild(lab);
       var track = el('div', 'wx-t');
       var fill = el('div', 'wx-f');
@@ -393,22 +531,22 @@ title: 八字排盘
       fill.style.background = WXHEX[k];
       track.appendChild(fill);
       r.appendChild(track);
-      r.appendChild(el('div', 'wx-v', c.wuxingCount[k] + '个 / ' + Number(c.wuxingScore[k]).toFixed(1)));
+      r.appendChild(el('div', 'wx-v', Number(c.wuxingScore[k]).toFixed(1)));
       wx.appendChild(r);
     });
     $('bzWxSub').textContent = '共 ' + tot + ' 字';
 
-    // 大运
     var dy = $('bzDy');
     dy.innerHTML = '';
+    var nowAge = curAge(c);
     c.dayun.forEach(function (gz, i) {
       var item = el('div', 'dy-item');
+      var lo = c.qiyun.age + i * 10;
       item.appendChild(el('div', 'dy-gz', gz));
-      item.appendChild(el('div', 'dy-age', (c.qiyun.age + i * 10) + '岁'));
+      item.appendChild(el('div', 'dy-age', lo + '–' + (lo + 10) + '岁'));
       var ss = (c.dyshensha[i] || [null, []])[1];
-      if (ss && ss.length) {
-        item.appendChild(el('div', 'dy-ss', ss.slice(0, 2).join('·')));
-      }
+      if (ss && ss.length) item.appendChild(el('div', 'dy-ss', ss.slice(0, 2).join('·')));
+      if (nowAge !== null && nowAge >= lo && nowAge < lo + 10) item.classList.add('on');
       dy.appendChild(item);
     });
 
@@ -418,18 +556,15 @@ title: 八字排盘
     $('bzJy').textContent = '交运：' + (c.qiyun.jiaoyunText || '') +
       '　交运日期 ' + fmtDate(c.qiyun.jiaoyun);
 
-    // 流年
-    var ln = $('bzLn');
-    ln.innerHTML = '';
-    var nowY = new Date().getFullYear();
-    for (var y = nowY - 2; y < nowY + 22; y++) {
-      var gz = JIAZI[((y - 1984) % 60 + 60) % 60];
-      var it = el('div', 'ln-i', y + ' ' + gz);
-      if (y === nowY) it.classList.add('on');
-      ln.appendChild(it);
-    }
-
+    renderLiunian(c);
     $('bzResult').classList.remove('hide');
+  }
+
+  function curAge(c) {
+    if (!c) return null;
+    var b = new Date(c.ms + 8 * 3600000);
+    var n = new Date(Date.now() + 8 * 3600000);
+    return n.getUTCFullYear() - b.getUTCFullYear() + 1;
   }
 
   function fmtDate(ms) {
@@ -452,8 +587,8 @@ title: 八字排盘
     try {
       var ms = cstMs(y, mo, d, hh, mi, 0);
       var chart = paipan(ms, sex, true);
-      render(chart, dv + ' ' + tv);
       window.__bzChart = chart;
+      render(chart, dv + ' ' + tv);
     } catch (e) {
       showErr('排盘失败：' + e.message);
       if (window.console) console.error(e);
@@ -466,11 +601,13 @@ title: 八字排盘
     var t = '四柱：' + c.pillarList.join(' ')
       + '\n日主：' + c.dayMaster + '（' + c.dayMasterWuxing + '）'
       + '\n十神：' + c.tenGods.join(' ')
-      + '\n纳音：' + c.nayin.join(' ')
-      + '\n神煞：' + c.shensha.map(function (a) { return a.join('·') || '—'; }).join(' | ')
       + '\n起运：' + c.qiyun.age + '岁' + c.qiyun.months + '月' + c.qiyun.days + '天'
       + '\n交运：' + (c.qiyun.jiaoyunText || '')
-      + '\n大运：' + c.dayun.slice(0, 8).join(' ');
+      + '\n大运：' + c.dayun.slice(0, 8).join(' ')
+      + '\n\n【解读】';
+    bzAnalyze(c).forEach(function (s) {
+      if (s.text) t += '\n' + s.title + '：' + s.text;
+    });
     navigator.clipboard.writeText(t).then(function () {
       var b = $('bzCopy'), o = b.textContent;
       b.textContent = '已复制';
