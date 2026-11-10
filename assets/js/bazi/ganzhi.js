@@ -338,14 +338,15 @@ function paipan(ms, sex = 1, lateZiAdvance = true) {
   const xiaoyun = xiaoyunList(p.hour, qy.forward, 110);
   qy.jiaoyunText = jiaoyunText(qy);
 
-  // 神煞：42 种已验证规则（shensha.js）
-  const shensha = bzAllShensha(pillars);
+  // 神煞：52 种已验证规则（shensha.js）
+  // sex 必须传入——元辰依赖「阳男阴女进、阴男阳女退」的性别判定
+  const shensha = bzAllShensha(pillars, sex);
 
   // 大运神煞：把大运干支当作「时柱」再取该柱神煞
   const dyshensha = dayun.map(function (gz) {
     const tmp = pillars.slice();
     tmp[3] = gz;
-    return [gz, bzShenshaForPillar(tmp, 3)];
+    return [gz, bzShenshaForPillar(tmp, 3, sex)];
   });
 
   // 胎对八字 = 今天的四柱

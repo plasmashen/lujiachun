@@ -198,7 +198,8 @@ var BZ_REF = {
   "月支":function(p){return p[1][1];}, "时支":function(p){return p[3][1];}
 };
 
-function bzShenshaForPillar(pillars, idx){
+function bzShenshaForPillar(pillars, idx, sex){
+  sex = sex || 1;
   var out=[], zhi=pillars[idx][1], gz=pillars[idx];
   var riGan=pillars[2][0], nianGan=pillars[0][0];
   var nianI=BZ_ZHI_STR.indexOf(pillars[0][1]);
