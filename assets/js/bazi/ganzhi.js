@@ -197,7 +197,7 @@ function qiyunAge(ms, yearGan, sex) {
   const y = new Date(ms + CST_OFFSET_MS).getUTCFullYear();
   const bounds = [];
   for (const yy of [y - 1, y, y + 1]) {
-    for (const name of JIE) bounds.push([solarTermTime(yy, name), name]);
+    for (const name of JIE) bounds.push([solarTermTime(yy, name, ms), name]);
   }
   bounds.sort((a, b) => a[0] - b[0]);
 
@@ -246,7 +246,7 @@ function jiaoyunText(qy) {
   const yy = new Date(qy.jiaoyun + CST_OFFSET_MS).getUTCFullYear();
   const b = [];
   for (const y0 of [yy - 1, yy, yy + 1]) {
-    for (const nm of JIE) b.push([solarTermTime(y0, nm), nm]);
+    for (const nm of JIE) b.push([solarTermTime(y0, nm, qy.jiaoyun), nm]);
   }
   b.sort((a, c) => a[0] - c[0]);
   const prev = b.filter(x => x[0] <= qy.jiaoyun).pop();

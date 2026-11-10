@@ -183,17 +183,20 @@ SOLAR_TERM_NAMES.forEach((n, i) => { TERM_LONGITUDE[n] = (i * 15) % 360; });
  * 某年某节气时刻（北京时间 UTC+8），返回毫秒时间戳。
  * 若提供了 BZ_JIEQI_DELTA 校准表，按 δ 修正（对齐问真 API）。
  */
-function solarTermTime(year, name) {
+function solarTermTime(year, name, refMs) {
   const base = solarTermTimeRaw(year, name);
-  if (typeof BZ_JIEQI_DELTA !== 'undefined') {
-    // 先查逐节气精确值，缺失时用节气名中位数兜底
-    let d = BZ_JIEQI_DELTA[year + '|' + name];
-    if (d === undefined && typeof BZ_JIEQI_DELTA_BY_NAME !== 'undefined') {
-      d = BZ_JIEQI_DELTA_BY_NAME[name];
-    }
-    if (d !== undefined) return base + d * 1000;
+  if (typeof BZ_JIEQI_DELTA === 'undefined') return base;
+
+  let d0 = BZ_JIEQI_DELTA[year + '|' + name];
+  if (d0 === undefined) {
+    // 缺失时用节气名中位数兜底（表已 100% 覆盖，此处仅防御）
+    d0 = (typeof BZ_JIEQI_DELTA_BY_NAME !== 'undefined')
+      ? BZ_JIEQI_DELTA_BY_NAME[name] : 0;
   }
-  return base;
+  // δ 随节气内时间线性漂移：δ(t) = δ0 + K × 距节天数
+  const K = (typeof BZ_JIEQI_K !== 'undefined') ? BZ_JIEQI_K : 0;
+  const x = (refMs === undefined) ? 0 : (refMs - base) / 86400000;
+  return base + (d0 + K * x) * 1000;
 }
 
 function solarTermTimeRaw(year, name) {
