@@ -1,0 +1,369 @@
+---
+layout: post
+title: 八字排盘
+---
+
+<style>
+.bazi-wrap { max-width: 1100px; margin: 0 auto;
+  font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Hiragino Sans GB",
+    "Microsoft YaHei", "Source Han Sans SC", "Noto Sans CJK SC", sans-serif; }
+.bazi-card { background: #fff; border-radius: 14px; padding: 26px; margin-bottom: 22px;
+  box-shadow: 0 2px 14px rgba(0,0,0,.07); border: 1px solid rgba(0,0,0,.05); }
+.bazi-card h2 { margin: 0 0 18px; font-size: 19px; font-weight: 600; color: #1a1a2e;
+  padding-bottom: 12px; border-bottom: 2px solid #f0f0f5; }
+
+/* 输入区 */
+.bz-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 14px; margin-bottom: 16px; }
+.bz-field label { display: block; font-size: 13px; color: #666; margin-bottom: 6px; font-weight: 500; }
+.bz-field input, .bz-field select { width: 100%; padding: 10px 12px; font-size: 15px;
+  border: 1px solid #dcdfe6; border-radius: 8px; box-sizing: border-box;
+  transition: border-color .2s; background: #fff; color: #333; }
+.bz-field input:focus, .bz-field select:focus { outline: none; border-color: #667eea; }
+.bz-actions { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; }
+.btn { padding: 11px 26px; font-size: 15px; font-weight: 600; border: none; border-radius: 8px;
+  cursor: pointer; transition: all .2s; }
+.btn-primary { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #fff; }
+.btn-primary:hover { transform: translateY(-2px); box-shadow: 0 6px 16px rgba(102,126,234,.35); }
+.btn-ghost { background: #f5f5f8; color: #555; }
+.btn-ghost:hover { background: #ebebf2; }
+
+/* 四柱表 */
+.pillar-table { width: 100%; border-collapse: separate; border-spacing: 8px; table-layout: fixed; }
+.pillar-table th { font-size: 13px; color: #888; font-weight: 500; padding: 4px 0; }
+.pillar-table td { text-align: center; padding: 10px 4px; }
+.pillar-table .col-label { text-align: right; font-size: 13px; color: #888; padding-right: 10px;
+  width: 82px; font-weight: 500; }
+.gz-big { font-size: 30px; font-weight: 700; letter-spacing: 4px; line-height: 1.25;
+  color: #1a1a2e; font-family: "Songti SC", "STSong", "SimSun", "Source Han Serif SC", "Noto Serif CJK SC", "Times New Roman", serif; }
+.gz-gan { color: #c0392b; }
+.gz-cell { background: #fafafc; border-radius: 10px; padding: 12px 6px; }
+.gz-cell.dm { background: linear-gradient(135deg,#fff5f7,#ffeef2); border: 1.5px solid #f8d0da; }
+.cg-line { font-size: 13px; color: #666; line-height: 1.7; }
+.tag { display: inline-block; font-size: 11px; padding: 1px 7px; border-radius: 4px;
+  background: #eef1ff; color: #5a6acf; margin: 1px 2px; }
+.tag.wx-木 { background:#e8f5e9; color:#2e7d32; }
+.tag.wx-火 { background:#ffeaea; color:#c62828; }
+.tag.wx-土 { background:#fff6e5; color:#a06a00; }
+.tag.wx-金 { background:#f0f0f5; color:#555; }
+.tag.wx-水 { background:#e7f2fb; color:#1565c0; }
+
+/* 信息网格 */
+.info-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; }
+.info-item { background: #fafafc; border-radius: 9px; padding: 12px 14px; }
+.info-item .k { font-size: 12px; color: #999; margin-bottom: 5px; }
+.info-item .v { font-size: 16px; font-weight: 600; color: #1a1a2e;
+  font-family: "Songti SC", "STSong", "SimSun", "Source Han Serif SC", "Noto Serif CJK SC", "Times New Roman", serif; }
+
+/* 五行条 */
+.wx-bars { display: grid; gap: 10px; }
+.wx-bar-row { display: grid; grid-template-columns: 46px 1fr 54px; align-items: center; gap: 10px; }
+.wx-bar-label { font-size: 14px; font-weight: 600; }
+.wx-bar-track { height: 20px; background: #f0f0f5; border-radius: 10px; overflow: hidden; }
+.wx-bar-fill { height: 100%; border-radius: 10px; transition: width .5s ease; }
+.wx-bar-val { font-size: 13px; color: #666; text-align: right; }
+
+/* 大运 */
+.dayun-scroll { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 10px; }
+.dayun-item { flex: 0 0 auto; min-width: 92px; text-align: center; background: #fafafc;
+  border-radius: 10px; padding: 12px 10px; border: 1px solid #eee; }
+.dayun-item.active { background: linear-gradient(135deg,#667eea,#764ba2); color:#fff; border-color:transparent; }
+.dayun-item .dy-gz { font-size: 19px; font-weight: 700; letter-spacing: 2px;
+  font-family: "Songti SC", "STSong", "SimSun", "Source Han Serif SC", "Noto Serif CJK SC", "Times New Roman", serif; margin-bottom: 4px; }
+.dayun-item .dy-age { font-size: 11px; opacity: .75; }
+
+/* 流年 */
+.liunian-grid { display: flex; flex-wrap: wrap; gap: 8px; }
+.ln-item { padding: 7px 12px; border-radius: 8px; background: #fafafc; font-size: 13px;
+  border: 1px solid #eee; cursor: pointer; transition: all .15s; }
+.ln-item:hover { border-color: #667eea; }
+.ln-item.cur { background: #667eea; color: #fff; border-color: transparent; }
+
+.bz-hint { font-size: 12px; color: #999; margin-top: 10px; line-height: 1.7; }
+.bz-error { color: #c62828; font-size: 14px; margin-top: 10px; }
+.section-hidden { display: none; }
+.god-col { font-size: 13px; }
+@media (max-width: 640px) {
+  .gz-big { font-size: 23px; letter-spacing: 2px; }
+  .pillar-table .col-label { width: 56px; font-size: 12px; }
+  .bazi-card { padding: 18px; }
+}
+</style>
+
+<div class="bazi-wrap">
+
+  <div class="bazi-card">
+    <h2>出生信息</h2>
+    <div class="bz-row">
+      <div class="bz-field">
+        <label>出生日期（公历）</label>
+        <input type="date" id="bzDate" value="1990-05-15">
+      </div>
+      <div class="bz-field">
+        <label>出生时间</label>
+        <input type="time" id="bzTime" value="10:30">
+      </div>
+      <div class="bz-field">
+        <label>性别</label>
+        <select id="bzSex">
+          <option value="1">男</option>
+          <option value="2">女</option>
+        </select>
+      </div>
+    </div>
+    <div class="bz-actions">
+      <button class="btn btn-primary" id="bzGo">开始排盘</button>
+      <button class="btn btn-ghost" id="bzNow">用现在时间</button>
+      <button class="btn btn-ghost" id="bzCopy">复制结果</button>
+    </div>
+    <div class="bz-hint">
+      按北京时间排盘，年柱以立春为界、月柱以十二节为界。23:00 后出生按次日子时计（晚子时换日）。
+    </div>
+    <div class="bz-error section-hidden" id="bzErr"></div>
+  </div>
+
+  <div id="bzResult" class="section-hidden">
+
+    <div class="bazi-card">
+      <h2>四柱命盘</h2>
+      <table class="pillar-table" id="bzPillars"></table>
+    </div>
+
+    <div class="bazi-card">
+      <h2>基本信息</h2>
+      <div class="info-grid" id="bzInfo"></div>
+    </div>
+
+    <div class="bazi-card">
+      <h2>五行分布</h2>
+      <div class="wx-bars" id="bzWuxing"></div>
+    </div>
+
+    <div class="bazi-card">
+      <h2>大运</h2>
+      <div class="dayun-scroll" id="bzDayun"></div>
+      <div class="bz-hint" id="bzQiyun"></div>
+    </div>
+
+    <div class="bazi-card">
+      <h2>流年（未来 12 年）</h2>
+      <div class="liunian-grid" id="bzLiunian"></div>
+    </div>
+
+  </div>
+</div>
+
+<script src="/assets/js/bazi/vsop-data.js"></script>
+<script src="/assets/js/bazi/astro.js"></script>
+<script src="/assets/js/bazi/ganzhi.js"></script>
+<script>
+(function () {
+  'use strict';
+
+  var WX_COLOR = { '木': '#4caf50', '火': '#e53935', '土': '#d4a017', '金': '#9e9e9e', '水': '#2196f3' };
+  var $ = function (id) { return document.getElementById(id); };
+
+  function el(tag, cls, text) {
+    var e = document.createElement(tag);
+    if (cls) e.className = cls;
+    if (text !== undefined && text !== null) e.textContent = text;
+    return e;
+  }
+
+  function showErr(msg) {
+    var b = $('bzErr');
+    b.textContent = msg;
+    b.classList.remove('section-hidden');
+  }
+  function clearErr() { $('bzErr').classList.add('section-hidden'); }
+
+  function render(c, dateStr) {
+    var p = c.pillars;
+
+    // ── 四柱表 ──
+    var t = $('bzPillars');
+    t.innerHTML = '';
+    var head = el('tr');
+    head.appendChild(el('th', '', ''));
+    ['年柱', '月柱', '日柱', '时柱'].forEach(function (x, i) {
+      var th = el('th', '', x);
+      if (i === 2) th.style.color = '#c0392b';
+      head.appendChild(th);
+    });
+    t.appendChild(head);
+
+    var rows = [
+      ['天干地支', c.pillarList, 'gz'],
+      ['十神', c.tenGods, 'god'],
+      ['藏干', c.canggan.map(function (a) { return a.join(' '); }), 'text'],
+      ['藏干十神', c.cangganGods.map(function (a) { return a.join(' '); }), 'text'],
+      ['纳音', c.nayin, 'text'],
+      ['星运', c.xingyun, 'text'],
+      ['自坐', c.zizuo, 'text'],
+      ['空亡', c.kongwang, 'text'],
+      ['神煞', c.shensha.map(function (a) { return a.length ? a.join('·') : '—'; }), 'text'],
+    ];
+
+    rows.forEach(function (row) {
+      var tr = el('tr');
+      tr.appendChild(el('td', 'col-label', row[0]));
+      row[1].forEach(function (val, i) {
+        var td = el('td');
+        var cell = el('div', 'gz-cell' + (i === 2 ? ' dm' : ''));
+        if (row[2] === 'gz') {
+          var big = el('div', 'gz-big');
+          var g = el('span', 'gz-gan', val[0]);
+          var z = el('span', '', val[1]);
+          big.appendChild(g); big.appendChild(z);
+          cell.appendChild(big);
+        } else if (row[2] === 'god') {
+          cell.appendChild(el('div', '', val));
+          cell.firstChild.style.fontSize = '15px';
+          cell.firstChild.style.fontWeight = '600';
+          cell.firstChild.style.color = (val === '日主') ? '#c0392b' : '#333';
+        } else {
+          var d = el('div', 'cg-line', val);
+          cell.appendChild(d);
+        }
+        td.appendChild(cell);
+        tr.appendChild(td);
+      });
+      t.appendChild(tr);
+    });
+
+    // ── 基本信息 ──
+    var info = $('bzInfo');
+    info.innerHTML = '';
+    var items = [
+      ['日主', c.dayMaster],
+      ['日主五行', c.dayMasterWuxing + ' · ' + c.dayMasterYinyang],
+      ['胎元', c.taiyuan + '（' + c.taiyuanNayin + '）'],
+      ['胎息', c.taixi + '（' + c.taixiNayin + '）'],
+      ['命宫', c.minggong + '（' + c.minggongNayin + '）'],
+      ['身宫', c.shengong + '（' + c.shengongNayin + '）'],
+      ['出生', dateStr],
+    ];
+    items.forEach(function (it) {
+      var box = el('div', 'info-item');
+      box.appendChild(el('div', 'k', it[0]));
+      box.appendChild(el('div', 'v', it[1]));
+      info.appendChild(box);
+    });
+
+    // ── 五行 ──
+    var wx = $('bzWuxing');
+    wx.innerHTML = '';
+    var wxKeys = ['木', '火', '土', '金', '水'];
+    var maxScore = 0;
+    wxKeys.forEach(function (key) {
+      if (c.wuxingScore[key] > maxScore) maxScore = c.wuxingScore[key];
+    });
+    wxKeys.forEach(function (key) {
+      var row = el('div', 'wx-bar-row');
+      var lab = el('div', 'wx-bar-label', key);
+      lab.style.color = WX_COLOR[key];
+      row.appendChild(lab);
+
+      var track = el('div', 'wx-bar-track');
+      var fill = el('div', 'wx-bar-fill');
+      var pct = maxScore > 0 ? (c.wuxingScore[key] / maxScore) * 100 : 0;
+      fill.style.width = pct + '%';
+      fill.style.background = WX_COLOR[key];
+      track.appendChild(fill);
+      row.appendChild(track);
+
+      row.appendChild(el('div', 'wx-bar-val',
+        c.wuxingCount[key] + ' 个 / ' + Number(c.wuxingScore[key]).toFixed(1)));
+      wx.appendChild(row);
+    });
+
+    // ── 大运 ──
+    var dy = $('bzDayun');
+    dy.innerHTML = '';
+    c.dayun.forEach(function (gz, i) {
+      var item = el('div', 'dayun-item');
+      item.appendChild(el('div', 'dy-gz', gz));
+      var age = c.qiyun.age + i * 10;
+      item.appendChild(el('div', 'dy-age', age + '岁起'));
+      dy.appendChild(item);
+    });
+
+    $('bzQiyun').textContent =
+      '起运：' + c.qiyun.age + ' 岁 ' + c.qiyun.months + ' 个月 ' + c.qiyun.days + ' 天'
+      + '（' + (c.qiyun.forward ? '顺行' : '逆行') + '）　交运：'
+      + formatDate(c.qiyun.jiaoyun);
+
+    // ── 流年 ──
+    var ln = $('bzLiunian');
+    ln.innerHTML = '';
+    var nowYear = new Date().getFullYear();
+    for (var y = nowYear; y < nowYear + 12; y++) {
+      var gz = JIAZI[((y - 1984) % 60 + 60) % 60];
+      var item = el('div', 'ln-item');
+      item.textContent = y + ' ' + gz;
+      if (y === nowYear) item.classList.add('cur');
+      ln.appendChild(item);
+    }
+
+    $('bzResult').classList.remove('section-hidden');
+  }
+
+  function formatDate(ms) {
+    var d = new Date(ms + 8 * 3600 * 1000);
+    var p = function (n) { return n < 10 ? '0' + n : '' + n; };
+    return d.getUTCFullYear() + '-' + p(d.getUTCMonth() + 1) + '-' + p(d.getUTCDate());
+  }
+
+  function run() {
+    clearErr();
+    var dv = $('bzDate').value;
+    var tv = $('bzTime').value || '12:00';
+    var sex = parseInt($('bzSex').value, 10);
+
+    if (!dv) { showErr('请选择出生日期'); return; }
+    var ym = dv.split('-');
+    var tm = tv.split(':');
+    var y = parseInt(ym[0], 10), mo = parseInt(ym[1], 10), d = parseInt(ym[2], 10);
+    var hh = parseInt(tm[0], 10), mi = parseInt(tm[1], 10);
+
+    if (y < 1900 || y > 2100) { showErr('仅支持 1900–2100 年'); return; }
+
+    try {
+      var ms = cstMs(y, mo, d, hh, mi, 0);
+      var chart = paipan(ms, sex, true);
+      render(chart, dv + ' ' + tv);
+      window.__bzChart = chart;
+    } catch (e) {
+      showErr('排盘失败：' + e.message);
+      console.error(e);
+    }
+  }
+
+  $('bzGo').addEventListener('click', run);
+  $('bzNow').addEventListener('click', function () {
+    var n = new Date(Date.now() + 8 * 3600 * 1000);
+    var p = function (x) { return x < 10 ? '0' + x : '' + x; };
+    $('bzDate').value = n.getUTCFullYear() + '-' + p(n.getUTCMonth() + 1) + '-' + p(n.getUTCDate());
+    $('bzTime').value = p(n.getUTCHours()) + ':' + p(n.getUTCMinutes());
+    run();
+  });
+  $('bzCopy').addEventListener('click', function () {
+    if (!window.__bzChart) { showErr('请先排盘'); return; }
+    var c = window.__bzChart;
+    var txt = '四柱：' + c.pillarList.join(' ')
+      + '\n日主：' + c.dayMaster + '（' + c.dayMasterWuxing + '）'
+      + '\n十神：' + c.tenGods.join(' ')
+      + '\n纳音：' + c.nayin.join(' ')
+      + '\n大运：' + c.dayun.slice(0, 8).join(' ');
+    navigator.clipboard.writeText(txt).then(function () {
+      var b = $('bzCopy');
+      var old = b.textContent;
+      b.textContent = '已复制';
+      setTimeout(function () { b.textContent = old; }, 1500);
+    }).catch(function () { showErr('复制失败，请手动选择文本'); });
+  });
+
+  // 首次自动排盘
+  run();
+})();
+</script>
