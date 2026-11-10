@@ -135,7 +135,7 @@ navigation_header:
 - title: Game
   url: /game/
 - title: 八字
-  url: /bazi.html
+  url: /bazi/
 - title: Fork Lujiachun
   url: https://github.com/plasmashen/lujiachun
 
