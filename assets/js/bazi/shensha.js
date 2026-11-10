@@ -41,7 +41,6 @@ var BZ_GZCOND = {
   "天赦日":{pos:"日柱",cond:"月支",spec:{"甲子":"丑亥子","甲午":"午巳未","戊寅":"卯寅辰","戊申":"戌申酉"}},
   "天转日":{pos:"日柱",cond:"月支",spec:{"壬子":"丑亥子","辛酉":"戌申酉","丙午":"午巳未","乙卯":"卯寅辰"}},
   "地转日":{pos:"日柱",cond:"月支",spec:{"丙子":"丑亥子","辛卯":"卯寅辰","戊午":"午巳未","癸酉":"戌申酉"}},
-  "拱禄":{pos:"日柱",cond:"时支",spec:{"戊辰":"午","丁巳":"未","癸丑":"亥"}},
 };
 var BZ_NAYIN_RULE = {
   "天罗":{pos:"日柱",zhi:"戌亥",nayin:"火"},
@@ -291,6 +290,11 @@ function bzShenshaForPillar(pillars, idx, sex){
     al=spec.spec[gz];
     if (al && al.indexOf(cz)>=0) out.push(name);
   }
+
+  /* ── 7b. 拱禄：日柱与时柱夹拱禄位，只有 5 组固定组合 ── */
+  var GONG_LU={"戊辰|戊午":1,"丁巳|丁未":1,"癸丑|癸亥":1,
+               "癸亥|癸丑":1,"己未|己巳":1};
+  if (idx===2 && GONG_LU[pillars[2]+"|"+pillars[3]]) out.push("拱禄");
 
   /* ── 8. 纳音型 ─────────────────────────────────── */
   var nn=bzNayinWuxing(pillars[0]);
