@@ -383,6 +383,7 @@ title: 八字排盘
 <script src="/assets/js/bazi/vsop-data.js"></script>
 <script src="/assets/js/bazi/jieqi-delta.js"></script>
 <script src="/assets/js/bazi/astro.js"></script>
+<script src="/assets/js/bazi/lunar.js"></script>
 <script src="/assets/js/bazi/ganzhi.js"></script>
 <script src="/assets/js/bazi/shensha.js"></script>
 <script src="/assets/js/bazi/interpret-data.js"></script>
@@ -461,7 +462,7 @@ title: 八字排盘
     '神煞': '古人对特定干支组合的标签，朱色为凶煞、青色为吉神'
   };
 
-  function renderChart(c) {
+  function renderChart(c, birthMs) {
     var t = $('tChart');
     t.innerHTML = '';
 
@@ -749,8 +750,8 @@ title: 八字排盘
     });
   }
 
-  function render(c, label) {
-    renderChart(c);
+  function render(c, label, birthMs) {
+    renderChart(c, birthMs);
     renderCore(c);
     renderWx(c);
     renderGod(c);
@@ -758,7 +759,14 @@ title: 八字排盘
     renderDy(c);
     renderLn(c);
     renderAppx(c);
-    $('mBirth').textContent = label + ' · ' + (c.sex === 1 ? '男' : '女');
+    var lunarStr = '';
+    try {
+      if (typeof bzLunar !== 'undefined' && birthMs != null) {
+        lunarStr = bzLunar.text(birthMs);
+      }
+    } catch (e) { lunarStr = ''; }
+    $('mBirth').textContent = (lunarStr ? lunarStr + ' · ' : '')
+      + label + ' · ' + (c.sex === 1 ? '男' : '女');
     $('bzView').classList.remove('hide');
   }
 
@@ -779,9 +787,10 @@ title: 八字排盘
       var todayMs = cstMs(today.getFullYear(), today.getMonth() + 1,
                           today.getDate(), 0, 0, 0);
       var ziAdv = ($('bzZi') || {}).value !== '0';   // 1=早子时(23:00换日) 0=晚子时
-      var chart = paipan(cstMs(y, mo, d, hh, mi, 0), sex, ziAdv, todayMs);
+      var birthMs = cstMs(y, mo, d, hh, mi, 0);
+      var chart = paipan(birthMs, sex, ziAdv, todayMs);
       window.__bz = chart;
-      render(chart, dv + ' ' + tv);
+      render(chart, dv + ' ' + tv, birthMs);
     } catch (e) {
       err('排盘失败：' + e.message);
       if (window.console) console.error(e);
