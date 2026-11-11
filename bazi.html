@@ -320,6 +320,9 @@ title: 八字排盘
       <table class="chart" id="tChart">
         <colgroup><col style="width:78px"><col><col><col><col></colgroup>
       </table>
+      <div class="chart-foot" id="cfRysl" style="display:none">
+        <span class="k"><i class="sw" style="background:#3f5d52"></i><span id="tRysl"></span></span>
+      </div>
       <div class="chart-foot">
         <span class="k"><i class="sw" style="background:#a8352a"></i>天干</span>
         <span class="k"><i class="sw" style="background:#1c1a17"></i>地支</span>
@@ -384,6 +387,7 @@ title: 八字排盘
 <script src="/assets/js/bazi/jieqi-delta.js"></script>
 <script src="/assets/js/bazi/astro.js"></script>
 <script src="/assets/js/bazi/lunar.js"></script>
+<script src="/assets/js/bazi/rysl.js"></script>
 <script src="/assets/js/bazi/ganzhi.js"></script>
 <script src="/assets/js/bazi/shensha.js"></script>
 <script src="/assets/js/bazi/interpret-data.js"></script>
@@ -765,6 +769,16 @@ title: 八字排盘
         lunarStr = bzLunar.text(birthMs);
       }
     } catch (e) { lunarStr = ''; }
+    try {
+      if (typeof bzRysl !== 'undefined' && birthMs != null && c.pillars) {
+        var mz = c.pillars.month.charAt(1);
+        var rs = bzRysl.text(birthMs, mz);
+        if (rs) {
+          $('tRysl').textContent = '出生日 · ' + rs;
+          $('cfRysl').style.display = '';
+        }
+      }
+    } catch (e) { /* 静默 */ }
     $('mBirth').textContent = (lunarStr ? lunarStr + ' · ' : '')
       + label + ' · ' + (c.sex === 1 ? '男' : '女');
     $('bzView').classList.remove('hide');
