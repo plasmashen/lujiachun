@@ -277,6 +277,11 @@ title: 八字排盘
         <input type="time" id="bzTime" value="10:30"></div>
       <div class="f w3"><label>性别</label>
         <select id="bzSex"><option value="1">男</option><option value="2">女</option></select></div>
+      <div class="f w3"><label>子时换日</label>
+        <select id="bzZi" title="23:00-23:59 出生时，算当天还是次日">
+          <option value="1">早子时（23:00 换日）</option>
+          <option value="0">晚子时（00:00 换日）</option>
+        </select></div>
     </div>
 
     <div class="qlab">日期快调</div>
@@ -438,7 +443,7 @@ title: 八字排盘
   });
 
   $('bzGo').addEventListener('click', run);
-  ['bzDate', 'bzTime', 'bzSex'].forEach(function (id) {
+  ['bzDate', 'bzTime', 'bzSex', 'bzZi'].forEach(function (id) {
     $(id).addEventListener('change', run);
   });
 
@@ -773,7 +778,8 @@ title: 八字排盘
       var today = new Date();
       var todayMs = cstMs(today.getFullYear(), today.getMonth() + 1,
                           today.getDate(), 0, 0, 0);
-      var chart = paipan(cstMs(y, mo, d, hh, mi, 0), sex, true, todayMs);
+      var ziAdv = ($('bzZi') || {}).value !== '0';   // 1=早子时(23:00换日) 0=晚子时
+      var chart = paipan(cstMs(y, mo, d, hh, mi, 0), sex, ziAdv, todayMs);
       window.__bz = chart;
       render(chart, dv + ' ' + tv);
     } catch (e) {
