@@ -135,13 +135,19 @@ title: 八字排盘
 .dim .v.sm{font-size:11px;color:var(--ink-3)}
 .dim .v.dm{color:var(--zhu);font-weight:650}
 
-.sha-cell{display:flex;flex-wrap:wrap;gap:3px;justify-content:center;padding:8px 2px}
+.sha-cell{display:flex;flex-wrap:wrap;gap:3px;justify-content:center;
+  align-content:flex-start;padding:8px 2px;min-height:52px}
 .sha{font-size:9.5px;padding:1.5px 4px;border-radius:2px;line-height:1.5;
   white-space:nowrap;cursor:help;background:#efece4;color:var(--ink-2);
   letter-spacing:.01em}
 .sha.ji{background:var(--qing-soft);color:var(--qing)}
 .sha.xiong{background:var(--zhu-soft);color:var(--zhu)}
 .sha.none{background:transparent;color:var(--ink-4)}
+/* 超出折叠：只显示前 4 个，其余计数 */
+.sha-more{font-size:9.5px;padding:1.5px 5px;border-radius:2px;line-height:1.5;
+  white-space:nowrap;cursor:pointer;background:transparent;
+  border:1px dashed var(--line);color:var(--ink-3);letter-spacing:.02em}
+.sha-more:hover{background:#efece4;color:var(--ink)}
 
 .chart-foot{display:flex;gap:16px;flex-wrap:wrap;margin-top:16px;
   font-size:10px;color:var(--ink-3);letter-spacing:.06em}
@@ -517,7 +523,9 @@ title: 八字排盘
       if (!arr.length) {
         wrap.appendChild(mk('span', 'sha none', '—'));
       } else {
-        arr.forEach(function (s) {
+        /* 只展示前 4 个，避免单柱过多把行高撑开；其余折叠为 +N */
+        var SHOW = 4;
+        arr.slice(0, SHOW).forEach(function (s) {
           var info = BZ_SHENSHA_INFO[s];
           var cls = 'sha';
           if (info) {
@@ -528,6 +536,21 @@ title: 八字排盘
           if (info) e.title = s + '（' + info.lvl + '）：' + info.desc;
           wrap.appendChild(e);
         });
+        if (arr.length > SHOW) {
+          var rest = arr.slice(SHOW);
+          var more = mk('span', 'sha-more', '+' + rest.length);
+          more.title = rest.join('、') + '\n（完整解说见下方「神煞」一节）';
+          more.addEventListener('click', function () {
+            var h = document.querySelectorAll('.sec-h h2');
+            for (var k = 0; k < h.length; k++) {
+              if (h[k].textContent.indexOf('神煞') >= 0) {
+                h[k].scrollIntoView({ behavior: 'smooth', block: 'start' });
+                break;
+              }
+            }
+          });
+          wrap.appendChild(more);
+        }
       }
       cell.appendChild(wrap);
       sr.appendChild(cell);
