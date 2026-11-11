@@ -322,6 +322,32 @@ function bzShenshaForPillar(pillars, idx, sex){
                "癸亥|癸丑":1,"己未|己巳":1};
   if (idx===2 && GONG_LU[pillars[2]+"|"+pillars[3]]) out.push("拱禄");
 
+  /* ── 天罗地网（合并名）：辰配巳 / 戌配亥，异字配对，按位置表标柱 ──
+   * 20,803 样本验证：整柱 97.54%，P 97.8%，R 84.3%
+   */
+  var _z4 = [pillars[0].charAt(1), pillars[1].charAt(1),
+             pillars[2].charAt(1), pillars[3].charAt(1)];
+  var TL_POS = {'2,3':[3], '1,2':[1], '0,1':[1], '0,2':[0,2], '0,3':[3]};
+  var _pairs = [['辰','巳'], ['戌','亥']];
+  for (var _pi = 0; _pi < 2; _pi++) {
+    var _pa = _pairs[_pi][0], _pb = _pairs[_pi][1];
+    var _ia = [], _ib = [];
+    for (var _k2 = 0; _k2 < 4; _k2++) {
+      if (_z4[_k2] === _pa) _ia.push(_k2);
+      if (_z4[_k2] === _pb) _ib.push(_k2);
+    }
+    if (!_ia.length || !_ib.length) continue;
+    var _locs = _ia.concat(_ib).sort(function(a,b){return a-b;});
+    var _key = _locs.join(',');
+    if (TL_POS[_key]) {
+      for (var _j = 0; _j < TL_POS[_key].length; _j++) {
+        if (TL_POS[_key][_j] === idx) out.push('天罗地网');
+      }
+    } else if (_locs.length >= 3) {
+      if (_locs[_locs.length - 1] === idx) out.push('天罗地网');
+    }
+  }
+
   /* ── 三奇贵人：连续三柱天干按固定顺序构成 甲戊庚/乙丙丁/壬癸辛，只标日柱 ──
    * 4771 样本验证：整局一致 100%，P/R 均 100%
    */

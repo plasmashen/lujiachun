@@ -1,4 +1,4 @@
-﻿﻿/**
+﻿/**
  * 八字排盘引擎 —— 干支历法与命理要素
  * 与 Python 版 core/ganzhi.py + core/elements.py + core/extras.py 对应。
  */
@@ -351,6 +351,12 @@ function paipan(ms, sex = 1, lateZiAdvance = true, todayMs) {
     // 金神判的是原局日柱/时柱，不是大运代入位置
     const gi = lst.indexOf('金神');
     if (gi >= 0) lst.splice(gi, 1);
+    // 童子煞只看原局日/时柱，大运代入不重算（实测大运神煞里童子煞 0 次）
+    const _tzi = lst.indexOf('童子煞');
+    if (_tzi >= 0) lst.splice(_tzi, 1);
+    // 童子煞只看原局日/时柱，大运代入不重算（实测大运神煞里童子煞 0 次）
+    const ti = lst.indexOf('童子煞');
+    if (ti >= 0) lst.splice(ti, 1);
     // 天罗地网判的是大运地支本身
     if ('戌亥'.indexOf(gz[1]) >= 0 && nayinYear === '火' && lst.indexOf('天罗') < 0) lst.push('天罗');
     if ('辰巳'.indexOf(gz[1]) >= 0 && '土水'.indexOf(nayinYear) >= 0 && lst.indexOf('地网') < 0) lst.push('地网');
