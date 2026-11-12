@@ -239,6 +239,30 @@ title: 八字排盘
   font-size:10.5px;color:var(--ink-3);line-height:1.85}
 
 /* 附录 */
+/* 流日流时 */
+.lr-bar{display:flex;gap:10px;align-items:center;margin-bottom:12px;flex-wrap:wrap}
+.lr-sel{font-family:inherit;font-size:.85rem;padding:5px 8px;border:1px solid var(--rule);
+  border-radius:4px;background:var(--paper);color:var(--ink)}
+.lr-yue{color:var(--ink-3);font-size:.82rem}
+.lr-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(86px,1fr));gap:6px;
+  margin-bottom:16px}
+.lr-d{border:1px solid var(--rule-soft);border-radius:5px;padding:7px 9px;cursor:pointer;
+  transition:.12s;background:var(--paper-2)}
+.lr-d:hover{border-color:var(--zhu)}
+.lr-d.on{border-color:var(--zhu);background:var(--zhu-soft,#f3e6e3)}
+.lr-d.today{border-color:var(--zhu);border-width:1.5px}
+.lr-d .d1{font-size:.72rem;color:var(--ink-3);letter-spacing:.03em}
+.lr-d .d2{font-size:.9rem;font-weight:600;margin:2px 0 1px;font-family:var(--serif)}
+.lr-d .d3{font-size:.7rem;color:var(--ink-3)}
+.lr-d .d4{font-size:.68rem;color:var(--zhu);margin-top:2px}
+.lr-shi{border-top:1px solid var(--rule-soft);padding-top:14px}
+.lr-shi-h{font-size:.85rem;color:var(--ink-2);margin-bottom:10px}
+.lr-shi-g{display:grid;grid-template-columns:repeat(auto-fill,minmax(92px,1fr));gap:6px}
+.lr-s{border:1px solid var(--rule-soft);border-radius:5px;padding:6px 8px;background:var(--paper-2)}
+.lr-s .s1{font-size:.7rem;color:var(--ink-3)}
+.lr-s .s2{font-size:.88rem;font-weight:600;font-family:var(--serif)}
+.lr-s .s3{font-size:.68rem;color:var(--ink-3)}
+
 /* 古籍印证 */
 .gj-list{margin-top:4px}
 .gj-i{border-left:2px solid var(--rule);padding:10px 0 10px 14px;margin-bottom:14px;
@@ -392,14 +416,26 @@ title: 八字排盘
     </div>
 
     <div class="bz-sec">
-      <div class="sec-h"><span class="sec-n">捌</span><h2>古籍印证</h2>
+      <div class="sec-h"><span class="sec-n">捌</span><h2>流日 · 流时</h2>
+        <span class="meta" id="mLr"></span></div>
+      <div class="lr-bar">
+        <select id="lrYear" class="lr-sel"></select>
+        <select id="lrMonth" class="lr-sel"></select>
+        <span class="lr-yue" id="lrYue"></span>
+      </div>
+      <div class="lr-grid" id="tLr"></div>
+      <div class="lr-shi" id="pLrShi"></div>
+    </div>
+
+    <div class="bz-sec">
+      <div class="sec-h"><span class="sec-n">玖</span><h2>古籍印证</h2>
         <span class="meta" id="mGj"></span></div>
       <div class="prose" id="pGjIntro"></div>
       <div class="gj-list" id="pGj"></div>
     </div>
 
     <div class="bz-sec">
-      <div class="sec-h"><span class="sec-n">玖</span><h2>附录</h2>
+      <div class="sec-h"><span class="sec-n">拾</span><h2>附录</h2>
         <span class="meta">胎元 · 命宫 · 起运</span></div>
       <div class="appx" id="pAppx"></div>
     </div>
@@ -416,6 +452,7 @@ title: 八字排盘
 <script src="/assets/js/bazi/shensha.js"></script>
 <script src="/assets/js/bazi/interpret-data.js"></script>
 <script src="/assets/js/bazi/interpret.js"></script>
+<script src="/assets/js/bazi/liuri.js"></script>
 <script src="/assets/js/bazi/guji-index.js"></script>
 <script src="/assets/js/bazi/guji.js"></script>
 <script>
@@ -762,6 +799,96 @@ title: 八字排盘
       '流年看的是这一年的主要议题，吉凶仍须结合大运与已积累的处境。把压力当信息读，比当判决读有用。'));
   }
 
+  var _lrSel = null;   // {y, m, d}
+
+  function renderLiuri(c) {
+    if (typeof bzLiuri === 'undefined') return;
+    var now = new Date(Date.now() + 8 * 3600000);
+    var cy = now.getUTCFullYear(), cm = now.getUTCMonth() + 1, cd = now.getUTCDate();
+    if (!_lrSel) _lrSel = { y: cy, m: cm, d: cd };
+
+    // 年份下拉：出生年次年 ~ +60
+    var by = new Date(c.ms + 8 * 3600000).getUTCFullYear();
+    var ySel = $('lrYear'), mSel = $('lrMonth');
+    if (!ySel.options.length) {
+      for (var y = by; y <= by + 80; y++) {
+        var o = document.createElement('option');
+        o.value = y; o.textContent = y + ' 年';
+        ySel.appendChild(o);
+      }
+      for (var m = 1; m <= 12; m++) {
+        var o2 = document.createElement('option');
+        o2.value = m; o2.textContent = bzLiuri.MONTH_CN[m] + ' 月';
+        mSel.appendChild(o2);
+      }
+      ySel.onchange = function () {
+        _lrSel.y = parseInt(ySel.value, 10); _lrSel.d = 1;
+        renderLiuri(c);
+      };
+      mSel.onchange = function () {
+        _lrSel.m = parseInt(mSel.value, 10); _lrSel.d = 1;
+        renderLiuri(c);
+      };
+    }
+    ySel.value = _lrSel.y;
+    mSel.value = _lrSel.m;
+
+    var segs = bzLiuri.yueSegs(_lrSel.y, _lrSel.m);
+    $('lrYue').textContent = '流月 ' + segs.map(function (sg) {
+      return sg.gz + '（' + (sg.days === 1 ? sg.from + '日' : sg.from + '-' + sg.to + '日') + '）';
+    }).join(' → ');
+
+    var list = bzLiuri.list(c, _lrSel.y, _lrSel.m);
+    var g = $('tLr');
+    g.innerHTML = '';
+    list.forEach(function (it) {
+      var d = mk('div', 'lr-d' + (it.isToday ? ' today' : ''));
+      if (it.d === _lrSel.d) d.classList.add('on');
+      d.appendChild(mk('div', 'd1', it.d + ' 日'));
+      d.appendChild(mk('div', 'd2', it.gz));
+      d.appendChild(mk('div', 'd3', it.god));
+      if (it.relations.length) {
+        d.appendChild(mk('div', 'd4', it.relations.join(' ')));
+      }
+      d.onclick = function () {
+        _lrSel.d = it.d;
+        renderLiuri(c);
+        renderShi(c);
+      };
+      g.appendChild(d);
+    });
+
+    $('mLr').textContent = _lrSel.y + '年' + bzLiuri.MONTH_CN[_lrSel.m] + '月 · '
+      + list.length + ' 天';
+    renderShi(c);
+  }
+
+  function renderShi(c) {
+    if (typeof bzLiuri === 'undefined') return;
+    var box = $('pLrShi');
+    var d = _lrSel.d;
+    var list = bzLiuri.shi(c, _lrSel.y, _lrSel.m, d);
+    var dayGz = bzLiuri.list(c, _lrSel.y, _lrSel.m).filter(function (x) {
+      return x.d === d;
+    })[0];
+
+    box.innerHTML = '';
+    var h = mk('div', 'lr-shi-h');
+    h.textContent = _lrSel.y + '-' + _lrSel.m + '-' + d + '　' +
+      (dayGz ? dayGz.gz + '（' + dayGz.god + '）' : '') + '　十二时辰';
+    box.appendChild(h);
+
+    var g = mk('div', 'lr-shi-g');
+    list.forEach(function (it) {
+      var s2 = mk('div', 'lr-s');
+      s2.appendChild(mk('div', 's1', it.zhi + '时 ' + it.range));
+      s2.appendChild(mk('div', 's2', it.gz));
+      s2.appendChild(mk('div', 's3', it.god + (it.relations.length ? ' · ' + it.relations.join(' ') : '')));
+      g.appendChild(s2);
+    });
+    box.appendChild(g);
+  }
+
   function renderGuji(c) {
     var box = $('pGj');
     if (!box) return;
@@ -848,6 +975,7 @@ title: 八字排盘
     renderSha(c);
     renderDy(c);
     renderLn(c);
+    renderLiuri(c);
     renderGuji(c);
     renderAppx(c);
     var lunarStr = '';
