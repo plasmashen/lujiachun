@@ -1,0 +1,360 @@
+---
+layout: default
+title: 古籍库
+description: 命理与中医古籍全文库 · 2792 章 566 万字 · 可全文检索
+permalink: /books/
+---
+
+<style>
+/* 宣纸墨色 · 与 bazi.html 同源 */
+:root{
+  --paper:#f7f4ed; --paper-2:#fdfcf8;
+  --ink:#1c1a17; --ink-2:#544f47; --ink-3:#797367; --ink-4:#a39c8f;
+  --rule:#ded7c8; --rule-soft:#eae5d9;
+  --zhu:#a8352a; --qing:#3f5d52;
+  --serif:"Songti SC","STSong","STZhongsong","SimSun","Source Han Serif SC",
+    "Source Han Serif CN","Noto Serif CJK SC","Noto Serif SC",Georgia,serif;
+  --sans:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB",
+    "Microsoft YaHei","Source Han Sans SC","Noto Sans CJK SC",sans-serif;
+}
+.bk-wrap{max-width:1180px;margin:0 auto;padding:0 20px;
+  font-family:var(--sans);color:var(--ink);background:var(--paper)}
+.bk-head{padding:36px 0 22px;border-bottom:1px solid var(--rule);margin-bottom:26px}
+.bk-head h1{margin:0 0 8px;font-size:1.7rem;letter-spacing:.04em}
+.bk-head p{margin:0;color:var(--ink-3);font-size:.9rem;line-height:1.7}
+.bk-search{display:flex;gap:10px;margin:22px 0 6px;flex-wrap:wrap}
+.bk-search input{flex:1;min-width:220px;padding:11px 14px;border:1px solid var(--rule);
+  border-radius:6px;background:var(--paper);color:var(--ink);font-size:.95rem;font-family:inherit}
+.bk-search input:focus{outline:none;border-color:var(--zhu)}
+.bk-tabs{display:flex;gap:6px;margin:16px 0 22px;flex-wrap:wrap}
+.bk-tab{padding:6px 14px;border:1px solid var(--rule);border-radius:999px;
+  cursor:pointer;font-size:.85rem;color:var(--ink-3);background:transparent;font-family:inherit}
+.bk-tab.on{background:var(--zhu);color:#fff;border-color:var(--zhu)}
+.bk-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:12px}
+.bk-card{border:1px solid var(--rule);border-radius:8px;padding:14px 16px;cursor:pointer;
+  transition:.15s;background:var(--paper)}
+.bk-card:hover{border-color:var(--zhu);transform:translateY(-1px)}
+.bk-card h3{margin:0 0 6px;font-size:1rem;font-weight:600}
+.bk-card .au{color:var(--ink-3);font-size:.78rem;margin-bottom:8px}
+.bk-card .mt{color:var(--ink-3);font-size:.75rem;font-variant-numeric:tabular-nums}
+.bk-reader{display:none}
+.bk-reader.on{display:block}
+.bk-rbar{display:flex;align-items:center;gap:14px;padding:12px 0;border-bottom:1px solid var(--rule);
+  position:sticky;top:0;background:var(--paper);z-index:10;flex-wrap:wrap}
+.bk-back{cursor:pointer;color:var(--zhu);font-size:.88rem;border:none;background:none;font-family:inherit}
+.bk-rtitle{font-weight:600;font-size:1rem;flex:1;min-width:140px}
+.bk-rnav{display:flex;gap:6px}
+.bk-rnav button{padding:5px 12px;border:1px solid var(--rule);border-radius:5px;background:none;
+  color:var(--ink);cursor:pointer;font-size:.82rem;font-family:inherit}
+.bk-rnav button:disabled{opacity:.35;cursor:default}
+.bk-toc{max-height:70vh;overflow-y:auto;border:1px solid var(--rule);border-radius:8px;
+  padding:10px;margin:16px 0}
+.bk-toc a{display:block;padding:7px 10px;border-radius:5px;color:var(--ink);
+  text-decoration:none;font-size:.88rem;line-height:1.5}
+.bk-toc a:hover{background:var(--rule-soft)}
+.bk-toc a.on{background:var(--zhu);color:#fff}
+.bk-toc .vol{font-size:.75rem;color:var(--ink-3);padding:10px 10px 4px;letter-spacing:.05em}
+.bk-body{max-width:760px;margin:0 auto;padding:10px 0 60px;font-size:1.06rem;line-height:2.1;
+  letter-spacing:.02em;font-family:var(--serif);color:var(--ink-2)}
+.bk-body h2{font-size:1.18rem;margin:0 0 18px;line-height:1.6}
+.bk-body .meta{color:var(--ink-3);font-size:.8rem;margin-bottom:22px;
+  padding-bottom:14px;border-bottom:1px solid var(--rule)}
+.bk-body p{margin:0 0 1em;text-indent:2em}
+.bk-body p.na{text-indent:0}
+.bk-hl{background:rgba(178,149,93,.28);border-radius:2px}
+.bk-hit{position:absolute;right:20px;bottom:20px;background:var(--zhu);color:#fff;
+  padding:8px 14px;border-radius:20px;font-size:.8rem;display:none}
+.bk-hit.on{display:block}
+</style>
+
+<div class="bk-wrap">
+  <div class="bk-head">
+    <h1>古籍库</h1>
+    <p>
+      <span id="bkStat">65 部 · 2792 章 · 566 万字</span>
+      <br>命理与中医经典全文，支持书名、章节与正文全文检索。
+    </p>
+    <div class="bk-search">
+      <input id="bkQ" placeholder="搜索书名、章节名，或按回车检索全书正文" autocomplete="off">
+      <button id="bkGo" style="padding:11px 20px;border:1px solid var(--zhu);background:var(--zhu);
+        color:#fff;border-radius:6px;cursor:pointer;font-size:.9rem;font-family:inherit">检索</button>
+    </div>
+    <div class="bk-tabs" id="bkTabs">
+      <button class="bk-tab on" data-f="all">全部</button>
+      <button class="bk-tab" data-f="ming">命理</button>
+      <button class="bk-tab" data-f="yi">中医</button>
+    </div>
+  </div>
+
+  <div id="bkList"><div class="bk-grid" id="bkGrid"></div></div>
+
+  <div class="bk-reader" id="bkReader">
+    <div class="bk-rbar">
+      <button class="bk-back" id="bkBack">← 返回书目</button>
+      <span class="bk-rtitle" id="bkRTitle"></span>
+      <div class="bk-rnav">
+        <button id="bkPrev">上一章</button>
+        <button id="bkNext">下一章</button>
+      </div>
+    </div>
+    <div class="bk-toc" id="bkToc"></div>
+    <div class="bk-body" id="bkBody"></div>
+  </div>
+</div>
+<div class="bk-hit" id="bkHit"></div>
+
+<script>
+(function(){
+  var IDX_URL = '/assets/js/bazi/books-index.json';
+  var BODY_URL = '/assets/js/bazi/books/';
+  var idx = [], cur = null, curCh = 0, cache = {}, q = '', filter = 'all';
+
+  function el(id){ return document.getElementById(id); }
+  function esc(s){ return (s||'').replace(/[&<>"]/g, function(c){
+    return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; }); }
+  function fmt(n){ return n >= 10000 ? (n/10000).toFixed(1)+'万' : String(n); }
+
+  function card(b){
+    var kind = b.id.indexOf('3_1_') === 0 ? '命理' : '中医';
+    return '<div class="bk-card" data-id="'+b.id+'">'
+      + '<h3>'+esc(b.name)+'</h3>'
+      + '<div class="au">'+esc(b.author || '佚名')+' · '+kind+'</div>'
+      + '<div class="mt">'+b.chapters+' 章 · '+fmt(b.chars)+' 字</div>'
+      + '</div>';
+  }
+
+  function render(){
+    var k = q.trim();
+    var list = idx.filter(function(b){
+      if(filter === 'ming' && b.id.indexOf('3_1_') !== 0) return false;
+      if(filter === 'yi' && b.id.indexOf('2_1_') !== 0) return false;
+      if(!k) return true;
+      if(b.name.indexOf(k) >= 0) return true;
+      return b.toc.some(function(c){ return (c.t||'').indexOf(k) >= 0; });
+    });
+    el('bkGrid').innerHTML = list.map(card).join('')
+      || '<p style="color:var(--ink-3)">没有匹配的书目</p>';
+    el('bkStat').textContent = list.length === idx.length
+      ? (idx.length+' 部 · 2792 章 · 566 万字')
+      : ('匹配 '+list.length+' 部');
+  }
+
+  function showToc(){
+    var b = cur;
+    var h = '', lastVol = null;
+    b.toc.forEach(function(c, i){
+      if(c.v && c.v !== lastVol){ h += '<div class="vol">'+esc(c.v)+'</div>'; lastVol = c.v; }
+      h += '<a href="#" data-i="'+i+'" class="'+(i===curCh?'on':'')+'">'
+        + (i+1) + '. ' + esc(c.t || ('第'+c.n+'章')) + '</a>';
+    });
+    el('bkToc').innerHTML = h;
+  }
+
+  function renderText(text, k){
+    if(!k) return text.split(/\n+/).map(function(p){
+      return '<p>'+esc(p)+'</p>'; }).join('');
+    var re = new RegExp('(' + k.replace(/[.*+?^${}()|[\]\\]/g,'\\$&') + ')', 'g');
+    return text.split(/\n+/).map(function(p){
+      return '<p class="na">'+esc(p).replace(re,'<span class="bk-hl">$1</span>')+'</p>';
+    }).join('');
+  }
+
+  function openCh(i, keepScroll){
+    if(!cur || i < 0 || i >= cur.toc.length) return;
+    curCh = i;
+    var toc = cur.toc[i];
+    el('bkRTitle').textContent = cur.name + (toc.t ? ' · ' + toc.t : '');
+    el('bkPrev').disabled = i === 0;
+    el('bkNext').disabled = i === cur.toc.length - 1;
+
+    // 更新目录高亮
+    var as = el('bkToc').querySelectorAll('a');
+    for(var j=0;j<as.length;j++) as[j].classList.toggle('on', j===i);
+
+    function paint(ch){
+      var body = ch.text || '';
+      if(ch.images && ch.images.length){
+        body += '\n' + ch.images.map(function(im){
+          return '![图]('+im+')'; }).join('\n');
+      }
+      el('bkBody').innerHTML =
+        '<h2>'+esc(ch.t || ('第'+ch.n+'章'))+'</h2>'
+        + '<div class="meta">'+esc(cur.name)+'　'+esc(ch.v||'')+'　'+esc(ch.w||'')+'</div>'
+        + renderText(body, q.trim());
+      if(!keepScroll) window.scrollTo({top:0, behavior:'smooth'});
+    }
+
+    var cached = cache[cur.id];
+    if(cached){ paint(cached.chapters[i]); return; }
+    el('bkBody').innerHTML = '<p class="na" style="color:var(--ink-3)">载入中…</p>';
+    fetch(BODY_URL + cur.id + '.json').then(function(r){ return r.json(); })
+      .then(function(d){
+        cache[cur.id] = d;
+        paint(d.chapters[i]);
+      }).catch(function(){
+        el('bkBody').innerHTML = '<p class="na">载入失败</p>';
+      });
+  }
+
+  function openBook(id){
+    cur = idx.filter(function(b){ return b.id === id; })[0];
+    if(!cur) return;
+    curCh = 0;
+    el('bkList').style.display = 'none';
+    el('bkReader').classList.add('on');
+    showToc();
+    openCh(0);
+  }
+
+  function back(){
+    el('bkReader').classList.remove('on');
+    el('bkList').style.display = '';
+    cur = null;
+  }
+
+  // 事件
+  el('bkGrid').addEventListener('click', function(e){
+    var c = e.target.closest('.bk-card');
+    if(c) openBook(c.dataset.id);
+  });
+  el('bkToc').addEventListener('click', function(e){
+    var a = e.target.closest('a');
+    if(a){ e.preventDefault(); openCh(+a.dataset.i); }
+  });
+  el('bkBack').onclick = back;
+  el('bkPrev').onclick = function(){ openCh(curCh-1); };
+  el('bkNext').onclick = function(){ openCh(curCh+1); };
+  el('bkQ').addEventListener('input', function(e){ q = e.target.value; render(); });
+
+  // ── 正文全文检索（回车触发）──
+  var bodyIdx = null;      // { bookId: [{n,t,text}] }
+  var searching = false;
+
+  function loadBook(id){
+    if(cache[id]) return Promise.resolve(cache[id]);
+    return fetch(BODY_URL + id + '.json').then(function(r){ return r.json(); })
+      .then(function(d){ cache[id] = d; return d; });
+  }
+
+  function buildBodyIndex(onProgress){
+    if(bodyIdx) { onProgress && onProgress(1); return Promise.resolve(bodyIdx); }
+    bodyIdx = {};
+    var done = 0, total = idx.length;
+    return idx.reduce(function(chain, b){
+      return chain.then(function(){
+        return loadBook(b.id).then(function(d){
+          bodyIdx[b.id] = d.chapters;
+          done++;
+          onProgress && onProgress(done / total);
+        }).catch(function(){ done++; });
+      });
+    }, Promise.resolve()).then(function(){ return bodyIdx; });
+  }
+
+  function searchBody(k){
+    if(!k || searching) return;
+    searching = true;
+    var hitEl = el('bkHit');
+    hitEl.classList.add('on');
+    hitEl.textContent = '正在索引正文… 0%';
+    buildBodyIndex(function(p){
+      hitEl.textContent = '正在索引正文… ' + Math.round(p*100) + '%';
+    }).then(function(){
+      var res = [];
+      idx.forEach(function(b){
+        var chs = bodyIdx[b.id] || [];
+        var hits = chs.filter(function(c){
+          return (c.text||'').indexOf(k) >= 0 || (c.t||'').indexOf(k) >= 0;
+        });
+        if(hits.length) res.push({book:b, hits:hits});
+      });
+      var totalHits = res.reduce(function(s,r){ return s + r.hits.length; }, 0);
+      hitEl.textContent = '正文命中 ' + totalHits + ' 章，分布在 ' + res.length + ' 部书';
+      setTimeout(function(){ hitEl.classList.remove('on'); }, 6000);
+      renderBodyResults(res, k);
+      searching = false;
+    });
+  }
+
+  function renderBodyResults(res, k){
+    if(!res.length){
+      el('bkGrid').innerHTML = '<p style="color:var(--ink-3)">正文中没有找到「'+esc(k)+'」</p>';
+      return;
+    }
+    var h = '';
+    res.forEach(function(r){
+      h += '<div class="bk-card" style="grid-column:1/-1">'
+        + '<h3 style="cursor:pointer" data-open="'+r.book.id+'">'+esc(r.book.name)
+        + ' <span style="font-weight:400;color:var(--ink-3);font-size:.8rem">'
+        + r.hits.length+' 处</span></h3>';
+      r.hits.slice(0, 8).forEach(function(c){
+        var i = (c.text||'').indexOf(k);
+        var snip = i >= 0
+          ? (c.text.slice(Math.max(0,i-30), i+50).replace(/\s+/g,' '))
+          : '';
+        h += '<div class="bk-hitline" data-book="'+r.book.id+'" data-ch="'+c.n+'" '
+          + 'style="padding:6px 0;border-top:1px solid var(--rule-soft);cursor:pointer;'
+          + 'font-size:.86rem;line-height:1.6">'
+          + '<b>'+esc(c.t||('第'+c.n+'章'))+'</b>'
+          + (snip ? '<br><span style="color:var(--ink-3)">…'+esc(snip)+'…</span>' : '')
+          + '</div>';
+      });
+      h += '</div>';
+    });
+    el('bkGrid').innerHTML = h;
+    el('bkStat').textContent = '正文检索「'+k+'」：' + res.length + ' 部书';
+  }
+  document.addEventListener('keydown', function(e){
+    if(e.key === 'Enter' && document.activeElement === el('bkQ')){
+      searchBody(el('bkQ').value.trim());
+    }
+  });
+  // 回车按钮（移动端友好）
+  document.addEventListener('click', function(e){
+    if(e.target && e.target.id === 'bkGo'){ searchBody(el('bkQ').value.trim()); }
+  });
+  el('bkGrid').addEventListener('click', function(e){
+    // 点正文命中行 → 跳到该章
+    var line = e.target.closest('.bk-hitline');
+    if(line){
+      var bid = line.dataset.book, n = +line.dataset.ch;
+      openBookById(bid, n);
+      return;
+    }
+    // 点结果卡片标题 → 打开该书
+    var t = e.target.closest('[data-open]');
+    if(t){ openBook(t.dataset.open); }
+  });
+
+  function openBookById(id, chapNum){
+    cur = idx.filter(function(b){ return b.id === id; })[0];
+    if(!cur) return;
+    var i = cur.toc.findIndex(function(c){ return c.n === chapNum; });
+    curCh = i >= 0 ? i : 0;
+    el('bkList').style.display = 'none';
+    el('bkReader').classList.add('on');
+    showToc();
+    openCh(curCh);
+  }
+
+  el('bkTabs').addEventListener('click', function(e){
+    var t = e.target.closest('.bk-tab');
+    if(!t) return;
+    filter = t.dataset.f;
+    var all = el('bkTabs').querySelectorAll('.bk-tab');
+    for(var i=0;i<all.length;i++) all[i].classList.toggle('on', all[i]===t);
+    render();
+  });
+
+  // 载入索引
+  fetch(IDX_URL).then(function(r){ return r.json(); }).then(function(d){
+    idx = d;
+    var ch = d.reduce(function(s,b){ return s + b.chapters; }, 0);
+    var cs = d.reduce(function(s,b){ return s + b.chars; }, 0);
+    el('bkStat').textContent = d.length+' 部 · '+ch+' 章 · '+fmt(cs)+' 字';
+    render();
+  }).catch(function(){
+    el('bkStat').textContent = '索引载入失败';
+  });
+})();
+</script>
