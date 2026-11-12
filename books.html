@@ -380,6 +380,11 @@ permalink: /books/
     // 深链跳转
     var t = parseHash();
     if(t){ openBookById(t.b, t.n); }
+    // 同页 hash 变化也要响应（从八字页点链接再切书时）
+    window.addEventListener('hashchange', function(){
+      var h = parseHash();
+      if(h){ openBookById(h.b, h.n); }
+    });
   }).catch(function(){
     el('bkStat').textContent = '索引载入失败';
   });
