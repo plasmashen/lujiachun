@@ -239,6 +239,31 @@ title: 八字排盘
   font-size:10.5px;color:var(--ink-3);line-height:1.85}
 
 /* 附录 */
+/* 五行能量 / 同党异党 */
+.eng-party{margin-bottom:16px}
+.eng-bar{display:flex;height:26px;border-radius:5px;overflow:hidden;
+  border:1px solid var(--rule);font-size:.72rem;line-height:26px}
+.eng-bar .t{background:var(--qing);color:#fff;text-align:center;
+  transition:width .3s;white-space:nowrap;overflow:hidden}
+.eng-bar .y{background:var(--zhu);color:#fff;text-align:center;
+  transition:width .3s;white-space:nowrap;overflow:hidden}
+.eng-legend{display:flex;justify-content:space-between;font-size:.76rem;
+  color:var(--ink-3);margin-top:6px}
+.eng-lv{text-align:center;font-size:.95rem;font-weight:600;margin:10px 0 4px;
+  font-family:var(--serif)}
+.eng-lv .sub{font-size:.76rem;font-weight:400;color:var(--ink-3);margin-left:8px}
+.eng-detail{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));
+  gap:8px;margin-top:12px}
+.eng-cell{border:1px solid var(--rule-soft);border-radius:5px;padding:8px 10px;
+  background:var(--paper-2)}
+.eng-cell .k{font-size:.72rem;color:var(--ink-4);margin-bottom:3px}
+.eng-cell .v{font-size:.92rem;font-weight:600;font-family:var(--serif)}
+.eng-cell .bar{height:3px;background:var(--rule-soft);border-radius:2px;margin-top:5px;
+  overflow:hidden}
+.eng-cell .bar i{display:block;height:100%;border-radius:2px}
+.eng-rel{margin-top:12px;font-size:.8rem;color:var(--ink-3);line-height:1.9}
+.eng-rel b{color:var(--ink-2);font-weight:500}
+
 /* 流日流时 */
 .lr-bar{display:flex;gap:10px;align-items:center;margin-bottom:12px;flex-wrap:wrap}
 .lr-sel{font-family:inherit;font-size:.85rem;padding:5px 8px;border:1px solid var(--rule);
@@ -388,6 +413,14 @@ title: 八字排盘
     </div>
 
     <div class="bz-sec">
+      <div class="sec-h"><span class="sec-n">叁之二</span><h2>五行能量</h2>
+        <span class="meta" id="mEng"></span></div>
+      <div class="eng-party" id="pEngParty"></div>
+      <div class="eng-detail" id="pEngDetail"></div>
+
+    </div>
+
+    <div class="bz-sec">
       <div class="sec-h"><span class="sec-n">肆</span><h2>十神</h2>
         <span class="meta">格局取向</span></div>
       <div class="kv" id="kvGod"></div>
@@ -452,6 +485,7 @@ title: 八字排盘
 <script src="/assets/js/bazi/shensha.js"></script>
 <script src="/assets/js/bazi/interpret-data.js"></script>
 <script src="/assets/js/bazi/interpret.js"></script>
+<script src="/assets/js/bazi/wuxing-energy.js"></script>
 <script src="/assets/js/bazi/liuri.js"></script>
 <script src="/assets/js/bazi/guji-index.js"></script>
 <script src="/assets/js/bazi/guji.js"></script>
@@ -801,6 +835,67 @@ title: 八字排盘
 
   var _lrSel = null;   // {y, m, d}
 
+  function renderEnergy(c) {
+    if (typeof bzEnergy === 'undefined') return;
+    var r = null;
+    try { r = bzEnergy.party(c); } catch (e) { r = null; }
+    var box = $('pEngParty'), det = $('pEngDetail');
+    if (!r) { box.innerHTML = ''; det.innerHTML = ''; return; }
+
+    // 同党 / 异党 进度条
+    box.innerHTML = '';
+    var bar = mk('div', 'eng-bar');
+    var t = mk('div', 't', '同党 ' + r.tongPct + '%');
+    t.style.width = r.tongPct + '%';
+    var y = mk('div', 'y', '异党 ' + r.yiPct + '%');
+    y.style.width = r.yiPct + '%';
+    bar.appendChild(t); bar.appendChild(y);
+    box.appendChild(bar);
+
+    var lg = mk('div', 'eng-legend');
+    lg.innerHTML = '<span>同党：' + r.roles.biJie + '（比劫）+ ' + r.roles.yin + '（印星）</span>'
+      + '<span>异党：' + r.roles.shiShang + '（食伤）· ' + r.roles.cai + '（财）· ' + r.roles.guanSha + '（官杀）</span>';
+    box.appendChild(lg);
+
+    var lv = mk('div', 'eng-lv', r.level);
+    lv.appendChild(mk('span', 'sub',
+      '日主 ' + r.dayMaster + '（' + r.dayMasterWuxing + '）· 同党 ' + r.tongSum + ' : 异党 ' + r.yiSum));
+    box.appendChild(lv);
+
+    if ($('mEng')) {
+      $('mEng').textContent = r.level + ' · 同党 ' + r.tongPct + '%';
+    }
+
+    // 五行能量明细
+    det.innerHTML = '';
+    var max = 0;
+    bzEnergy.WX_ORDER.forEach(function (w) {
+      if (r.raw[w] > max) max = r.raw[w];
+    });
+    var COLOR = { 木: '#4a7c59', 火: '#b04a3a', 土: '#9a7b3f', 金: '#6b7078', 水: '#3a6b8a' };
+    bzEnergy.WX_ORDER.forEach(function (w) {
+      var cell = mk('div', 'eng-cell');
+      cell.appendChild(mk('div', 'k', w + (w === r.dayMasterWuxing ? '（日主）' : '')));
+      cell.appendChild(mk('div', 'v', r.raw[w].toFixed(2)));
+      var bar2 = mk('div', 'bar');
+      var fill = document.createElement('i');
+      fill.style.width = (max > 0 ? r.raw[w] / max * 100 : 0) + '%';
+      fill.style.background = COLOR[w] || '#999';
+      bar2.appendChild(fill);
+      cell.appendChild(bar2);
+      det.appendChild(cell);
+    });
+
+    // 刑冲破害合
+    if (r.relations && r.relations.length) {
+      var rl = mk('div', 'eng-rel');
+      rl.innerHTML = '<b>刑冲破害合：</b>' + r.relations.map(function (x) {
+        return x.pair + '（' + x.type + '）';
+      }).join('　');
+      det.appendChild(rl);
+    }
+  }
+
   function renderLiuri(c) {
     if (typeof bzLiuri === 'undefined') return;
     var now = new Date(Date.now() + 8 * 3600000);
@@ -971,6 +1066,7 @@ title: 八字排盘
     renderChart(c, birthMs);
     renderCore(c);
     renderWx(c);
+    renderEnergy(c);
     renderGod(c);
     renderSha(c);
     renderDy(c);
