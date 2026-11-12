@@ -224,7 +224,19 @@ permalink: /books/
   el('bkBack').onclick = back;
   el('bkPrev').onclick = function(){ openCh(curCh-1); };
   el('bkNext').onclick = function(){ openCh(curCh+1); };
-  el('bkQ').addEventListener('input', function(e){ q = e.target.value; render(); });
+  var lastQ = '';
+  el('bkQ').addEventListener('input', function(e){
+    q = e.target.value;
+    if(q === lastQ) return;
+    lastQ = q;
+    // 搜索时若停在阅读器，先退回书目区
+    if(el('bkReader').classList.contains('on')){
+      el('bkReader').classList.remove('on');
+      el('bkList').style.display = '';
+      cur = null;
+    }
+    render();
+  });
 
   // ── 正文全文检索（回车触发）──
   var bodyIdx = null;      // { bookId: [{n,t,text}] }
