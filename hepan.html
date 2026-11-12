@@ -1,0 +1,326 @@
+---
+layout: default
+title: 八字合盘
+description: 双人八字合盘 · 四柱对照 · 五行能量雷达 · 关系分析
+permalink: /hepan/
+---
+
+<style>
+:root{
+  --paper:#f7f4ed; --paper-2:#fdfcf8;
+  --ink:#1c1a17; --ink-2:#544f47; --ink-3:#797367; --ink-4:#a39c8f;
+  --rule:#ded7c8; --rule-soft:#eae5d9;
+  --zhu:#a8352a; --zhu-soft:#f3e6e3; --qing:#3f5d52;
+  --serif:"Songti SC","STSong","STZhongsong","SimSun","Source Han Serif SC",
+    "Source Han Serif CN","Noto Serif CJK SC","Noto Serif SC",Georgia,serif;
+  --sans:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB",
+    "Microsoft YaHei","Source Han Sans SC","Noto Sans CJK SC",sans-serif;
+}
+body{background:var(--paper)}
+.hp{max-width:1080px;margin:0 auto;padding:0 20px;font-family:var(--sans);color:var(--ink)}
+.hp-head{padding:34px 0 20px;border-bottom:1px solid var(--rule);margin-bottom:24px}
+.hp-head h1{margin:0 0 6px;font-size:1.6rem;letter-spacing:.04em}
+.hp-head p{margin:0;color:var(--ink-3);font-size:.88rem;line-height:1.7}
+
+.hp-form{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-bottom:20px}
+@media(max-width:720px){.hp-form{grid-template-columns:1fr}}
+.hp-pane{border:1px solid var(--rule);border-radius:8px;padding:14px 16px;background:var(--paper-2)}
+.hp-pane h3{margin:0 0 12px;font-size:.92rem;color:var(--ink-2);
+  display:flex;align-items:center;gap:8px}
+.hp-pane h3 .tag{font-size:.7rem;color:var(--zhu);border:1px solid var(--zhu);
+  border-radius:3px;padding:1px 6px;font-weight:400}
+.hp-row{display:flex;gap:8px;margin-bottom:9px;align-items:center}
+.hp-row label{width:52px;font-size:.8rem;color:var(--ink-3);flex-shrink:0}
+.hp-row input,.hp-row select{flex:1;padding:7px 9px;border:1px solid var(--rule);
+  border-radius:4px;background:var(--paper);color:var(--ink);font-size:.86rem;font-family:inherit}
+.hp-row input:focus,.hp-row select:focus{outline:none;border-color:var(--zhu)}
+.hp-actions{display:flex;gap:10px;align-items:center;margin-bottom:26px;flex-wrap:wrap}
+.hp-btn{padding:9px 22px;border:1px solid var(--zhu);background:var(--zhu);color:#fff;
+  border-radius:5px;cursor:pointer;font-size:.9rem;font-family:inherit}
+.hp-btn.ghost{background:none;color:var(--zhu)}
+.hp-btn:hover{opacity:.88}
+.hp-rel{display:flex;gap:6px;flex-wrap:wrap}
+.hp-rel button{padding:5px 13px;border:1px solid var(--rule);background:none;
+  color:var(--ink-3);border-radius:999px;cursor:pointer;font-size:.8rem;font-family:inherit}
+.hp-rel button.on{background:var(--zhu);color:#fff;border-color:var(--zhu)}
+
+.hp-result{display:none}
+.hp-result.on{display:block}
+.hp-sec{border-top:1px solid var(--rule-soft);padding:20px 0}
+.hp-sec:first-child{border-top:none}
+.hp-sec h2{margin:0 0 14px;font-size:1rem;color:var(--ink-2);
+  display:flex;align-items:center;gap:8px}
+.hp-sec h2 .n{color:var(--ink-4);font-size:.8rem;font-weight:400}
+
+.hp-pillars{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media(max-width:720px){.hp-pillars{grid-template-columns:1fr}}
+.hp-pg{border:1px solid var(--rule);border-radius:8px;overflow:hidden;background:var(--paper-2)}
+.hp-pg-h{padding:9px 14px;background:var(--rule-soft);font-size:.85rem;font-weight:600;
+  display:flex;justify-content:space-between;align-items:center}
+.hp-pg-h .who{font-weight:400;color:var(--ink-3);font-size:.78rem}
+.hp-pg-b{display:grid;grid-template-columns:repeat(4,1fr);text-align:center;padding:12px 8px}
+.hp-pg-b .col .lb{font-size:.68rem;color:var(--ink-4);margin-bottom:5px}
+.hp-pg-b .col .gz{font-family:var(--serif);font-size:1.25rem;line-height:1.5;font-weight:600}
+.hp-pg-b .col .god{font-size:.68rem;color:var(--ink-3);margin-top:3px}
+
+.hp-table{width:100%;border-collapse:collapse;font-size:.86rem}
+.hp-table th,.hp-table td{padding:9px 12px;border-bottom:1px solid var(--rule-soft);text-align:left}
+.hp-table th{color:var(--ink-3);font-weight:500;font-size:.79rem;width:22%}
+.hp-table td.v{font-family:var(--serif);font-size:.95rem}
+.hp-table tr:last-child td{border-bottom:none}
+
+.hp-radar-wrap{display:flex;gap:24px;align-items:center;flex-wrap:wrap;justify-content:center}
+.hp-radar{flex-shrink:0}
+.hp-legend{font-size:.82rem;color:var(--ink-3);line-height:2}
+.hp-legend i{display:inline-block;width:10px;height:10px;border-radius:2px;
+  margin-right:6px;vertical-align:middle}
+
+.hp-points{list-style:none;padding:0;margin:0}
+.hp-points li{padding:9px 0 9px 22px;position:relative;font-size:.88rem;line-height:1.75;
+  border-bottom:1px solid var(--rule-soft);color:var(--ink-2)}
+.hp-points li:last-child{border-bottom:none}
+.hp-points li:before{content:'';position:absolute;left:4px;top:17px;
+  width:7px;height:7px;border-radius:50%}
+.hp-points li.good:before{background:var(--qing)}
+.hp-points li.warn:before{background:var(--zhu)}
+.hp-points li.info:before{background:var(--ink-4)}
+.hp-caveat{margin-top:18px;padding:12px 14px;background:var(--rule-soft);
+  border-radius:6px;font-size:.8rem;color:var(--ink-3);line-height:1.8}
+</style>
+
+<div class="hp">
+  <div class="hp-head">
+    <h1>八字合盘</h1>
+    <p>双人四柱对照 · 五行能量雷达 · 夫妻宫与日主互动分析</p>
+  </div>
+
+  <div class="hp-form">
+    <div class="hp-pane">
+      <h3>甲方 <span class="tag">案例 1</span></h3>
+      <div class="hp-row"><label>生日</label><input type="date" id="hpDateA" value="1990-05-15"></div>
+      <div class="hp-row"><label>时辰</label><input type="time" id="hpTimeA" value="10:30"></div>
+      <div class="hp-row"><label>性别</label><select id="hpSexA"><option value="1">男</option><option value="2">女</option></select></div>
+    </div>
+    <div class="hp-pane">
+      <h3>乙方 <span class="tag">案例 2</span></h3>
+      <div class="hp-row"><label>生日</label><input type="date" id="hpDateB" value="1991-06-20"></div>
+      <div class="hp-row"><label>时辰</label><input type="time" id="hpTimeB" value="08:00"></div>
+      <div class="hp-row"><label>性别</label><select id="hpSexB"><option value="1">男</option><option value="2">女</option></select></div>
+    </div>
+  </div>
+
+  <div class="hp-actions">
+    <button class="hp-btn" id="hpGo">开始合盘</button>
+    <div class="hp-rel" id="hpRel"></div>
+  </div>
+
+  <div class="hp-result" id="hpResult"></div>
+</div>
+
+<script src="/assets/js/bazi/vsop-data.js"></script>
+<script src="/assets/js/bazi/jieqi-delta.js"></script>
+<script src="/assets/js/bazi/astro.js"></script>
+<script src="/assets/js/bazi/lunar.js"></script>
+<script src="/assets/js/bazi/ganzhi.js"></script>
+<script src="/assets/js/bazi/shensha.js"></script>
+<script src="/assets/js/bazi/interpret.js"></script>
+<script src="/assets/js/bazi/hepan.js"></script>
+<script>
+(function(){
+  'use strict';
+  var rel = 'love';
+  var WL = { 木:'#4a7c59', 火:'#b04a3a', 土:'#9a7b3f', 金:'#6b7078', 水:'#3a6b8a' };
+
+  function $(id){ return document.getElementById(id); }
+
+  // 关系类型按钮
+  var box = $('hpRel');
+  bzHepan.REL_TYPES.forEach(function(t){
+    var b = document.createElement('button');
+    b.textContent = t.n;
+    b.dataset.k = t.k;
+    if(t.k === rel) b.classList.add('on');
+    b.onclick = function(){
+      rel = t.k;
+      box.querySelectorAll('button').forEach(function(x){ x.classList.remove('on'); });
+      b.classList.add('on');
+    };
+    box.appendChild(b);
+  });
+
+  function toMs(dateStr, timeStr){
+    var d = dateStr.split('-').map(Number);
+    var t = (timeStr || '00:00').split(':').map(Number);
+    return Date.UTC(d[0], d[1]-1, d[2], t[0]-8, t[1], 0);
+  }
+
+  function fmtGz(p){ return p || '--'; }
+
+  function render(r){
+    var box = $('hpResult');
+    box.innerHTML = '';
+    box.classList.add('on');
+
+    // ① 四柱对照
+    var s1 = document.createElement('div'); s1.className = 'hp-sec';
+    s1.innerHTML = '<h2><span class="n">壹</span>四柱对照</h2>';
+    var wrap = document.createElement('div'); wrap.className = 'hp-pillars';
+    [['甲方', r.a], ['乙方', r.b]].forEach(function(pair){
+      var name = pair[0], d = pair[1];
+      var g = document.createElement('div'); g.className = 'hp-pg';
+      var h = document.createElement('div'); h.className = 'hp-pg-h';
+      h.innerHTML = name + '<span class="who">' + (d.sex === 1 ? '男' : '女') + '　' + (d.shengxiao ? d.shengxiao + '年' : '') + '</span>';
+      g.appendChild(h);
+      var b2 = document.createElement('div'); b2.className = 'hp-pg-b';
+      ['年柱','月柱','日柱','时柱'].forEach(function(lb, i){
+        var col = document.createElement('div'); col.className = 'col';
+        var gz = (d.pillars && d.pillars[['year','month','day','hour'][i]]) || '--';
+        col.innerHTML = '<div class="lb">' + lb + '</div><div class="gz">' + gz + '</div>';
+        b2.appendChild(col);
+      });
+      g.appendChild(b2);
+      wrap.appendChild(g);
+    });
+    s1.appendChild(wrap);
+    box.appendChild(s1);
+
+    // ② 重要参数
+    var s2 = document.createElement('div'); s2.className = 'hp-sec';
+    s2.innerHTML = '<h2><span class="n">贰</span>重要参数</h2>';
+    var rows = [
+      ['生肖', r.a.shengxiao || '--', r.b.shengxiao || '--'],
+      ['日主', (r.a.dayMaster||'--') + '(' + (r.a.dayMasterWuxing||'') + ')', (r.b.dayMaster||'--') + '(' + (r.b.dayMasterWuxing||'') + ')'],
+      ['夫妻宫', r.a.fuqigong || '--', r.b.fuqigong || '--'],
+      ['旺衰', r.a.wangshuai || '--', r.b.wangshuai || '--'],
+      ['关系', r.relLabel, '']
+    ];
+    var tb = document.createElement('table'); tb.className = 'hp-table';
+    var th = document.createElement('tr');
+    th.innerHTML = '<th></th><th style="width:39%">甲方</th><th style="width:39%">乙方</th>';
+    tb.appendChild(th);
+    rows.forEach(function(row){
+      var tr = document.createElement('tr');
+      tr.innerHTML = '<th>' + row[0] + '</th><td class="v">' + row[1] + '</td><td class="v">' + row[2] + '</td>';
+      tb.appendChild(tr);
+    });
+    s2.appendChild(tb);
+    box.appendChild(s2);
+
+    // ③ 五行能量雷达
+    var s3 = document.createElement('div'); s3.className = 'hp-sec';
+    s3.innerHTML = '<h2><span class="n">叁</span>五行能量</h2>';
+    var rw = document.createElement('div'); rw.className = 'hp-radar-wrap';
+    rw.appendChild(radar(r));
+    var lg = document.createElement('div'); lg.className = 'hp-legend';
+    bzHepan.WX_ORDER.forEach(function(w){
+      lg.innerHTML += '<div><i style="background:' + WL[w] + '"></i>' + w +
+        '　甲 ' + r.a.energy[w] + '　乙 ' + r.b.energy[w] + '　合 ' + r.merged[w] + '</div>';
+    });
+    rw.appendChild(lg);
+    s3.appendChild(rw);
+    box.appendChild(s3);
+
+    // ④ 关系分析
+    var s4 = document.createElement('div'); s4.className = 'hp-sec';
+    s4.innerHTML = '<h2><span class="n">肆</span>' + r.relLabel + '分析</h2>';
+    var ul = document.createElement('ul'); ul.className = 'hp-points';
+    if(r.points.length){
+      r.points.forEach(function(p){
+        var li = document.createElement('li');
+        li.className = p.level;
+        li.textContent = p.text;
+        ul.appendChild(li);
+      });
+    } else {
+      ul.innerHTML = '<li class="info">双方日柱之间无明显合冲关系，属平和相处型。</li>';
+    }
+    s4.appendChild(ul);
+    var cv = document.createElement('div'); cv.className = 'hp-caveat';
+    cv.textContent = '合盘看的是两人气场的互动倾向，不是关系成败的判决。'
+      + '同日支相冲的搭档也常有互补成就，同日支相合也可能缺张力。'
+      + '把它当沟通时的参考语言，比当结论更有用。';
+    s4.appendChild(cv);
+    box.appendChild(s4);
+  }
+
+  // 五行雷达（SVG 五边形）
+  function radar(r){
+    var S = 200, C = S / 2, R = 76;
+    var W = bzHepan.WX_ORDER;
+    function pt(i, val){
+      var ang = -Math.PI / 2 + i * 2 * Math.PI / 5;
+      var rr = R * (val / 100);
+      return [C + rr * Math.cos(ang), C + rr * Math.sin(ang)];
+    }
+    var svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+    svg.setAttribute('width', S); svg.setAttribute('height', S);
+    svg.setAttribute('class', 'hp-radar');
+
+    // 网格
+    [20, 40, 60, 80, 100].forEach(function(p){
+      var pts = W.map(function(_, i){ return pt(i, p).join(','); }).join(' ');
+      var poly = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
+      poly.setAttribute('points', pts);
+      poly.setAttribute('fill', 'none');
+      poly.setAttribute('stroke', '#ded7c8');
+      poly.setAttribute('stroke-width', '0.8');
+      svg.appendChild(poly);
+    });
+    // 轴线 + 标签
+    W.forEach(function(w, i){
+      var p = pt(i, 100);
+      var ln = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+      ln.setAttribute('x1', C); ln.setAttribute('y1', C);
+      ln.setAttribute('x2', p[0]); ln.setAttribute('y2', p[1]);
+      ln.setAttribute('stroke', '#eae5d9');
+      svg.appendChild(ln);
+      var t = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+      var lp = pt(i, 122);
+      t.setAttribute('x', lp[0]); t.setAttribute('y', lp[1] + 4);
+      t.setAttribute('text-anchor', 'middle');
+      t.setAttribute('font-size', '12');
+      t.setAttribute('fill', WL[w]);
+      t.textContent = w;
+      svg.appendChild(t);
+    });
+    // 三层数据
+    [
+      { e: r.a.energy, c: '#4a7c59', op: .18 },
+      { e: r.b.energy, c: '#3a6b8a', op: .18 },
+      { e: r.merged, c: '#a8352a', op: .12 }
+    ].forEach(function(d){
+      var pts = W.map(function(w, i){ return pt(i, d.e[w] || 0).join(','); }).join(' ');
+      var poly = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
+      poly.setAttribute('points', pts);
+      poly.setAttribute('fill', d.c);
+      poly.setAttribute('fill-opacity', d.op);
+      poly.setAttribute('stroke', d.c);
+      poly.setAttribute('stroke-width', '1.5');
+      svg.appendChild(poly);
+    });
+    return svg;
+  }
+
+  $('hpGo').onclick = function(){
+    var err = null;
+    var a, b;
+    try {
+      a = paipan(toMs($('hpDateA').value, $('hpTimeA').value),
+                 parseInt($('hpSexA').value, 10), true, Date.now());
+      b = paipan(toMs($('hpDateB').value, $('hpTimeB').value),
+                 parseInt($('hpSexB').value, 10), true, Date.now());
+    } catch (e) {
+      err = e.message;
+    }
+    if (err || !a || !b) {
+      $('hpResult').innerHTML = '<p style="color:#a8352a">合盘失败：' + (err || '排盘出错') + '</p>';
+      $('hpResult').classList.add('on');
+      return;
+    }
+    render(bzHepan.compute(a, b, rel));
+  };
+
+  // 首屏自动跑一次
+  $('hpGo').click();
+})();
+</script>
