@@ -187,14 +187,20 @@ function solarTermTime(year, name, refMs) {
   const base = solarTermTimeRaw(year, name);
   if (typeof BZ_JIEQI_DELTA === 'undefined') return base;
 
-  let d0 = BZ_JIEQI_DELTA[year + '|' + name];
-  if (d0 === undefined) {
+  let entry = BZ_JIEQI_DELTA[year + '|' + name];
+  let d0 = 0, K = (typeof BZ_JIEQI_K !== 'undefined') ? BZ_JIEQI_K : 0;
+  if (entry === undefined) {
     // 缺失时用节气名中位数兜底（表已 100% 覆盖，此处仅防御）
     d0 = (typeof BZ_JIEQI_DELTA_BY_NAME !== 'undefined')
       ? BZ_JIEQI_DELTA_BY_NAME[name] : 0;
+  } else if (Array.isArray(entry)) {
+    // 新格式：[a, b] 每格独立的截距与斜率
+    d0 = entry[0];
+    if (entry.length > 1 && typeof entry[1] === 'number') K = entry[1];
+  } else {
+    d0 = entry;
   }
   // δ 随节气内时间线性漂移：δ(t) = δ0 + K × 距节天数
-  const K = (typeof BZ_JIEQI_K !== 'undefined') ? BZ_JIEQI_K : 0;
   const x = (refMs === undefined) ? 0 : (refMs - base) / 86400000;
   return base + (d0 + K * x) * 1000;
 }
