@@ -358,6 +358,18 @@ permalink: /books/
     render();
   });
 
+  // 深链：#b=<bookId>&n=<章号>
+  function parseHash(){
+    var h = (location.hash || '').replace(/^#/, '');
+    if(!h) return null;
+    var o = {};
+    h.split('&').forEach(function(kv){
+      var p = kv.split('=');
+      if(p.length === 2) o[decodeURIComponent(p[0])] = decodeURIComponent(p[1]);
+    });
+    return (o.b) ? {b:o.b, n: parseInt(o.n,10) || 1} : null;
+  }
+
   // 载入索引
   fetch(IDX_URL).then(function(r){ return r.json(); }).then(function(d){
     idx = d;
@@ -365,6 +377,9 @@ permalink: /books/
     var cs = d.reduce(function(s,b){ return s + b.chars; }, 0);
     el('bkStat').textContent = d.length+' 部 · '+ch+' 章 · '+fmt(cs)+' 字';
     render();
+    // 深链跳转
+    var t = parseHash();
+    if(t){ openBookById(t.b, t.n); }
   }).catch(function(){
     el('bkStat').textContent = '索引载入失败';
   });

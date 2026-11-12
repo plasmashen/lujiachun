@@ -239,6 +239,23 @@ title: 八字排盘
   font-size:10.5px;color:var(--ink-3);line-height:1.85}
 
 /* 附录 */
+/* 古籍印证 */
+.gj-list{margin-top:4px}
+.gj-i{border-left:2px solid var(--rule);padding:10px 0 10px 14px;margin-bottom:14px;
+  transition:border-color .15s}
+.gj-i:hover{border-left-color:var(--zhu)}
+.gj-h{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;margin-bottom:6px}
+.gj-b{font-weight:600;font-size:.95rem}
+.gj-c{color:var(--ink-2);font-size:.88rem}
+.gj-t{color:var(--ink-3);font-size:.76rem;border:1px solid var(--rule);
+  border-radius:3px;padding:1px 6px}
+.gj-r{color:var(--zhu);font-size:.76rem}
+.gj-p{color:var(--ink-2);font-size:.88rem;line-height:1.85;font-family:var(--serif);
+  margin:0;text-indent:2em}
+.gj-a{display:inline-block;margin-top:6px;font-size:.78rem;color:var(--zhu);
+  text-decoration:none;border-bottom:1px dotted var(--zhu)}
+.gj-a:hover{opacity:.75}
+
 .appx{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));
   border-top:1px solid var(--rule-soft)}
 .appx-i{padding:13px 14px 13px 0;border-bottom:1px solid var(--rule-soft)}
@@ -375,7 +392,14 @@ title: 八字排盘
     </div>
 
     <div class="bz-sec">
-      <div class="sec-h"><span class="sec-n">捌</span><h2>附录</h2>
+      <div class="sec-h"><span class="sec-n">捌</span><h2>古籍印证</h2>
+        <span class="meta" id="mGj"></span></div>
+      <div class="prose" id="pGjIntro"></div>
+      <div class="gj-list" id="pGj"></div>
+    </div>
+
+    <div class="bz-sec">
+      <div class="sec-h"><span class="sec-n">玖</span><h2>附录</h2>
         <span class="meta">胎元 · 命宫 · 起运</span></div>
       <div class="appx" id="pAppx"></div>
     </div>
@@ -392,6 +416,8 @@ title: 八字排盘
 <script src="/assets/js/bazi/shensha.js"></script>
 <script src="/assets/js/bazi/interpret-data.js"></script>
 <script src="/assets/js/bazi/interpret.js"></script>
+<script src="/assets/js/bazi/guji-index.js"></script>
+<script src="/assets/js/bazi/guji.js"></script>
 <script>
 (function () {
   'use strict';
@@ -736,6 +762,66 @@ title: 八字排盘
       '流年看的是这一年的主要议题，吉凶仍须结合大运与已积累的处境。把压力当信息读，比当判决读有用。'));
   }
 
+  function renderGuji(c) {
+    var box = $('pGj');
+    if (!box) return;
+    var recs = [];
+    try {
+      if (typeof gujiRecommend === 'function') recs = gujiRecommend(c) || [];
+    } catch (e) { recs = []; }
+
+    var m = $('mGj');
+    var intro = $('pGjIntro');
+    if (!recs.length) {
+      box.innerHTML = '';
+      if (m) m.textContent = '';
+      if (intro) intro.textContent = '';
+      return;
+    }
+
+    if (m) m.textContent = recs.length + ' 部古籍对应章节';
+    if (intro) {
+      intro.textContent = '按命盘的年月日时与格局，在古籍原文中定位到对应的章节。'
+        + '这是传统命理「查书」的方式：日干、月令、时柱各有专论。';
+    }
+
+    box.innerHTML = '';
+    recs.forEach(function (r) {
+      var d = document.createElement('div');
+      d.className = 'gj-i';
+
+      var h = document.createElement('div');
+      h.className = 'gj-h';
+      var b = document.createElement('span');
+      b.className = 'gj-b';
+      b.textContent = r.book;
+      var ch = document.createElement('span');
+      ch.className = 'gj-c';
+      ch.textContent = r.chapter;
+      var tag = document.createElement('span');
+      tag.className = 'gj-t';
+      tag.textContent = r.reason;
+      h.appendChild(b); h.appendChild(ch); h.appendChild(tag);
+      d.appendChild(h);
+
+      var p = document.createElement('p');
+      p.className = 'gj-p';
+      var txt = r.preview || '';
+      p.textContent = txt.length >= 280 ? txt.slice(0, 280) + '…' : txt;
+      d.appendChild(p);
+
+      var a = document.createElement('a');
+      a.className = 'gj-a';
+      a.href = '/books/#b=' + r.bookId + '&n=' + r.num;
+      a.target = '_blank';
+      a.rel = 'noopener';
+      a.textContent = '读原文 →';
+      d.appendChild(a);
+
+      box.appendChild(d);
+    });
+  }
+
   function renderAppx(c) {
     var box = $('pAppx');
     box.innerHTML = '';
@@ -762,6 +848,7 @@ title: 八字排盘
     renderSha(c);
     renderDy(c);
     renderLn(c);
+    renderGuji(c);
     renderAppx(c);
     var lunarStr = '';
     try {
