@@ -122,31 +122,48 @@
         var rk = [zhis[a], zhis[b]].sort().join('');
         if (seenRel[rk]) continue;
         seenRel[rk] = 1;
-        if (CHONG[zhis[a]] === zhis[b]) {
+        // 规则与权重可由 bzSettings 自定义
+        var S = (typeof bzSettings !== 'undefined') ? bzSettings : null;
+        var on = function (t) { return S ? S.xcEnabled(t) : true; };
+
+        if (CHONG[zhis[a]] === zhis[b] && on('chong')) {
           var wa = ZHI_WX[zhis[a]], wb = ZHI_WX[zhis[b]];
-          raw[wa] -= raw[wa] * 0.10;  // 冲主动摇，减力
-          raw[wb] -= raw[wb] * 0.10;
+          var kc = S ? S.xcWeight('chong') : -0.10;
+          raw[wa] += raw[wa] * kc;
+          raw[wb] += raw[wb] * kc;
           relations.push({ type: '冲', pair: zhis[a] + zhis[b],
-            text: zhis[a] + zhis[b] + '相冲，双方力量各减一成' });
+            text: zhis[a] + zhis[b] + '相冲，双方力量' + (kc < 0 ? '各减' : '各增') +
+                  Math.abs(Math.round(kc * 100)) + '%' });
         }
-        if (LIUHE[zhis[a]] === zhis[b]) {
+        if (LIUHE[zhis[a]] === zhis[b] && on('liuhe')) {
           var wc = ZHI_WX[zhis[a]];
-          raw[wc] += raw[wc] * 0.05;
+          var kh = S ? S.xcWeight('liuhe') : 0.05;
+          raw[wc] += raw[wc] * kh;
           relations.push({ type: '合', pair: zhis[a] + zhis[b],
             text: zhis[a] + zhis[b] + '六合，' + wc + '气增旺' });
         }
-        if (HAI[zhis[a]] === zhis[b]) {
+        if (HAI[zhis[a]] === zhis[b] && on('hai')) {
           relations.push({ type: '害', pair: zhis[a] + zhis[b],
             text: zhis[a] + zhis[b] + '相害，暗中消耗' });
+        }
+        if (S && S.isXing(zhis[a], zhis[b]) && on('xing')) {
+          relations.push({ type: '刑', pair: zhis[a] + zhis[b],
+            text: zhis[a] + zhis[b] + '相刑，易生内耗' });
         }
       }
     }
 
     // 三合 / 三会成局
+    var S2 = (typeof bzSettings !== 'undefined') ? bzSettings : null;
+    var onSh = function (t) { return S2 ? S2.xcEnabled(t) : true; };
+    var wSanhe = S2 ? S2.xcWeight('sanhe') : 1.5;
+    var wSanhui = S2 ? S2.xcWeight('sanhui') : 2.0;
+
     SANHE.forEach(function (g2) {
+      if (!onSh('sanhe')) return;
       var hit = g2.zhi.filter(function (z) { return zhis.indexOf(z) >= 0; });
       if (hit.length === 3) {
-        raw[g2.wx] += 1.5;
+        raw[g2.wx] += wSanhe;
         relations.push({ type: '三合', pair: g2.zhi.join(''),
           text: g2.zhi.join('') + '三合' + g2.wx + '局，' + g2.wx + '势大增' });
       } else if (hit.length === 2) {
@@ -156,9 +173,10 @@
       }
     });
     SANHUI.forEach(function (g2) {
+      if (!onSh('sanhui')) return;
       var hit = g2.zhi.filter(function (z) { return zhis.indexOf(z) >= 0; });
       if (hit.length === 3) {
-        raw[g2.wx] += 2.0;
+        raw[g2.wx] += wSanhui;
         relations.push({ type: '三会', pair: g2.zhi.join(''),
           text: g2.zhi.join('') + '三会' + g2.wx + '方，' + g2.wx + '势极旺' });
       }

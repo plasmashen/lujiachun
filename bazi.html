@@ -266,6 +266,37 @@ title: 八字排盘
 .set-f{display:flex;justify-content:flex-end;gap:10px;padding:13px 20px;
   border-top:1px solid var(--rule)}
 
+/* 设置面板：表单/列表/权重 */
+.set-form{display:grid;grid-template-columns:1.2fr .8fr 1.2fr .9fr auto;gap:5px;margin-bottom:8px}
+@media(max-width:560px){.set-form{grid-template-columns:1fr 1fr}}
+.set-form input,.set-form select{padding:5px 7px;border:1px solid var(--rule);
+  border-radius:4px;font-size:.76rem;font-family:inherit;background:var(--paper-2);
+  color:var(--ink);min-width:0}
+.set-form input:focus,.set-form select:focus{outline:none;border-color:var(--zhu)}
+.set-add{padding:5px 12px;border:1px solid var(--zhu);background:var(--zhu);color:#fff;
+  border-radius:4px;cursor:pointer;font-size:.76rem;font-family:inherit;white-space:nowrap}
+.set-list{margin-top:6px}
+.set-list .it{display:flex;justify-content:space-between;align-items:center;
+  padding:5px 8px;border:1px solid var(--rule-soft);border-radius:4px;
+  margin-bottom:4px;font-size:.76rem;background:var(--paper-2)}
+.set-list .it .x{border:none;background:none;color:var(--zhu);cursor:pointer;
+  font-size:.9rem;line-height:1;padding:0 2px}
+.set-weights{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));
+  gap:6px;margin-top:8px}
+.set-w{display:flex;align-items:center;gap:5px;font-size:.74rem;color:var(--ink-3)}
+.set-w input{width:62px;padding:4px 6px;border:1px solid var(--rule);border-radius:3px;
+  font-size:.74rem;font-family:inherit;background:var(--paper-2);color:var(--ink)}
+.set-cang{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:7px}
+.set-cang .cg{border:1px solid var(--rule-soft);border-radius:4px;padding:5px 7px;
+  background:var(--paper-2);font-size:.74rem}
+.set-cang .cg .z{font-weight:600;color:var(--ink-2);margin-bottom:4px;
+  display:flex;justify-content:space-between}
+.set-cang .cg .z .r{color:var(--zhu);cursor:pointer;font-weight:400}
+.set-cang .cg .gs{display:flex;gap:3px;flex-wrap:wrap}
+.set-cang .cg .gs span{padding:1px 5px;background:var(--rule-soft);border-radius:2px;
+  cursor:pointer;font-family:var(--serif)}
+.set-cang .cg .gs span:hover{background:var(--zhu-soft)}
+
 /* 五行能量 / 同党异党 */
 .eng-party{margin-bottom:16px}
 .eng-bar{display:flex;height:26px;border-radius:5px;overflow:hidden;
@@ -449,6 +480,47 @@ title: 八字排盘
           <div class="set-lb">神煞显示</div>
           <div class="set-chips" id="setSha"></div>
           <div class="set-tip">点击可隐藏／显示对应神煞</div>
+        </div>
+
+        <div class="set-g">
+          <div class="set-lb">新增自定义神煞</div>
+          <div class="set-form">
+            <input id="csName" placeholder="神煞名称，如 天德贵人" maxlength="12">
+            <select id="csFrom">
+              <option value="dayGan">日干</option>
+              <option value="yearGan">年干</option>
+              <option value="monthGan">月干</option>
+              <option value="hourGan">时干</option>
+              <option value="yearZhi">年支</option>
+              <option value="monthZhi">月支</option>
+              <option value="dayZhi">日支</option>
+              <option value="hourZhi">时支</option>
+            </select>
+            <input id="csMap" placeholder="触发地支，逗号分隔，如 子,午">
+            <select id="csTo">
+              <option value="all">标四柱</option>
+              <option value="year">只标年柱</option>
+              <option value="month">只标月柱</option>
+              <option value="day">只标日柱</option>
+              <option value="hour">只标时柱</option>
+            </select>
+            <button class="set-add" id="csAdd">添加</button>
+          </div>
+          <div class="set-list" id="csList"></div>
+          <div class="set-tip">规则：取「源」的干或支，落在目标柱的地支时标注</div>
+        </div>
+
+        <div class="set-g">
+          <div class="set-lb">刑冲破害生效规则</div>
+          <div class="set-opts" id="setXcRules"></div>
+          <div class="set-weights" id="setXcWeights"></div>
+          <div class="set-tip">勾选的关系参与五行能量计算；权重为对五行力量的增减比例</div>
+        </div>
+
+        <div class="set-g">
+          <div class="set-lb">地支藏干自由编辑</div>
+          <div class="set-cang" id="setCangEdit"></div>
+          <div class="set-tip">可增删藏干、调整顺序。修改后自动切换为「自定义」模式</div>
         </div>
 
       </div>
@@ -838,6 +910,23 @@ title: 八字排盘
 
   function renderSha(c) {
     var sec = bzAnalyze(c)[4];
+
+    // 自定义神煞并入（在 bzAnalyze 之后，按柱插入）
+    if (typeof bzSettings !== 'undefined' && bzSettings.get('customShensha').length) {
+      try {
+        var adm = bzSettings.applyCustomShensha(c.pillars || {});
+        var KN = ['年柱', '月柱', '日柱', '时柱'];
+        var extra = [];
+        adm.forEach(function (arr, i) {
+          arr.forEach(function (nm) {
+            extra.push([nm + '（' + KN[i] + '·自定义）', '按自定义规则标注']);
+          });
+        });
+        if (extra.length) {
+          sec.items = extra.concat(sec.items || []);
+        }
+      } catch (e) { /* 忽略 */ }
+    }
     // 应用神煞隐藏设置
     if (typeof bzSettings !== 'undefined') {
       sec.items = (sec.items || []).filter(function (it) {
@@ -987,6 +1076,146 @@ title: 八字排盘
       });
     }
 
+    // ── 刑冲破害生效规则 ──
+    var xr = $('setXcRules');
+    if (xr) {
+      xr.innerHTML = '';
+      [['chong','冲'],['liuhe','六合'],['sanhe','三合'],['sanhui','三会'],
+       ['hai','害'],['xing','刑']].forEach(function (it) {
+        var b = document.createElement('button');
+        b.textContent = it[1];
+        if (S.xcEnabled(it[0])) b.classList.add('on');
+        b.onclick = function () {
+          var r = JSON.parse(JSON.stringify(S.get('xcRules') || {}));
+          r[it[0]] = !S.xcEnabled(it[0]);
+          S.set('xcRules', r);
+          renderSettingOptions();
+          if (_lastC) render(_lastC, _lastLabel, _lastMs);
+        };
+        xr.appendChild(b);
+      });
+    }
+
+    // ── 权重输入 ──
+    var xw = $('setXcWeights');
+    if (xw) {
+      var W = S.get('xcWeight') || {};
+      var show = [['chong','冲'],['liuhe','六合'],['sanhe','三合'],['sanhui','三会']];
+      var html = '';
+      show.forEach(function (it) {
+        var v = typeof W[it[0]] === 'number' ? W[it[0]] : 0;
+        html += '<div class="set-w"><span>' + it[1] + '</span>'
+          + '<input type="number" step="0.05" data-w="' + it[0] + '" value="' + v + '"></div>';
+      });
+      if (xw.dataset.built !== '1') {
+        xw.innerHTML = html;
+        xw.dataset.built = '1';
+        xw.querySelectorAll('input[data-w]').forEach(function (inp) {
+          inp.onchange = function () {
+            var w2 = JSON.parse(JSON.stringify(S.get('xcWeight') || {}));
+            var val = parseFloat(inp.value);
+            if (isNaN(val)) val = 0;
+            w2[inp.dataset.w] = val;
+            S.set('xcWeight', w2);
+            if (_lastC) render(_lastC, _lastLabel, _lastMs);
+          };
+        });
+      }
+    }
+
+    // ── 自定义神煞列表 ──
+    var cl = $('csList');
+    if (cl) {
+      var list = S.get('customShensha') || [];
+      cl.innerHTML = '';
+      if (!list.length) {
+        cl.innerHTML = '<div style="color:var(--ink-4);font-size:.74rem">暂无自定义神煞</div>';
+      } else {
+        list.forEach(function (cfg) {
+          var d = document.createElement('div');
+          d.className = 'it';
+          var FROM = { dayGan:'日干', yearGan:'年干', monthGan:'月干', hourGan:'时干',
+                       yearZhi:'年支', monthZhi:'月支', dayZhi:'日支', hourZhi:'时支' };
+          var TO = { all:'四柱', year:'年', month:'月', day:'日', hour:'时' };
+          var mapstr = Object.keys(cfg.map || {}).map(function (k) {
+            return k + '→' + (cfg.map[k] || []).join('');
+          }).join(' ');
+          d.innerHTML = '<span><b>' + cfg.name + '</b>　' + (FROM[cfg.from] || '') +
+            '　' + mapstr + '　标' + (TO[cfg.to] || '日') + '</span>';
+          var x = document.createElement('button');
+          x.className = 'x'; x.textContent = '×';
+          x.onclick = function () {
+            S.removeCustomShensha(cfg.name);
+            renderSettingOptions();
+            if (_lastC) render(_lastC, _lastLabel, _lastMs);
+          };
+          d.appendChild(x);
+          cl.appendChild(d);
+        });
+      }
+    }
+
+    // ── 藏干自由编辑 ──
+    var ce = $('setCangEdit');
+    if (ce) {
+      var DZ12 = '子丑寅卯辰巳午未申酉戌亥';
+      ce.innerHTML = '';
+      for (let zi = 0; zi < DZ12.length; zi++) {
+        let ZZ = DZ12[zi];
+        // 用 IIFE 固定 ZZ（否则闭包共用最后的「亥」）
+        var box = document.createElement('div');
+        box.className = 'cg';
+        var cur = S.canggan(ZZ).slice();
+        var hd = document.createElement('div');
+        hd.className = 'z';
+        hd.innerHTML = '<span>' + ZZ + '</span>';
+        var add = document.createElement('span');
+        add.className = 'r';
+        add.textContent = '+';
+        add.title = '添加藏干';
+        hd.appendChild(add);
+        box.appendChild(hd);
+        var gs = document.createElement('div');
+        gs.className = 'gs';
+        cur.forEach(function (g) {
+          var sp = document.createElement('span');
+          sp.textContent = g;
+          sp.title = '点击删除';
+          sp.onclick = function () {
+            var cc = JSON.parse(JSON.stringify(S.get('cangganCustom') || {}));
+            var arr = (cc[ZZ] || S.canggan(ZZ)).slice();
+            var idx = arr.indexOf(g);
+            if (idx >= 0) arr.splice(idx, 1);
+            if (!arr.length) return;
+            cc[ZZ] = arr;
+            S.set('cangganCustom', cc);
+            S.set('cangganMode', 'custom');
+            renderSettingOptions();
+            renderSettingOptions();
+            if (_lastC) render(_lastC, _lastLabel, _lastMs);
+          };
+          gs.appendChild(sp);
+        });
+        add.onclick = function () {
+          var g = prompt('输入要添加的天干（甲-癸）：');
+          if (!g) return;
+          g = g.trim();
+          if ('甲乙丙丁戊己庚辛壬癸'.indexOf(g) < 0) return;
+          var cc = JSON.parse(JSON.stringify(S.get('cangganCustom') || {}));
+          var arr = (cc[ZZ] || S.canggan(ZZ)).slice();
+          if (arr.indexOf(g) >= 0) return;
+          arr.push(g);
+          cc[ZZ] = arr;
+          S.set('cangganCustom', cc);
+          S.set('cangganMode', 'custom');
+          renderSettingOptions();
+          if (_lastC) render(_lastC, _lastLabel, _lastMs);
+        };
+        box.appendChild(gs);
+        ce.appendChild(box);
+      }
+    }
+
     // 神煞开关
     var sha = $('setSha');
     if (sha && _lastC && _lastC.shensha) {
@@ -1024,6 +1253,40 @@ title: 八字排盘
     $('setMask').classList.add('hide');
     if (_lastC) render(_lastC, _lastLabel, _lastMs);
   }
+
+  if ($('csAdd')) $('csAdd').onclick = function () {
+    var nm = ($('csName').value || '').trim();
+    var mp = ($('csMap').value || '').trim();
+    if (!nm || !mp) { alert('请填写名称和触发地支'); return; }
+    var zhis = mp.split(/[,，\s]+/).filter(function (x) {
+      return '子丑寅卯辰巳午未申酉戌亥'.indexOf(x) >= 0;
+    });
+    if (!zhis.length) { alert('触发地支无效'); return; }
+    var src = $('csFrom').value;
+    var srcChar = '';
+    // 用当前命盘取源字符
+    if (_lastC && _lastC.pillars) {
+      var pk = { dayGan:'day', yearGan:'year', monthGan:'month', hourGan:'hour',
+                 yearZhi:'year', monthZhi:'month', dayZhi:'day', hourZhi:'hour' };
+      var pv = _lastC.pillars[pk[src]] || '';
+      srcChar = src.indexOf('Gan') >= 0 ? pv[0] : pv[1];
+    }
+    // 无命盘时给一个通用表：所有天干都能触发
+    var map = {};
+    if (srcChar) {
+      map[srcChar] = zhis;
+    } else {
+      '甲乙丙丁戊己庚辛壬癸子丑寅卯辰巳午未申酉戌亥'.split('').forEach(function (c) {
+        map[c] = zhis;
+      });
+    }
+    bzSettings.addCustomShensha({
+      name: nm, from: src, to: $('csTo').value, map: map
+    });
+    $('csName').value = ''; $('csMap').value = '';
+    renderSettingOptions();
+    if (_lastC) render(_lastC, _lastLabel, _lastMs);
+  };
 
   if ($('bzSetBtn')) $('bzSetBtn').onclick = openSettings;
   if ($('setClose')) $('setClose').onclick = closeSettings;
