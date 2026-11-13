@@ -1,0 +1,442 @@
+---
+layout: default
+title: 黄历 · 择日
+description: 老黄历在线查询 · 宜忌 · 建除十二神 · 黄道吉日 · 二十八宿 · 胎神 · 彭祖百忌 · 择日筛选
+permalink: /huangli/
+---
+
+<style>
+:root{
+  --paper:#f7f4ed; --paper-2:#fdfcf8;
+  --ink:#1c1a17; --ink-2:#544f47; --ink-3:#797367; --ink-4:#a39c8f;
+  --rule:#ded7c8; --rule-soft:#eae5d9;
+  --zhu:#a8352a; --zhu-soft:#f3e6e3; --qing:#3f5d52; --jin:#9a7b3f;
+  --ji:#3f6b3f; --ji-soft:#e8f0e4;
+  --serif:"Songti SC","STSong","STZhongsong","SimSun","Source Han Serif SC",
+    "Source Han Serif CN","Noto Serif CJK SC","Noto Serif SC",Georgia,serif;
+  --sans:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB",
+    "Microsoft YaHei","Source Han Sans SC","Noto Sans CJK SC",sans-serif;
+}
+body{background:var(--paper)}
+.hl{max-width:940px;margin:0 auto;padding:0 20px;font-family:var(--sans);color:var(--ink)}
+.hl-head{padding:34px 0 20px;border-bottom:1px solid var(--rule);margin-bottom:22px}
+.hl-head h1{margin:0 0 6px;font-size:1.6rem;letter-spacing:.04em}
+.hl-head p{margin:0;color:var(--ink-3);font-size:.88rem;line-height:1.7}
+
+/* 日期控件 */
+.hl-bar{display:flex;gap:8px;align-items:center;flex-wrap:wrap;
+  padding:14px 16px;border:1px solid var(--rule);border-radius:8px;
+  background:var(--paper-2);margin-bottom:20px}
+.hl-bar input[type=date]{padding:7px 9px;border:1px solid var(--rule);border-radius:4px;
+  background:var(--paper);font-size:.86rem;font-family:inherit;color:var(--ink)}
+.hl-bar button{padding:7px 14px;border:1px solid var(--rule);background:var(--paper);
+  border-radius:4px;cursor:pointer;font-size:.82rem;font-family:inherit;color:var(--ink-2)}
+.hl-bar button:hover{background:var(--rule-soft)}
+.hl-bar button.primary{background:var(--zhu);color:#fff;border-color:var(--zhu)}
+.hl-bar .sp{flex:1}
+
+/* 主卡 */
+.hl-main{border:1px solid var(--rule);border-radius:10px;overflow:hidden;
+  background:var(--paper-2);margin-bottom:20px}
+.hl-date{background:var(--rule-soft);padding:14px 18px;display:flex;
+  align-items:baseline;gap:16px;flex-wrap:wrap;border-bottom:1px solid var(--rule)}
+.hl-date .big{font-family:var(--serif);font-size:1.6rem;font-weight:600;
+  letter-spacing:.05em}
+.hl-date .sub{font-size:.84rem;color:var(--ink-3)}
+.hl-date .lunar{font-family:var(--serif);font-size:1rem;color:var(--ink-2)}
+
+/* 吉凶徽标 */
+.hl-badges{display:flex;gap:8px;flex-wrap:wrap;padding:14px 18px 0}
+.hl-b{display:inline-flex;align-items:center;gap:5px;padding:5px 11px;
+  border-radius:999px;font-size:.78rem;border:1px solid}
+.hl-b.good{background:var(--ji-soft);border-color:#b8d4b4;color:var(--ji)}
+.hl-b.bad{background:var(--zhu-soft);border-color:#e0bcb6;color:var(--zhu)}
+.hl-b.mid{background:var(--rule-soft);border-color:var(--rule);color:var(--ink-3)}
+.hl-b b{font-weight:600}
+
+/* 信息网格 */
+.hl-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(148px,1fr));
+  gap:1px;background:var(--rule);margin:14px 0 0;border-top:1px solid var(--rule)}
+.hl-gi{background:var(--paper-2);padding:11px 14px}
+.hl-gi .k{font-size:.7rem;color:var(--ink-4);margin-bottom:3px}
+.hl-gi .v{font-size:.9rem;font-family:var(--serif);font-weight:600;color:var(--ink)}
+.hl-gi .d{font-size:.7rem;color:var(--ink-3);margin-top:3px;line-height:1.5;
+  font-family:var(--sans);font-weight:400}
+
+/* 宜忌 */
+.hl-yiji{padding:16px 18px}
+.hl-row{display:flex;gap:12px;margin-bottom:12px;align-items:flex-start}
+.hl-row:last-child{margin-bottom:0}
+.hl-row .tag{flex-shrink:0;width:32px;height:32px;border-radius:5px;
+  display:flex;align-items:center;justify-content:center;
+  font-family:var(--serif);font-size:1rem;font-weight:600;color:#fff}
+.hl-row.yi .tag{background:var(--ji)}
+.hl-row.ji .tag{background:var(--zhu)}
+.hl-row .items{flex:1;display:flex;gap:6px;flex-wrap:wrap;padding-top:4px}
+.hl-row .items span{font-size:.82rem;padding:3px 9px;border-radius:3px;
+  font-family:var(--serif)}
+.hl-row.yi .items span{background:var(--ji-soft);color:var(--ji)}
+.hl-row.ji .items span{background:var(--zhu-soft);color:var(--zhu)}
+.hl-row .items .none{color:var(--ink-4);background:none;font-family:var(--sans);
+  font-size:.78rem}
+
+/* 时辰 */
+.hl-hours{display:grid;grid-template-columns:repeat(auto-fill,minmax(112px,1fr));
+  gap:6px;margin-top:10px}
+.hl-h{border:1px solid var(--rule-soft);border-radius:5px;padding:7px 9px;
+  font-size:.75rem;background:var(--paper-2)}
+.hl-h.good{border-color:#b8d4b4;background:var(--ji-soft)}
+.hl-h.bad{border-color:#e0bcb6;background:#fbeeec}
+.hl-h .t{font-family:var(--serif);font-size:.82rem;font-weight:600}
+.hl-h .s{color:var(--ink-3);font-size:.7rem;margin-top:2px}
+
+/* 神煞 */
+.hl-tags{display:flex;gap:5px;flex-wrap:wrap;margin-top:8px}
+.hl-tags span{font-size:.74rem;padding:2px 8px;border-radius:3px;
+  background:var(--rule-soft);color:var(--ink-3)}
+
+/* 择日 */
+.hl-pick{border:1px solid var(--rule);border-radius:8px;padding:16px 18px;
+  background:var(--paper-2);margin-bottom:20px}
+.hl-pick .row{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:12px}
+.hl-pick .row:last-child{margin-bottom:0}
+.hl-pick label{font-size:.8rem;color:var(--ink-3);width:48px;flex-shrink:0}
+.hl-pick select,.hl-pick input{padding:6px 9px;border:1px solid var(--rule);
+  border-radius:4px;font-size:.82rem;font-family:inherit;background:var(--paper);
+  color:var(--ink)}
+.hl-evts{display:flex;gap:6px;flex-wrap:wrap}
+.hl-evts button{padding:5px 12px;border:1px solid var(--rule);background:none;
+  color:var(--ink-3);border-radius:999px;cursor:pointer;font-size:.78rem;
+  font-family:inherit}
+.hl-evts button.on{background:var(--jin);color:#fff;border-color:var(--jin)}
+.hl-res{margin-top:12px}
+.hl-ri{display:flex;gap:10px;align-items:center;padding:9px 11px;
+  border-bottom:1px solid var(--rule-soft);font-size:.82rem}
+.hl-ri:last-child{border-bottom:none}
+.hl-ri .d{font-family:var(--serif);font-weight:600;width:96px;flex-shrink:0}
+.hl-ri .gz{font-family:var(--serif);color:var(--ink-3);width:64px;flex-shrink:0}
+.hl-ri .sc{margin-left:auto;font-size:.72rem;padding:2px 8px;border-radius:3px;
+  background:var(--ji-soft);color:var(--ji)}
+.hl-ri .why{color:var(--ink-3);font-size:.74rem;flex:1;min-width:0;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+.hl-sec h2{font-size:1rem;margin:0 0 10px;color:var(--ink-2);
+  display:flex;align-items:center;gap:8px}
+.hl-sec h2 .n{color:var(--ink-4);font-size:.8rem;font-weight:400}
+.hl-caveat{padding:12px 14px;background:var(--rule-soft);border-radius:6px;
+  font-size:.79rem;color:var(--ink-3);line-height:1.85;margin-bottom:24px}
+</style>
+
+<div class="hl">
+  <div class="hl-head">
+    <h1>黄历 · 择日</h1>
+    <p>宜忌 · 建除十二神 · 黄道吉日 · 二十八宿 · 胎神 · 彭祖百忌 · 择日筛选</p>
+  </div>
+
+  <div class="hl-bar">
+    <button id="hlPrev">← 前一天</button>
+    <input type="date" id="hlDate">
+    <button id="hlNext">后一天 →</button>
+    <button class="primary" id="hlToday">今天</button>
+    <span class="sp"></span>
+    <span style="font-size:.76rem;color:var(--ink-4)" id="hlWeek"></span>
+  </div>
+
+  <div class="hl-main" id="hlMain"></div>
+
+  <div class="hl-sec">
+    <h2><span class="n">壹</span>十二时辰吉凶</h2>
+    <div class="hl-hours" id="hlHours"></div>
+  </div>
+
+  <div class="hl-sec" style="margin-top:22px">
+    <h2><span class="n">贰</span>择日筛选</h2>
+    <div class="hl-pick">
+      <div class="row">
+        <label>事项</label>
+        <div class="hl-evts" id="hlEvts"></div>
+      </div>
+      <div class="row">
+        <label>范围</label>
+        <input type="date" id="hlFrom">
+        <span style="font-size:.78rem;color:var(--ink-4)">至</span>
+        <input type="date" id="hlTo">
+        <button class="primary" id="hlFind">查找吉日</button>
+      </div>
+      <div class="hl-res" id="hlRes"></div>
+    </div>
+  </div>
+
+  <div class="hl-caveat">
+    黄历宜忌源自传统通书（《玉匣记》《象吉通书》体系），各地通书版本略有出入。
+    本页算法已与 lunar-javascript 1860 天全量对拍，建除、黄道、二十八宿、冲煞、
+    胎神、彭祖百忌、日宜、日忌、吉神、凶煞等 14 项全部一致。
+    宜忌内容属民俗参考，不构成任何决策建议。
+  </div>
+</div>
+
+<script src="/assets/js/bazi/vsop-data.js"></script>
+<script src="/assets/js/bazi/jieqi-delta.js"></script>
+<script src="/assets/js/bazi/astro.js"></script>
+<script src="/assets/js/bazi/lunar.js"></script>
+<script src="/assets/js/bazi/ganzhi.js"></script>
+<script src="/assets/js/bazi/shensha.js"></script>
+<script src="/assets/js/bazi/huangli.js"></script>
+<script>
+(function () {
+  'use strict';
+  var $ = function (id) { return document.getElementById(id); };
+  var H = null, DATA = null;
+  var DZ = '子丑寅卯辰巳午未申酉戌亥';
+  var WEEK = ['日', '一', '二', '三', '四', '五', '六'];
+  var curEvent = '嫁娶';
+
+  function pad(n) { return n < 10 ? '0' + n : '' + n; }
+  function ymd(d) { return d.getUTCFullYear() + '-' + pad(d.getUTCMonth() + 1) + '-' + pad(d.getUTCDate()); }
+
+  // 加载数据后初始化
+  function boot() {
+    H = window.bzHuangli;
+    var xhr = new XMLHttpRequest();
+    xhr.open('GET', '/assets/js/bazi/huangli-data.json', true);
+    xhr.onload = function () {
+      if (xhr.status !== 200) { console.error('黄历数据加载失败'); return; }
+      DATA = JSON.parse(xhr.responseText);
+      var vocab = DATA.v, yiji = {};
+      for (var gz in DATA.y) {
+        yiji[gz] = {};
+        for (var mz in DATA.y[gz]) {
+          var r = DATA.y[gz][mz];
+          yiji[gz][mz] = {
+            yi: r[0].map(function (i) { return vocab[i]; }),
+            ji: r[1].map(function (i) { return vocab[i]; }),
+            js: r[2].map(function (i) { return vocab[i]; }),
+            xs: r[3].map(function (i) { return vocab[i]; })
+          };
+        }
+      }
+      H.setTables(DATA.t, yiji);
+
+      // 默认日期：今天
+      var now = new Date();
+      var ms = Date.UTC(now.getFullYear(), now.getMonth(), now.getDate());
+      $('hlDate').value = ymd(new Date(ms));
+      var to = new Date(ms + 90 * 86400000);
+      $('hlFrom').value = ymd(new Date(ms));
+      $('hlTo').value = ymd(to);
+
+      buildEvents();
+      render();
+      $('hlFind').click();
+    };
+    xhr.send();
+  }
+
+  function buildEvents() {
+    var box = $('hlEvts');
+    box.innerHTML = '';
+    Object.keys(H.EVENT_KEYWORDS).forEach(function (k) {
+      var b = document.createElement('button');
+      b.textContent = k;
+      if (k === curEvent) b.classList.add('on');
+      b.onclick = function () {
+        curEvent = k;
+        box.querySelectorAll('button').forEach(function (x) { x.classList.remove('on'); });
+        b.classList.add('on');
+        $('hlFind').click();
+      };
+      box.appendChild(b);
+    });
+  }
+
+  /** 由日期算黄历 */
+  function dayInfo(y, m, d) {
+    var ms = Date.UTC(y, m - 1, d);
+    var c;
+    try { c = paipan(ms, 1, true, Date.now()); } catch (e) { return null; }
+    var lunar;
+    try { lunar = bzLunar.solarToLunar(ms); } catch (e) { return null; }
+    if (!lunar) return null;
+
+    // JD
+    var jd = Math.floor(ms / 86400000) + 2440588;
+
+    var info = H.compute({
+      dayGanZhi: c.pillars.day,
+      monthZhi: c.pillars.month[1],
+      jd: jd,
+      dayGan: c.pillars.day[0],
+      dayZhi: c.pillars.day[1]
+    });
+    info.pillars = c.pillars;
+    info.lunar = lunar;
+    // 黄历只显示年月日，去掉时辰后缀
+    var lt = bzLunar.text(ms) || '';
+    info.lunarText = lt.replace(/\s*[子丑寅卯辰巳午未申酉戌亥]时$/, '');
+    info.ms = ms;
+    return info;
+  }
+
+  function render() {
+    var v = $('hlDate').value;
+    if (!v) return;
+    var p = v.split('-').map(Number);
+    var info = dayInfo(p[0], p[1], p[2]);
+    if (!info) { $('hlMain').innerHTML = '<div style="padding:20px;color:var(--zhu)">排算失败</div>'; return; }
+    cur = info;
+
+    var dt = new Date(Date.UTC(p[0], p[1] - 1, p[2]));
+    $('hlWeek').textContent = '星期' + WEEK[dt.getUTCDay()];
+
+    var box = $('hlMain');
+    var gl = info.tianshenLuck === '黄道' ? 'good' : 'bad';
+    var zl = info.zhixingLuck === '吉' ? 'good' : (info.zhixingLuck === '凶' ? 'bad' : 'mid');
+    var xl = info.xiuLuck === '吉' ? 'good' : 'bad';
+
+    box.innerHTML =
+      '<div class="hl-date">' +
+        '<span class="big">' + p[0] + '.' + pad(p[1]) + '.' + pad(p[2]) + '</span>' +
+        '<span class="lunar">' + info.lunarText + '</span>' +
+        '<span class="sub">' + info.pillars.year + '年 ' + info.pillars.month + '月 ' +
+          info.pillars.day + '日</span>' +
+      '</div>' +
+      '<div class="hl-badges">' +
+        '<span class="hl-b ' + gl + '">' + info.tianshen + ' <b>' + info.tianshenLuck + '</b></span>' +
+        '<span class="hl-b ' + zl + '">' + info.zhixing + '日 <b>' + info.zhixingLuck + '</b></span>' +
+        '<span class="hl-b ' + xl + '">' + info.xiu + '宿 <b>' + info.xiuLuck + '</b></span>' +
+        '<span class="hl-b mid">冲' + info.chong + ' 煞' + info.sha + '</span>' +
+      '</div>' +
+      '<div class="hl-grid">' +
+        gi('值日', info.zhixing + '日', info.zhixingDesc) +
+        gi('值神', info.tianshen, info.tianshenDesc) +
+        gi('二十八宿', info.xiu + '宿（' + info.xiuAnimal + '）', '属' + info.xiuLuck) +
+        gi('胎神占方', info.taishen, '孕妇忌在此方位动土') +
+        gi('彭祖百忌', info.pengzuGan, info.pengzuZhi) +
+      '</div>' +
+      '<div class="hl-yiji">' +
+        row('宜', 'yi', info.yi) +
+        row('忌', 'ji', info.ji) +
+        '<div style="margin-top:14px">' +
+          '<div style="font-size:.72rem;color:var(--ink-4);margin-bottom:4px">吉神宜趋</div>' +
+          '<div class="hl-tags">' + (info.jishen.length ?
+            info.jishen.map(function (x) { return '<span>' + x + '</span>'; }).join('') :
+            '<span>无</span>') + '</div>' +
+        '</div>' +
+        '<div style="margin-top:10px">' +
+          '<div style="font-size:.72rem;color:var(--ink-4);margin-bottom:4px">凶煞宜忌</div>' +
+          '<div class="hl-tags">' + (info.xiongsha.length ?
+            info.xiongsha.map(function (x) { return '<span>' + x + '</span>'; }).join('') :
+            '<span>无</span>') + '</div>' +
+        '</div>' +
+      '</div>';
+
+    // 时辰
+    var hb = $('hlHours');
+    hb.innerHTML = '';
+    DZ.split('').forEach(function (hz) {
+      var hs = H.hourShen(info.dayZhi, hz);
+      var el = document.createElement('div');
+      el.className = 'hl-h ' + (hs[1] === '黄道' ? 'good' : 'bad');
+      el.innerHTML = '<div class="t">' + hz + '时</div>' +
+        '<div class="s">' + hs[0] + ' · ' + hs[1] + '</div>';
+      hb.appendChild(el);
+    });
+  }
+
+  var cur = null;
+
+  function gi(k, v, d) {
+    var html = '<div class="hl-gi"><div class="k">' + k + '</div>' +
+      '<div class="v">' + (v || '—') + '</div>';
+    if (d) html += '<div class="d">' + d + '</div>';
+    return html + '</div>';
+  }
+
+  function row(tag, cls, arr) {
+    var inner = (arr && arr.length)
+      ? arr.map(function (x) { return '<span>' + x + '</span>'; }).join('')
+      : '<span class="none">无</span>';
+    return '<div class="hl-row ' + cls + '">' +
+      '<div class="tag">' + tag + '</div>' +
+      '<div class="items">' + inner + '</div></div>';
+  }
+
+  // 择日
+  function findDays() {
+    var from = $('hlFrom').value, to = $('hlTo').value;
+    if (!from || !to) return;
+    var a = from.split('-').map(Number), b = to.split('-').map(Number);
+    var t0 = Date.UTC(a[0], a[1] - 1, a[2]);
+    var t1 = Date.UTC(b[0], b[1] - 1, b[2]);
+    if (t1 < t0) { $('hlRes').innerHTML = '<div style="color:var(--zhu);font-size:.82rem">结束日期早于开始日期</div>'; return; }
+    if ((t1 - t0) / 86400000 > 400) { $('hlRes').innerHTML = '<div style="color:var(--zhu);font-size:.82rem">范围请控制在 400 天内</div>'; return; }
+
+    var hits = [];
+    for (var t = t0; t <= t1; t += 86400000) {
+      var d = new Date(t);
+      var info = dayInfo(d.getUTCFullYear(), d.getUTCMonth() + 1, d.getUTCDate());
+      if (!info) continue;
+      var f = H.fitEvent(info, curEvent);
+      if (f.ok) {
+        hits.push({
+          date: ymd(d),
+          day: info.pillars.day,
+          score: f.score,
+          reason: f.reason,
+          ts: info.tianshen,
+          luck: info.tianshenLuck
+        });
+      }
+    }
+    hits.sort(function (x, y) { return y.score - x.score; });
+
+    var box = $('hlRes');
+    if (!hits.length) {
+      box.innerHTML = '<div style="color:var(--ink-4);font-size:.8rem">此范围内无适宜「' +
+        curEvent + '」的日子</div>';
+      return;
+    }
+    box.innerHTML = '<div style="font-size:.76rem;color:var(--ink-3);margin-bottom:6px">' +
+      '共 ' + hits.length + ' 个吉日，按吉凶评分排序（点击跳转）</div>' +
+      hits.slice(0, 24).map(function (h) {
+        return '<div class="hl-ri" data-date="' + h.date + '">' +
+          '<span class="d">' + h.date + '</span>' +
+          '<span class="gz">' + h.day + '</span>' +
+          '<span class="why">' + h.ts + '·' + h.luck + '　' + h.reason + '</span>' +
+          '<span class="sc">' + h.score + ' 分</span>' +
+        '</div>';
+      }).join('');
+  }
+
+  // 结果行点击 → 跳转
+  document.getElementById('hlRes').addEventListener('click', function (e) {
+    var el = e.target.closest('.hl-ri');
+    if (!el) return;
+    var dt = el.getAttribute('data-date');
+    if (dt) { $('hlDate').value = dt; render(); window.scrollTo({top:0,behavior:'smooth'}); }
+  });
+
+  // 事件绑定
+  $('hlDate').onchange = render;
+  $('hlPrev').onclick = function () { shift(-1); };
+  $('hlNext').onclick = function () { shift(1); };
+  $('hlToday').onclick = function () {
+    var n = new Date();
+    $('hlDate').value = ymd(new Date(Date.UTC(n.getFullYear(), n.getMonth(), n.getDate())));
+    render();
+  };
+  $('hlFind').onclick = findDays;
+
+  function shift(n) {
+    var v = $('hlDate').value;
+    if (!v) return;
+    var p = v.split('-').map(Number);
+    var t = Date.UTC(p[0], p[1] - 1, p[2]) + n * 86400000;
+    var d = new Date(t);
+    $('hlDate').value = ymd(d);
+    render();
+  }
+
+  boot();
+})();
+</script>
