@@ -1,24 +1,29 @@
 ---
-permalink: "manifest.json"
+permalink: "/manifest.json"
 layout: null
 sitemap: false
 ---
 {
-  "lang": "{{ site.lang | default: "en-US" }}",
-  "name": "{{ site.title }}",
-  "short_name": "{{ site.short_name | default: site.title | replace: ' ', '' }}",
-  "theme_color": "{{ site.manifest.theme_color | default: '#24292e' }}",
-  "background_color": "{{ site.manifest.background_color | default: '#ffffff' }}",
-  {% if site.favicons -%}
-    "icons": [
-      {% for icon in site.favicons -%}
-      {
-        "src": "{{ icon[1] | relative_url }}",
-        "sizes": "{{ icon[0] }}x{{ icon[0] }}"
-      }{% if forloop.last != true %},{% endif %}
-      {% endfor %}
-    ],
-  {% endif -%}
-  "start_url": "/",
-  "display": "standalone"
+  "lang": "zh-CN",
+  "name": "鹿佳莼 · 命理工具",
+  "short_name": "命理工具",
+  "description": "八字排盘 · 紫微斗数 · 黄历择日 · 八字合盘 · 古籍库。离线可用。",
+  "theme_color": "#1c1a17",
+  "background_color": "#f7f4ed",
+  "icons": [
+    { "src": "/assets/logos/pwa-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "/assets/logos/pwa-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "/assets/logos/pwa-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ],
+  "start_url": "/bazi/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "categories": ["lifestyle", "utilities"],
+  "shortcuts": [
+    { "name": "八字排盘", "short_name": "八字", "url": "/bazi/", "description": "四柱 · 十神 · 神煞 · 大运流年" },
+    { "name": "紫微斗数", "short_name": "紫微", "url": "/ziwei/", "description": "十二宫 · 十四主星 · 四化" },
+    { "name": "黄历择日", "short_name": "黄历", "url": "/huangli/", "description": "宜忌 · 建除十二神 · 择日" },
+    { "name": "八字合盘", "short_name": "合盘", "url": "/hepan/", "description": "双人命盘对照 · 五行雷达" }
+  ]
 }

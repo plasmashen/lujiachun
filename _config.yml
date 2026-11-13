@@ -120,6 +120,11 @@ favicons: # Favicons are also used in the manifest file. Syntax is 'size: path'
   512: '/assets/logos/logo@512px.png'
   1024: '/assets/logos/logo@1024px.png'
 
+manifest: # PWA 主题色（用于浏览器 UI 与启动屏）
+  theme_color: '#1c1a17'
+  background_color: '#f7f4ed'
+  short_name: '命理工具'
+
 # 9. Site navigation
 navigation_header:
 - title: Home
