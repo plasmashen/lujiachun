@@ -43,14 +43,14 @@ const CORE_PAGES = [
 
 // ── 命理核心 JS：缺一个排盘就废，必须预缓存 ──
 const CORE_SCRIPTS = [
-  {%- for f in site.data.pwa_core -%}
+  {%- for f in site.pwa_core -%}
     "{{ f | relative_url }}",
   {%- endfor -%}
 ];
 
 // ── 大文件：异步缓存，失败不影响使用 ──
 const HEAVY_ASSETS = [
-  {%- for f in site.data.pwa_heavy -%}
+  {%- for f in site.pwa_heavy -%}
     "{{ f | relative_url }}",
   {%- endfor -%}
 ];

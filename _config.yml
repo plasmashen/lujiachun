@@ -177,3 +177,32 @@ fonts:
     - https://fonts.gstatic.com
   font_urls:
     - https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700&display=swap
+
+# 10. PWA 预缓存清单（sw.js 直接读 site.pwa_core / site.pwa_heavy）
+pwa_core:
+  - /assets/js/bazi/astro.js
+  - /assets/js/bazi/ganzhi.js
+  - /assets/js/bazi/lunar.js
+  - /assets/js/bazi/jieqi-delta.js
+  - /assets/js/bazi/vsop-data.js
+  - /assets/js/bazi/shensha.js
+  - /assets/js/bazi/rysl.js
+  - /assets/js/bazi/interpret.js
+  - /assets/js/bazi/interpret-data.js
+  - /assets/js/bazi/settings.js
+  - /assets/js/bazi/wuxing-energy.js
+  - /assets/js/bazi/cases.js
+  - /assets/js/bazi/share.js
+  - /assets/js/bazi/qrcode.js
+  - /assets/js/bazi/liuri.js
+  - /assets/js/bazi/ziwei.js
+  - /assets/js/bazi/ziwei-text.js
+  - /assets/js/bazi/hepan.js
+  - /assets/js/bazi/huangli.js
+  - /assets/js/bazi/huangli-data.json
+  - /assets/js/bazi/guji.js
+  - /assets/js/bazi/pwa.js
+
+pwa_heavy:
+  - /assets/js/bazi/guji-index.js
+  - /assets/js/bazi/guji-index2.json
