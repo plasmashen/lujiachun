@@ -86,6 +86,32 @@ body{background:var(--paper)}
 .hp-points li.info:before{background:var(--ink-4)}
 .hp-caveat{margin-top:18px;padding:12px 14px;background:var(--rule-soft);
   border-radius:6px;font-size:.8rem;color:var(--ink-3);line-height:1.8}
+
+/* 案例库 */
+.set-mask{position:fixed;inset:0;background:rgba(28,26,23,.42);z-index:200;
+  display:flex;align-items:center;justify-content:center;padding:20px}
+.set-mask.hide{display:none}
+.set-panel{background:var(--paper);border-radius:10px;max-width:560px;width:100%;
+  max-height:86vh;display:flex;flex-direction:column;box-shadow:0 8px 40px rgba(0,0,0,.18)}
+.set-h{display:flex;align-items:center;justify-content:space-between;
+  padding:15px 18px;border-bottom:1px solid var(--rule)}
+.set-h h3{margin:0;font-size:.96rem}
+.set-close{border:none;background:none;font-size:1.4rem;cursor:pointer;
+  color:var(--ink-3);line-height:1;padding:0 4px}
+.set-body{padding:6px 18px 14px;overflow-y:auto;flex:1}
+.set-f{display:flex;justify-content:flex-end;gap:10px;padding:12px 18px;
+  border-top:1px solid var(--rule)}
+.case-i{display:flex;align-items:center;gap:10px;padding:10px 12px;
+  border:1px solid var(--rule-soft);border-radius:6px;margin-bottom:7px;
+  background:var(--paper-2);font-size:.82rem}
+.case-i .nm{font-weight:600;flex:1;min-width:0;overflow:hidden;
+  text-overflow:ellipsis;white-space:nowrap;cursor:pointer}
+.case-i .sub{font-size:.72rem;color:var(--ink-4);white-space:nowrap}
+.case-i .x{border:none;background:none;color:var(--zhu);cursor:pointer;
+  font-size:1rem;line-height:1;padding:0 2px;flex-shrink:0}
+.case-empty{color:var(--ink-4);font-size:.8rem;text-align:center;padding:30px 0;line-height:1.9}
+.case-tip{font-size:.72rem;color:var(--ink-4);margin-top:10px;line-height:1.7;
+  padding:8px 10px;background:var(--rule-soft);border-radius:4px}
 </style>
 
 <div class="hp">
@@ -111,7 +137,21 @@ body{background:var(--paper)}
 
   <div class="hp-actions">
     <button class="hp-btn" id="hpGo">开始合盘</button>
+    <button class="hp-btn ghost" id="hpSave" style="padding:9px 16px">保存</button>
+    <button class="hp-btn ghost" id="hpCases" style="padding:9px 16px">我的合盘</button>
     <div class="hp-rel" id="hpRel"></div>
+  </div>
+
+  <div class="set-mask hide" id="caseMask">
+    <div class="set-panel" style="max-width:520px">
+      <div class="set-h"><h3>我的合盘</h3>
+        <button class="set-close" id="caseClose">×</button></div>
+      <div class="set-body" id="caseBody" style="padding:10px 16px 16px"></div>
+      <div class="set-f">
+        <button class="hp-btn ghost" id="caseClear" style="padding:7px 16px">清空全部</button>
+        <button class="hp-btn" id="caseDone" style="padding:7px 20px">关闭</button>
+      </div>
+    </div>
   </div>
 
   <div class="hp-result" id="hpResult"></div>
@@ -124,6 +164,7 @@ body{background:var(--paper)}
 <script src="/assets/js/bazi/ganzhi.js"></script>
 <script src="/assets/js/bazi/shensha.js"></script>
 <script src="/assets/js/bazi/interpret.js"></script>
+<script src="/assets/js/bazi/cases.js"></script>
 <script src="/assets/js/bazi/hepan.js"></script>
 <script>
 (function(){
@@ -318,6 +359,94 @@ body{background:var(--paper)}
       return;
     }
     render(bzHepan.compute(a, b, rel));
+  };
+
+  // ───────────── 合盘案例库 ─────────────
+  function esc(s) {
+    return String(s || '').replace(/[&<>"]/g, function (m) {
+      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[m];
+    });
+  }
+
+  function curPair() {
+    return {
+      date: $('hpDateA').value, time: $('hpTimeA').value,
+      sex: parseInt($('hpSexA').value, 10),
+      person2: {
+        date: $('hpDateB').value, time: $('hpTimeB').value,
+        sex: parseInt($('hpSexB').value, 10)
+      }
+    };
+  }
+
+  function renderCases() {
+    var box = $('caseBody');
+    if (!box) return;
+    var list = bzCases.list('hepan');
+    if (!list.length) {
+      box.innerHTML = '<div class="case-empty">还没有保存的合盘<br>' +
+        '配对后点「保存」即可存下来</div>';
+      return;
+    }
+    box.innerHTML = list.map(function (c) {
+      return '<div class="case-i" data-id="' + c.id + '">' +
+        '<span class="nm" title="点击载入">' + esc(c.name) + '</span>' +
+        '<span class="sub">' + c.date + '</span>' +
+        '<button class="x" data-del="' + c.id + '" title="删除">×</button></div>';
+    }).join('') +
+    '<div class="case-tip">案例只存在本机浏览器，不上传、不同步。' +
+    '清理浏览器数据会一并清除。</div>';
+  }
+
+  function openCases() { renderCases(); $('caseMask').classList.remove('hide'); }
+  function closeCases() { $('caseMask').classList.add('hide'); }
+
+  if ($('hpSave')) $('hpSave').onclick = function () {
+    var p = curPair();
+    if (!p.date || !p.person2.date) { alert('请先填写双方生日'); return; }
+    var dup = bzCases.exists({ kind: 'hepan', date: p.date, time: p.time || '00:00', sex: p.sex });
+    if (dup) { alert('这组合盘已经保存过了：' + dup.name); return; }
+    var nm = prompt('给这组合盘起个名字（留空自动命名）：', '');
+    if (nm === null) return;
+    if (!nm) nm = p.date + ' × ' + p.person2.date;
+    var it = bzCases.add({
+      kind: 'hepan', name: nm, date: p.date, time: p.time || '00:00',
+      sex: p.sex, person2: p.person2
+    });
+    if (!it) { alert('保存失败，浏览器存储可能已满'); return; }
+    var b = $('hpSave'), o = b.textContent;
+    b.textContent = '已保存 ✓';
+    setTimeout(function () { b.textContent = o; }, 1400);
+  };
+
+  if ($('hpCases')) $('hpCases').onclick = openCases;
+  if ($('caseClose')) $('caseClose').onclick = closeCases;
+  if ($('caseDone')) $('caseDone').onclick = closeCases;
+  if ($('caseMask')) $('caseMask').onclick = function (e) {
+    if (e.target === $('caseMask')) closeCases();
+  };
+  if ($('caseClear')) $('caseClear').onclick = function () {
+    if (!confirm('确定清空全部合盘？')) return;
+    bzCases.clear('hepan');
+    renderCases();
+  };
+  if ($('caseBody')) $('caseBody').onclick = function (e) {
+    var del = e.target.getAttribute && e.target.getAttribute('data-del');
+    if (del) { bzCases.remove(del); renderCases(); return; }
+    var nm = e.target.classList && e.target.classList.contains('nm') ? e.target : null;
+    if (!nm) return;
+    var c = bzCases.get(nm.parentNode.getAttribute('data-id'));
+    if (!c) return;
+    $('hpDateA').value = c.date;
+    $('hpTimeA').value = c.time;
+    $('hpSexA').value = String(c.sex);
+    if (c.person2) {
+      $('hpDateB').value = c.person2.date;
+      $('hpTimeB').value = c.person2.time;
+      $('hpSexB').value = String(c.person2.sex);
+    }
+    closeCases();
+    $('hpGo').click();
   };
 
   // 首屏自动跑一次
