@@ -334,6 +334,32 @@ function paipan(ms, sex = 1, lateZiAdvance = true, todayMs) {
   const sg = shengong(p.year[0], p.month[1], p.hour[1]);
 
   const qy = qiyunAge(ms, p.year[0], sex);
+
+  // 距节天数（供人元司令 / 命宫换月判定）
+  let daysFromJie = null;
+  try {
+    if (typeof solarTermTime === 'function') {
+      const bjMs = ms + 8 * 3600 * 1000;
+      const d = new Date(bjMs);
+      const y = d.getUTCFullYear();
+      const m = d.getUTCMonth() + 1;
+      // 当前月支对应的节名
+      const mz = p.month[1];
+      const JIE_OF_ZHI = {
+        寅: '立春', 卯: '惊蛰', 辰: '清明', 巳: '立夏', 午: '芒种', 未: '小暑',
+        申: '立秋', 酉: '白露', 戌: '寒露', 亥: '立冬', 子: '大雪', 丑: '小寒'
+      };
+      const jn = JIE_OF_ZHI[mz];
+      if (jn) {
+        let jt = solarTermTime(y, jn, ms);
+        if (jt != null && jt > ms) jt = solarTermTime(y - 1, jn, ms);
+        if (jt != null) {
+          daysFromJie = Math.floor((ms - jt) / 86400000);
+          if (daysFromJie < 0) daysFromJie = 0;
+        }
+      }
+    }
+  } catch (e) { daysFromJie = null; }
   const dayun = dayunList(p.month, qy.forward, 12);
   const xiaoyun = xiaoyunList(p.hour, qy.forward, 110);
   qy.jiaoyunText = jiaoyunText(qy);
@@ -378,6 +404,7 @@ function paipan(ms, sex = 1, lateZiAdvance = true, todayMs) {
     nayin: nayinList, xingyun, zizuo, kongwang: kongwangList, shensha,
     taiyuan: ty, taiyuanNayin: nayin(ty),
     taixi: tx, taixiNayin: nayin(tx),
+    daysFromJie: daysFromJie,
     minggong: mg, minggongNayin: nayin(mg),
     shengong: sg, shengongNayin: nayin(sg),
     qiyun: qy, dayun, xiaoyun, dyshensha, tdbz,

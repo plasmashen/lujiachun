@@ -239,6 +239,33 @@ title: 八字排盘
   font-size:10.5px;color:var(--ink-3);line-height:1.85}
 
 /* 附录 */
+/* 命理设置面板 */
+.set-mask{position:fixed;inset:0;background:rgba(28,26,23,.42);z-index:200;
+  display:flex;align-items:center;justify-content:center;padding:20px}
+.set-mask.hide{display:none}
+.set-panel{background:var(--paper);border-radius:10px;max-width:560px;width:100%;
+  max-height:86vh;display:flex;flex-direction:column;box-shadow:0 8px 40px rgba(0,0,0,.18)}
+.set-h{display:flex;align-items:center;justify-content:space-between;
+  padding:16px 20px;border-bottom:1px solid var(--rule)}
+.set-h h3{margin:0;font-size:1rem}
+.set-close{border:none;background:none;font-size:1.4rem;cursor:pointer;
+  color:var(--ink-3);line-height:1;padding:0 4px}
+.set-body{padding:6px 20px 16px;overflow-y:auto;flex:1}
+.set-g{padding:14px 0;border-bottom:1px solid var(--rule-soft)}
+.set-g:last-child{border-bottom:none}
+.set-lb{font-size:.88rem;font-weight:600;margin-bottom:9px;color:var(--ink-2)}
+.set-opts{display:flex;gap:6px;flex-wrap:wrap}
+.set-opts button{padding:5px 13px;border:1px solid var(--rule);background:none;
+  color:var(--ink-3);border-radius:999px;cursor:pointer;font-size:.79rem;font-family:inherit}
+.set-opts button.on{background:var(--zhu);color:#fff;border-color:var(--zhu)}
+.set-tip{font-size:.74rem;color:var(--ink-4);margin-top:7px;line-height:1.65}
+.set-chips{display:flex;gap:5px;flex-wrap:wrap;max-height:150px;overflow-y:auto}
+.set-chips button{padding:3px 9px;border:1px solid var(--rule);background:none;
+  color:var(--ink-3);border-radius:3px;cursor:pointer;font-size:.75rem;font-family:inherit}
+.set-chips button.off{opacity:.35;text-decoration:line-through}
+.set-f{display:flex;justify-content:flex-end;gap:10px;padding:13px 20px;
+  border-top:1px solid var(--rule)}
+
 /* 五行能量 / 同党异党 */
 .eng-party{margin-bottom:16px}
 .eng-bar{display:flex;height:26px;border-radius:5px;overflow:hidden;
@@ -369,6 +396,7 @@ title: 八字排盘
     <div class="acts">
       <button class="btn btn-main" id="bzGo">排盘</button>
       <button class="btn btn-ghost" id="bzCopy">复制全文</button>
+      <button class="btn btn-ghost" id="bzSetBtn">命理设置</button>
     </div>
 
     <div class="tip">
@@ -376,6 +404,59 @@ title: 八字排盘
       解读依传统命理规则推算，作了解之用。
     </div>
     <div class="err hide" id="bzErr"></div>
+  </div>
+
+  <!-- 命理设置面板 -->
+  <div class="set-mask hide" id="setMask">
+    <div class="set-panel">
+      <div class="set-h">
+        <h3>命理设置</h3>
+        <button class="set-close" id="setClose">×</button>
+      </div>
+      <div class="set-body">
+
+        <div class="set-g">
+          <div class="set-lb">格局取法</div>
+          <div class="set-opts" id="setGeju"></div>
+          <div class="set-tip">月令透干取格：藏干本气→中气→余气，第一个透干者定格局</div>
+        </div>
+
+        <div class="set-g">
+          <div class="set-lb">地支藏干</div>
+          <div class="set-opts" id="setCang"></div>
+          <div class="set-tip">不同流派对地支所藏天干的主次排序不同</div>
+        </div>
+
+        <div class="set-g">
+          <div class="set-lb">人元司令分野</div>
+          <div class="set-opts" id="setSiling"></div>
+          <div class="set-tip">按所选古籍的司令分段表取用事天干</div>
+        </div>
+
+        <div class="set-g">
+          <div class="set-lb">命宫身宫</div>
+          <div class="set-opts" id="setGong"></div>
+          <div class="set-tip">按本月推算，或月令过中气后按次月推算</div>
+        </div>
+
+        <div class="set-g">
+          <div class="set-lb">刑冲破害</div>
+          <div class="set-opts" id="setXc"></div>
+          <div class="set-tip">关闭后不在五行能量与命盘中提示冲合关系</div>
+        </div>
+
+        <div class="set-g">
+          <div class="set-lb">神煞显示</div>
+          <div class="set-chips" id="setSha"></div>
+          <div class="set-tip">点击可隐藏／显示对应神煞</div>
+        </div>
+
+      </div>
+      <div class="set-f">
+        <button class="hp-btn ghost" id="setReset" style="padding:7px 16px">恢复默认</button>
+        <button class="hp-btn" id="setDone" style="padding:7px 20px">完成</button>
+      </div>
+    </div>
   </div>
 
   <div id="bzView" class="hide">
@@ -422,7 +503,7 @@ title: 八字排盘
 
     <div class="bz-sec">
       <div class="sec-h"><span class="sec-n">肆</span><h2>十神</h2>
-        <span class="meta">格局取向</span></div>
+        <span class="meta" id="mGeju">格局</span></div>
       <div class="kv" id="kvGod"></div>
       <div class="prose" id="pGod"></div>
     </div>
@@ -482,6 +563,7 @@ title: 八字排盘
 <script src="/assets/js/bazi/lunar.js"></script>
 <script src="/assets/js/bazi/rysl.js"></script>
 <script src="/assets/js/bazi/ganzhi.js"></script>
+<script src="/assets/js/bazi/settings.js"></script>
 <script src="/assets/js/bazi/shensha.js"></script>
 <script src="/assets/js/bazi/interpret-data.js"></script>
 <script src="/assets/js/bazi/interpret.js"></script>
@@ -665,6 +747,22 @@ title: 八字排盘
     t.appendChild(sr);
   }
 
+  function applyCangganSetting(c) {
+    if (typeof bzSettings === 'undefined' || !c || !c.pillars) return;
+    var keys = ['year', 'month', 'day', 'hour'];
+    var out = [], gods = [];
+    keys.forEach(function (k) {
+      var z = (c.pillars[k] || '')[1];
+      var cg = bzSettings.canggan(z);
+      out.push(cg);
+      gods.push(cg.map(function (g) {
+        return (typeof tenGod === 'function') ? tenGod(c.dayMaster, g) : '';
+      }));
+    });
+    c.canggan = out;
+    c.cangganGods = gods;
+  }
+
   function renderCore(c) {
     var sec = bzAnalyze(c)[0];
     $('mCore').textContent = c.dayMaster + ' · ' + c.dayMasterWuxing;
@@ -740,6 +838,13 @@ title: 八字排盘
 
   function renderSha(c) {
     var sec = bzAnalyze(c)[4];
+    // 应用神煞隐藏设置
+    if (typeof bzSettings !== 'undefined') {
+      sec.items = (sec.items || []).filter(function (it) {
+        var nm = (it[0] || it.k || '').replace(/（.*$/, '').trim();
+        return (bzSettings.get('shenshaHidden') || []).indexOf(nm) < 0;
+      });
+    }
     $('mSha').textContent = sec.items.length + ' 项';
     fillKv('kvSha', sec.items);
     var p = $('pSha');
@@ -833,6 +938,105 @@ title: 八字排盘
       '流年看的是这一年的主要议题，吉凶仍须结合大运与已积累的处境。把压力当信息读，比当判决读有用。'));
   }
 
+  // ───────────── 命理设置 ─────────────
+  var _lastC = null, _lastLabel = '', _lastMs = null;
+
+  function renderSettingOptions() {
+    var S = bzSettings;
+
+    function fillOpts(id, items, cur, onPick) {
+      var box = $(id);
+      if (!box) return;
+      box.innerHTML = '';
+      items.forEach(function (it) {
+        var b = document.createElement('button');
+        b.textContent = it.n;
+        if (it.k === cur) b.classList.add('on');
+        b.onclick = function () {
+          onPick(it.k);
+          renderSettingOptions();
+          if (_lastC) render(_lastC, _lastLabel, _lastMs);
+        };
+        box.appendChild(b);
+      });
+    }
+
+    fillOpts('setGeju', S.GEJU_MODES, S.get('gejuMode'),
+      function (k) { S.set('gejuMode', k); });
+    fillOpts('setCang', S.CANG_MODES, S.get('cangganMode'),
+      function (k) { S.set('cangganMode', k); });
+    fillOpts('setSiling', S.SILING_MODES, S.get('silingMode'),
+      function (k) { S.set('silingMode', k); });
+    fillOpts('setGong', S.GONG_MODES, S.get('gongMode'),
+      function (k) { S.set('gongMode', k); });
+
+    // 刑冲破害：开关
+    var xc = $('setXc');
+    if (xc) {
+      xc.innerHTML = '';
+      [{ k: true, n: '显示' }, { k: false, n: '隐藏' }].forEach(function (it) {
+        var b = document.createElement('button');
+        b.textContent = it.n;
+        if (S.showXingchong() === it.k) b.classList.add('on');
+        b.onclick = function () {
+          S.set('showXingchong', it.k);
+          renderSettingOptions();
+          if (_lastC) render(_lastC, _lastLabel, _lastMs);
+        };
+        xc.appendChild(b);
+      });
+    }
+
+    // 神煞开关
+    var sha = $('setSha');
+    if (sha && _lastC && _lastC.shensha) {
+      var hid = S.get('shenshaHidden') || [];
+      var names = [];
+      (_lastC.shensha || []).forEach(function (arr) {
+        (arr || []).forEach(function (n) {
+          if (names.indexOf(n) < 0) names.push(n);
+        });
+      });
+      sha.innerHTML = '';
+      names.forEach(function (n) {
+        var b = document.createElement('button');
+        b.textContent = n;
+        if (hid.indexOf(n) >= 0) b.classList.add('off');
+        b.onclick = function () {
+          var h = (S.get('shenshaHidden') || []).slice();
+          var i = h.indexOf(n);
+          if (i >= 0) h.splice(i, 1); else h.push(n);
+          S.set('shenshaHidden', h);
+          renderSettingOptions();
+          if (_lastC) render(_lastC, _lastLabel, _lastMs);
+        };
+        sha.appendChild(b);
+      });
+      if (!names.length) sha.innerHTML = '<span style="color:var(--ink-4);font-size:.78rem">先排一次盘</span>';
+    }
+  }
+
+  function openSettings() {
+    renderSettingOptions();
+    $('setMask').classList.remove('hide');
+  }
+  function closeSettings() {
+    $('setMask').classList.add('hide');
+    if (_lastC) render(_lastC, _lastLabel, _lastMs);
+  }
+
+  if ($('bzSetBtn')) $('bzSetBtn').onclick = openSettings;
+  if ($('setClose')) $('setClose').onclick = closeSettings;
+  if ($('setDone')) $('setDone').onclick = closeSettings;
+  if ($('setMask')) $('setMask').onclick = function (e) {
+    if (e.target === $('setMask')) closeSettings();
+  };
+  if ($('setReset')) $('setReset').onclick = function () {
+    bzSettings.reset();
+    renderSettingOptions();
+    if (_lastC) render(_lastC, _lastLabel, _lastMs);
+  };
+
   var _lrSel = null;   // {y, m, d}
 
   function renderEnergy(c) {
@@ -866,6 +1070,18 @@ title: 八字排盘
       $('mEng').textContent = r.level + ' · 同党 ' + r.tongPct + '%';
     }
 
+    // 格局（按设置取法）
+    if (typeof bzSettings !== 'undefined' && $('mGeju')) {
+      var gj = '';
+      try {
+        gj = bzSettings.geju(c.pillars || {}, function (dg, og) {
+          return (typeof tenGod === 'function') ? tenGod(dg, og) : '';
+        });
+      } catch (e) { gj = ''; }
+      $('mGeju').textContent = gj || '格局';
+      c._gejuName = gj;
+    }
+
     // 五行能量明细
     det.innerHTML = '';
     var max = 0;
@@ -886,8 +1102,9 @@ title: 八字排盘
       det.appendChild(cell);
     });
 
-    // 刑冲破害合
-    if (r.relations && r.relations.length) {
+    // 刑冲破害合（受设置控制）
+    var showXc = (typeof bzSettings === 'undefined') || bzSettings.showXingchong();
+    if (showXc && r.relations && r.relations.length) {
       var rl = mk('div', 'eng-rel');
       rl.innerHTML = '<b>刑冲破害合：</b>' + r.relations.map(function (x) {
         return x.pair + '（' + x.type + '）';
@@ -989,6 +1206,10 @@ title: 八字排盘
     if (!box) return;
     var recs = [];
     try {
+      // 把设置里算出的格局传给推荐引擎
+      if (c._gejuName) {
+        c.geju = { name: c._gejuName };
+      }
       if (typeof gujiRecommend === 'function') recs = gujiRecommend(c) || [];
     } catch (e) { recs = []; }
 
@@ -1047,6 +1268,48 @@ title: 八字排盘
   function renderAppx(c) {
     var box = $('pAppx');
     box.innerHTML = '';
+
+    // 命宫/身宫：按设置决定是否用次月（过中气换月）
+    var mgZhi = (c.minggong || '')[1], sgZhi = (c.shengong || '')[1];
+    var mz = (c.pillars && c.pillars.month ? c.pillars.month[1] : '');
+    if (typeof bzSettings !== 'undefined' && mgZhi && mz) {
+      // 用真实中气时刻判定是否已过中气
+      var passed = false;
+      try {
+        if (c.daysFromJie != null && typeof solarTermTime === 'function') {
+          var ZQ_OF_ZHI = {
+            寅: '雨水', 卯: '春分', 辰: '谷雨', 巳: '小满', 午: '夏至', 未: '大暑',
+            申: '处暑', 酉: '秋分', 戌: '霜降', 亥: '小雪', 子: '冬至', 丑: '大寒'
+          };
+          var zn = ZQ_OF_ZHI[mz];
+          if (zn) {
+            var y0 = (c.pillars.year || '');
+            var by = new Date(c.ms + 8 * 3600000).getUTCFullYear();
+            var zt = solarTermTime(by, zn, c.ms);
+            if (zt != null && zt < c.ms) {
+              var zt2 = solarTermTime(by + 1, zn, c.ms);
+              if (zt2 != null && zt2 < c.ms) zt = zt2;
+            }
+            if (zt == null) { var zp = solarTermTime(by - 1, zn, c.ms); if (zp != null && zp < c.ms) zt = zp; }
+            passed = (zt != null && c.ms >= zt);
+          }
+        }
+      } catch (e) { passed = false; }
+      var mz2 = bzSettings.gongMonthZhi(mz, passed);
+      if (mz2 !== mz) {
+        var yg = (c.pillars.year || '')[0];
+        var mi = DZ.indexOf(mz2), hi = DZ.indexOf((c.pillars.hour || '')[1]);
+        if (mi >= 0 && hi >= 0) {
+          var nz = DZ[((17 - mi - hi) % 12 + 12) % 12];
+          var nz2 = DZ[(mi + hi + 1) % 12];
+          c.minggong = gzWithYearGan(yg, nz);
+          c.minggongNayin = nayin(c.minggong);
+          c.shengong = gzWithYearGan(yg, nz2);
+          c.shengongNayin = nayin(c.shengong);
+        }
+      }
+    }
+
     [
       ['胎元', c.taiyuan + '（' + c.taiyuanNayin + '）'],
       ['胎息', c.taixi + '（' + c.taixiNayin + '）'],
@@ -1063,6 +1326,7 @@ title: 八字排盘
   }
 
   function render(c, label, birthMs) {
+    applyCangganSetting(c);
     renderChart(c, birthMs);
     renderCore(c);
     renderWx(c);
@@ -1074,6 +1338,7 @@ title: 八字排盘
     renderLiuri(c);
     renderGuji(c);
     renderAppx(c);
+    _lastC = c; _lastLabel = label; _lastMs = birthMs;
     var lunarStr = '';
     try {
       if (typeof bzLunar !== 'undefined' && birthMs != null) {
@@ -1084,6 +1349,18 @@ title: 八字排盘
       if (typeof bzRysl !== 'undefined' && birthMs != null && c.pillars) {
         var mz = c.pillars.month.charAt(1);
         var rs = bzRysl.text(birthMs, mz);
+        // 若设置了非默认的司令流派，用通用分段表重算
+        if (typeof bzSettings !== 'undefined'
+            && bzSettings.get('silingMode') !== 'ziping'
+            && c.daysFromJie != null) {
+          var alt = bzSettings.siling(mz, c.daysFromJie);
+          if (alt) {
+            var WX = { 甲:'木',乙:'木',丙:'火',丁:'火',戊:'土',己:'土',
+                       庚:'金',辛:'金',壬:'水',癸:'水' };
+            var tail = alt.length > 1 ? '土' : (WX[alt] || '');
+            rs = alt + tail + '用事';
+          }
+        }
         if (rs) {
           $('tRysl').textContent = '出生日 · ' + rs;
           $('cfRysl').style.display = '';
