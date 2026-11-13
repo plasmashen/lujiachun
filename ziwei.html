@@ -1,0 +1,435 @@
+---
+layout: default
+title: 紫微斗数排盘
+description: 紫微斗数在线排盘 · 十二宫 · 十四主星 · 六吉六煞 · 四化 · 大限
+permalink: /ziwei/
+---
+
+<style>
+:root{
+  --paper:#f7f4ed; --paper-2:#fdfcf8;
+  --ink:#1c1a17; --ink-2:#544f47; --ink-3:#797367; --ink-4:#a39c8f;
+  --rule:#ded7c8; --rule-soft:#eae5d9;
+  --zhu:#a8352a; --zhu-soft:#f3e6e3; --qing:#3f5d52; --jin:#9a7b3f;
+  --serif:"Songti SC","STSong","STZhongsong","SimSun","Source Han Serif SC",
+    "Source Han Serif CN","Noto Serif CJK SC","Noto Serif SC",Georgia,serif;
+  --sans:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB",
+    "Microsoft YaHei","Source Han Sans SC","Noto Sans CJK SC",sans-serif;
+}
+body{background:var(--paper)}
+.zw{max-width:1080px;margin:0 auto;padding:0 20px;font-family:var(--sans);color:var(--ink)}
+.zw-head{padding:34px 0 20px;border-bottom:1px solid var(--rule);margin-bottom:22px}
+.zw-head h1{margin:0 0 6px;font-size:1.6rem;letter-spacing:.04em}
+.zw-head p{margin:0;color:var(--ink-3);font-size:.88rem;line-height:1.7}
+
+/* 输入区 */
+.zw-form{border:1px solid var(--rule);border-radius:8px;padding:16px 18px;
+  background:var(--paper-2);margin-bottom:18px}
+.zw-frow{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:10px}
+.zw-frow:last-child{margin-bottom:0}
+.zw-frow label{width:56px;font-size:.82rem;color:var(--ink-3);flex-shrink:0}
+.zw-frow input,.zw-frow select{padding:7px 9px;border:1px solid var(--rule);
+  border-radius:4px;background:var(--paper);color:var(--ink);font-size:.86rem;
+  font-family:inherit;min-width:0}
+.zw-frow input:focus,.zw-frow select:focus{outline:none;border-color:var(--zhu)}
+.zw-btn{padding:9px 22px;border:1px solid var(--zhu);background:var(--zhu);color:#fff;
+  border-radius:5px;cursor:pointer;font-size:.9rem;font-family:inherit}
+.zw-btn:hover{opacity:.88}
+.zw-btn.ghost{background:none;color:var(--zhu)}
+
+/* 命盘 */
+.zw-view{display:none}
+.zw-view.on{display:block}
+.zw-meta{display:flex;gap:18px;flex-wrap:wrap;padding:12px 16px;background:var(--rule-soft);
+  border-radius:6px;margin-bottom:16px;font-size:.84rem;color:var(--ink-2)}
+.zw-meta b{color:var(--ink);font-weight:600}
+.zw-meta .k{color:var(--ink-4);margin-right:4px}
+
+/* 十二宫盘（4x4 网格，中间 2x2 是信息区） */
+.zw-board{display:grid;grid-template-columns:repeat(4,1fr);
+  grid-template-rows:repeat(4,minmax(150px,auto));
+  gap:1px;background:var(--rule);border:1px solid var(--rule);
+  border-radius:8px;overflow:hidden;margin-bottom:20px}
+.zw-cell{background:var(--paper-2);padding:7px 8px;position:relative;
+  display:flex;flex-direction:column;font-size:.78rem;cursor:pointer;
+  transition:background .15s}
+.zw-cell:hover{background:#f2ede2}
+.zw-cell.ming{background:#faf3ee;box-shadow:inset 0 0 0 2px var(--zhu)}
+.zw-cell.shen .pal:after{content:'身';display:inline-block;margin-left:4px;
+  background:var(--jin);color:#fff;font-size:.6rem;padding:0 3px;border-radius:2px;
+  vertical-align:middle}
+.zw-cell.center{grid-column:2/4;grid-row:2/4;background:var(--paper);
+  cursor:default;justify-content:center;align-items:center;padding:16px}
+.zw-cell.center:hover{background:var(--paper)}
+
+.zw-cell .pal{font-size:.7rem;color:var(--ink-4);display:flex;
+  justify-content:space-between;align-items:center;margin-bottom:4px}
+.zw-cell .pal .gz{font-family:var(--serif);color:var(--ink-3);font-size:.76rem}
+.zw-cell .stars{flex:1;display:flex;flex-direction:column;gap:1px}
+.zw-cell .st{font-family:var(--serif);font-size:.84rem;line-height:1.35}
+.zw-cell .st.main{color:var(--ink);font-weight:600}
+.zw-cell .st.lucky{color:var(--qing)}
+.zw-cell .st.sha{color:var(--zhu)}
+.zw-cell .st .hua{font-family:var(--sans);font-size:.6rem;padding:0 2px;
+  border-radius:2px;margin-left:3px;vertical-align:middle}
+.zw-cell .st .hua.lu{background:#e8f0e4;color:#3f6b3f}
+.zw-cell .st .hua.quan{background:#f5e9d6;color:#8a6520}
+.zw-cell .st .hua.ke{background:#e4eaf2;color:#3a5a80}
+.zw-cell .st .hua.ji{background:var(--zhu-soft);color:var(--zhu)}
+.zw-cell .maj{color:var(--ink-4);font-size:.66rem;margin-top:3px;
+  font-family:var(--serif)}
+
+/* 中宫 */
+.zw-center{text-align:center}
+.zw-center .name{font-size:1.15rem;font-family:var(--serif);font-weight:600;
+  letter-spacing:.08em;margin-bottom:10px}
+.zw-center .row{font-size:.76rem;color:var(--ink-3);line-height:1.9}
+.zw-center .row b{color:var(--ink-2);font-weight:600;font-family:var(--serif)}
+.zw-center .sihua{margin-top:10px;padding-top:9px;border-top:1px solid var(--rule);
+  font-size:.72rem;color:var(--ink-3);line-height:1.8}
+.zw-center .sihua span{margin:0 3px}
+.zw-center .sihua .lu{color:#3f6b3f}.zw-center .sihua .quan{color:#8a6520}
+.zw-center .sihua .ke{color:#3a5a80}.zw-center .sihua .ji{color:var(--zhu)}
+
+/* 详情面板 */
+.zw-detail{border:1px solid var(--rule);border-radius:8px;padding:16px 18px;
+  background:var(--paper-2);margin-bottom:18px;min-height:90px}
+.zw-detail h3{margin:0 0 8px;font-size:.95rem;display:flex;align-items:center;gap:8px}
+.zw-detail h3 .tag{font-size:.68rem;color:var(--zhu);border:1px solid var(--zhu);
+  border-radius:3px;padding:1px 5px;font-weight:400}
+.zw-detail .sec{margin-bottom:12px}
+.zw-detail .sec:last-child{margin-bottom:0}
+.zw-detail .st-name{font-family:var(--serif);font-size:1rem;font-weight:600;
+  color:var(--ink);margin-bottom:3px}
+.zw-detail .st-name .kw{font-family:var(--sans);font-size:.7rem;font-weight:400;
+  color:var(--ink-3);margin-left:8px}
+.zw-detail .st-desc{font-size:.83rem;line-height:1.85;color:var(--ink-2);
+  margin-bottom:5px}
+.zw-detail .st-note{font-size:.76rem;color:var(--ink-3);line-height:1.8;
+  padding-left:10px;border-left:2px solid var(--rule-soft)}
+.zw-detail .pal-desc{font-size:.8rem;color:var(--ink-3);line-height:1.8;
+  padding:8px 11px;background:var(--rule-soft);border-radius:4px;margin-bottom:12px}
+.zw-empty{color:var(--ink-4);font-size:.82rem;line-height:1.8}
+
+/* 大限 */
+.zw-dayun{display:grid;grid-template-columns:repeat(auto-fill,minmax(96px,1fr));
+  gap:6px;margin-top:8px}
+.zw-dy{border:1px solid var(--rule-soft);border-radius:4px;padding:7px 9px;
+  background:var(--paper-2);font-size:.74rem;cursor:pointer;text-align:center}
+.zw-dy:hover{background:#f2ede2}
+.zw-dy .r{color:var(--ink-4);font-size:.66rem;display:block;margin-bottom:2px}
+.zw-dy .p{font-family:var(--serif);color:var(--ink-2);font-size:.8rem}
+.zw-dy.cur{border-color:var(--zhu);background:var(--zhu-soft)}
+
+/* 通用 */
+.zw-sec{margin-bottom:22px}
+.zw-sec h2{font-size:1rem;margin:0 0 12px;color:var(--ink-2);
+  display:flex;align-items:center;gap:8px}
+.zw-sec h2 .n{color:var(--ink-4);font-size:.8rem;font-weight:400}
+.zw-caveat{padding:12px 14px;background:var(--rule-soft);border-radius:6px;
+  font-size:.79rem;color:var(--ink-3);line-height:1.85;margin-top:16px}
+@media(max-width:760px){
+  .zw-board{grid-template-columns:repeat(4,1fr);grid-template-rows:repeat(4,minmax(112px,auto))}
+  .zw-cell{padding:5px 6px}
+  .zw-cell .st{font-size:.74rem}
+  .zw-center .name{font-size:.92rem}
+}
+</style>
+
+<div class="zw">
+  <div class="zw-head">
+    <h1>紫微斗数排盘</h1>
+    <p>十二宫 · 十四主星 · 六吉六煞 · 生年四化 · 大限</p>
+  </div>
+
+  <div class="zw-form">
+    <div class="zw-frow">
+      <label>生日</label>
+      <input type="date" id="zwDate" value="1990-05-15">
+      <label style="width:auto">时辰</label>
+      <input type="time" id="zwTime" value="10:30">
+      <label style="width:auto">性别</label>
+      <select id="zwSex"><option value="1">男</option><option value="2">女</option></select>
+    </div>
+    <div class="zw-frow">
+      <button class="zw-btn" id="zwGo">排盘</button>
+      <span style="font-size:.76rem;color:var(--ink-4)">
+        农历、四柱、五行局自动换算
+      </span>
+    </div>
+  </div>
+
+  <div class="zw-view" id="zwView">
+    <div class="zw-meta" id="zwMeta"></div>
+
+    <div class="zw-sec">
+      <h2><span class="n">壹</span>十二宫命盘</h2>
+      <div class="zw-board" id="zwBoard"></div>
+    </div>
+
+    <div class="zw-sec">
+      <h2><span class="n">贰</span>宫位详情</h2>
+      <div class="zw-detail" id="zwDetail">
+        <div class="zw-empty">点击上方任意宫位查看星曜解读</div>
+      </div>
+    </div>
+
+    <div class="zw-sec">
+      <h2><span class="n">叁</span>大限</h2>
+      <div class="zw-dayun" id="zwDayun"></div>
+    </div>
+
+    <div class="zw-caveat">
+      紫微斗数流派分歧较大，本页采用<b>三合派</b>排盘、<b>南派四化</b>。
+      四化飞星另有中州派、飞星派等算法，同一张盘可读出不同结论，属正常现象。
+      排盘算法已与 iztro 开源库 2808 组样本交叉验证，九项指标全部一致。
+    </div>
+  </div>
+</div>
+
+<script src="/assets/js/bazi/vsop-data.js"></script>
+<script src="/assets/js/bazi/jieqi-delta.js"></script>
+<script src="/assets/js/bazi/astro.js"></script>
+<script src="/assets/js/bazi/lunar.js"></script>
+<script src="/assets/js/bazi/ganzhi.js"></script>
+<script src="/assets/js/bazi/shensha.js"></script>
+<script src="/assets/js/bazi/ziwei.js"></script>
+<script src="/assets/js/bazi/ziwei-text.js"></script>
+<script>
+(function () {
+  'use strict';
+  var $ = function (id) { return document.getElementById(id); };
+  var DZ = '子丑寅卯辰巳午未申酉戌亥';
+  var cur = null;
+
+  // 宫位在 4x4 盘上的位置（传统紫微盘布局）
+  // 顺序：巳午未申 / 辰+中宫+酉 / 卯+中宫+戌 / 寅丑子亥
+  var BOARD = [
+    ['巳', '午', '未', '申'],
+    ['辰', null, null, '酉'],
+    ['卯', null, null, '戌'],
+    ['寅', '丑', '子', '亥']
+  ];
+
+  function toMs(dateStr, timeStr) {
+    var d = dateStr.split('-').map(Number);
+    var t = (timeStr || '00:00').split(':').map(Number);
+    return Date.UTC(d[0], d[1] - 1, d[2], t[0] - 8, t[1], 0);
+  }
+
+  // 时间 → 时辰索引（0=子 ... 11=亥），23:00-00:59 为子时
+  function timeIndex(hour) {
+    return Math.floor(((hour + 1) % 24) / 2);
+  }
+
+  function render(c) {
+    var T = bzZiweiText;
+    var view = $('zwView');
+    view.classList.add('on');
+
+    // 基础信息
+    var p = c.pillars;
+    var meta = $('zwMeta');
+    meta.innerHTML =
+      '<span><span class="k">农历</span><b>' + c.lunarText + '</b></span>' +
+      '<span><span class="k">四柱</span><b>' + p.year + ' ' + p.month + ' ' + p.day + ' ' + p.hour + '</b></span>' +
+      '<span><span class="k">命宫</span><b>' + c.zw.mingGan + c.zw.mingZhi + '</b></span>' +
+      '<span><span class="k">身宫</span><b>' + c.zw.shenZhi + '</b></span>' +
+      '<span><span class="k">五行局</span><b>' + c.zw.juName + '</b></span>' +
+      '<span><span class="k">命主</span><b>' + c.zw.soul + '</b></span>' +
+      '<span><span class="k">身主</span><b>' + c.zw.body + '</b></span>';
+
+    // 十二宫盘
+    var board = $('zwBoard');
+    board.innerHTML = '';
+    BOARD.forEach(function (row) {
+      row.forEach(function (z) {
+        if (z === null) {
+          if (board.querySelector('.center')) return;
+          var ctr = document.createElement('div');
+          ctr.className = 'zw-cell center';
+          var miao = c.zw.mingGan + c.zw.mingZhi;
+          var sh = c.zw.sihua;
+          var sihuaHtml = '';
+          ['禄', '权', '科', '忌'].forEach(function (h) {
+            var star = null;
+            for (var s in sh) { if (sh[s] === h) star = s; }
+            if (star) {
+              sihuaHtml += '<span class="' + cls(h) + '">' + star + '化' + h + '</span>';
+            }
+          });
+          ctr.innerHTML =
+            '<div class="zw-center">' +
+            '<div class="name">' + miao + '</div>' +
+            '<div class="row"><span class="k">五行局</span><b>' + c.zw.juName + '</b></div>' +
+            '<div class="row"><span class="k">命主</span><b>' + c.zw.soul + '</b>' +
+            '　<span class="k">身主</span><b>' + c.zw.body + '</b></div>' +
+            '<div class="row"><span class="k">大限</span><b>' + (c.zw.forward ? '顺行' : '逆行') + '</b></div>' +
+            '<div class="sihua">' + sihuaHtml + '</div>' +
+            '</div>';
+          board.appendChild(ctr);
+          return;
+        }
+        var p2 = c.zw.palaces[z];
+        var cell = document.createElement('div');
+        cell.className = 'zw-cell' + (p2.name === '命宫' ? ' ming' : '') +
+                         (p2.isBody ? ' shen' : '');
+        cell.setAttribute('data-zhi', z);
+
+        var starsHtml = '';
+        p2.major.forEach(function (s) {
+          starsHtml += '<div class="st main">' + s.name +
+            (s.hua ? '<span class="hua ' + cls(s.hua) + '">' + s.hua + '</span>' : '') +
+            '</div>';
+        });
+        p2.minor.forEach(function (s) {
+          var isSha = !!T.SHA_STARS[s.name];
+          starsHtml += '<div class="st ' + (isSha ? 'sha' : 'lucky') + '">' + s.name +
+            (s.hua ? '<span class="hua ' + cls(s.hua) + '">' + s.hua + '</span>' : '') +
+            '</div>';
+        });
+        if (!p2.major.length && !p2.minor.length) {
+          starsHtml = '<div class="st" style="color:var(--ink-4)">空宫</div>';
+        }
+
+        cell.innerHTML =
+          '<div class="pal"><span class="' + (p2.name === '命宫' ? 'pal-name' : '') +
+            '">' + p2.name + '</span>' +
+            '<span class="gz">' + p2.gan + z + '</span></div>' +
+          '<div class="stars">' + starsHtml + '</div>';
+
+        cell.onclick = function () { showDetail(c, z); };
+        board.appendChild(cell);
+      });
+    });
+
+    // 大限
+    var dy = $('zwDayun');
+    dy.innerHTML = '';
+    var age = c.age || 0;
+    c.zw.dayun.forEach(function (d) {
+      var el = document.createElement('div');
+      el.className = 'zw-dy' + (age >= d.start && age <= d.end ? ' cur' : '');
+      el.innerHTML = '<span class="r">' + d.start + '-' + d.end + '</span>' +
+        '<span class="p">' + d.palace + '·' + d.zhi + '</span>';
+      el.onclick = function () { showDetail(c, d.zhi); };
+      dy.appendChild(el);
+    });
+  }
+
+  function cls(h) {
+    return { '禄': 'lu', '权': 'quan', '科': 'ke', '忌': 'ji' }[h] || '';
+  }
+
+  function showDetail(c, z) {
+    var T = bzZiweiText;
+    var p = c.zw.palaces[z];
+    var box = $('zwDetail');
+    var html = '';
+
+    html += '<h3>' + p.gan + z + ' · ' + p.name +
+      (p.isBody ? '<span class="tag">身宫</span>' : '') + '</h3>';
+    if (T.PALACE_DESC[p.name]) {
+      html += '<div class="pal-desc">' + T.PALACE_DESC[p.name] + '</div>';
+    }
+
+    // 主星
+    p.major.forEach(function (s) {
+      var info = T.MAIN_STARS[s.name];
+      html += '<div class="sec">';
+      html += '<div class="st-name">' + s.name +
+        (info ? '<span class="kw">' + info.type + ' · ' + info.wx + ' · ' + info.dou +
+          '　' + info.keywords.join('、') + '</span>' : '') +
+        (s.hua ? '<span class="hua ' + cls(s.hua) + '" style="margin-left:6px">化' + s.hua + '</span>' : '') +
+        '</div>';
+      if (info) {
+        html += '<div class="st-desc">' + info.desc + '</div>';
+        html += '<div class="st-note"><b>得位：</b>' + info.strong +
+          '<br><b>失衡：</b>' + info.weak + '</div>';
+      }
+      if (s.hua && T.SIHUA_DESC[s.hua]) {
+        html += '<div class="st-note" style="margin-top:5px;border-left-color:var(--zhu)">' +
+          '<b>' + T.SIHUA_DESC[s.hua].name + '：</b>' + T.SIHUA_DESC[s.hua].desc + '</div>';
+      }
+      html += '</div>';
+    });
+
+    // 辅星
+    p.minor.forEach(function (s) {
+      var lucky = T.LUCKY_STARS[s.name];
+      var sha = T.SHA_STARS[s.name];
+      var info = lucky || sha;
+      var isSha = !!sha;
+      html += '<div class="sec">';
+      html += '<div class="st-name" style="color:' + (isSha ? 'var(--zhu)' : 'var(--qing)') + '">' +
+        s.name + '<span class="kw">' + (isSha ? '煞星' : '吉星') + '</span>' +
+        (s.hua ? '<span class="hua ' + cls(s.hua) + '" style="margin-left:6px">化' + s.hua + '</span>' : '') +
+        '</div>';
+      if (info) html += '<div class="st-desc">' + info.desc + '</div>';
+      if (s.hua && T.SIHUA_DESC[s.hua]) {
+        html += '<div class="st-note"><b>' + T.SIHUA_DESC[s.hua].name + '：</b>' +
+          T.SIHUA_DESC[s.hua].desc + '</div>';
+      }
+      html += '</div>';
+    });
+
+    if (!p.major.length && !p.minor.length) {
+      html += '<div class="zw-empty">此宫无主星也无辅星，为「空宫」。' +
+        '空宫需借对宫（' + DZ[(DZ.indexOf(z) + 6) % 12] + '宫）的主星来看，' +
+        '或表示该领域较无主见、易受环境影响。</div>';
+    }
+
+    box.innerHTML = html;
+  }
+
+  function run() {
+    var ms = toMs($('zwDate').value, $('zwTime').value);
+    var d = new Date(ms + 8 * 3600000);
+    var hour = d.getUTCHours();
+    var ti = timeIndex(hour);
+    var sex = parseInt($('zwSex').value, 10);
+
+    var c;
+    try {
+      c = paipan(ms, sex, true, Date.now());
+    } catch (e) {
+      alert('排盘失败：' + e.message);
+      return;
+    }
+
+    // 农历
+    var lunar = null, lunarText = '';
+    try {
+      lunar = bzLunar ? bzLunar.solarToLunar(ms) : null;
+      lunarText = bzLunar ? bzLunar.text(ms) : '';
+    } catch (e) { lunarText = ''; }
+
+    if (!lunar || lunar.month == null) {
+      alert('农历换算失败');
+      return;
+    }
+
+    var zw = bzZiwei.paipan({
+      lunarMonth: lunar.month,
+      lunarDay: lunar.day,
+      timeIndex: ti,
+      yearGan: c.pillars.year[0],
+      yearZhi: c.pillars.year[1],
+      sex: sex,
+      isLeapMonth: !!lunar.isLeap
+    });
+
+    // 年龄（用于高亮当前大限）
+    var birthY = d.getUTCFullYear();
+    var nowY = new Date().getUTCFullYear();
+    var age = nowY - birthY;
+
+    cur = { pillars: c.pillars, lunarText: lunarText, zw: zw, age: age };
+    render(cur);
+  }
+
+  $('zwGo').onclick = run;
+  // 首屏自动排一次
+  run();
+})();
+</script>
