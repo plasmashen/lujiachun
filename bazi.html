@@ -297,6 +297,21 @@ title: 八字排盘
   cursor:pointer;font-family:var(--serif)}
 .set-cang .cg .gs span:hover{background:var(--zhu-soft)}
 
+/* 案例库 */
+.case-i{display:flex;align-items:center;gap:10px;padding:10px 12px;
+  border:1px solid var(--rule-soft);border-radius:6px;margin-bottom:7px;
+  background:var(--paper-2);font-size:.82rem}
+.case-i:hover{border-color:var(--rule)}
+.case-i .nm{font-weight:600;flex:1;min-width:0;overflow:hidden;
+  text-overflow:ellipsis;white-space:nowrap;cursor:pointer}
+.case-i .sub{font-size:.72rem;color:var(--ink-4);white-space:nowrap}
+.case-i .x{border:none;background:none;color:var(--zhu);cursor:pointer;
+  font-size:1rem;line-height:1;padding:0 2px;flex-shrink:0}
+.case-empty{color:var(--ink-4);font-size:.8rem;text-align:center;padding:30px 0;
+  line-height:1.9}
+.case-tip{font-size:.72rem;color:var(--ink-4);margin-top:10px;line-height:1.7;
+  padding:8px 10px;background:var(--rule-soft);border-radius:4px}
+
 /* 五行能量 / 同党异党 */
 .eng-party{margin-bottom:16px}
 .eng-bar{display:flex;height:26px;border-radius:5px;overflow:hidden;
@@ -428,6 +443,9 @@ title: 八字排盘
       <button class="btn btn-main" id="bzGo">排盘</button>
       <button class="btn btn-ghost" id="bzCopy">复制全文</button>
       <button class="btn btn-ghost" id="bzSetBtn">命理设置</button>
+      <button class="btn btn-ghost" id="bzSave">保存命盘</button>
+      <button class="btn btn-ghost" id="bzCases">我的案例</button>
+      <button class="btn btn-ghost" id="bzShare">分享卡片</button>
     </div>
 
     <div class="tip">
@@ -527,6 +545,21 @@ title: 八字排盘
       <div class="set-f">
         <button class="hp-btn ghost" id="setReset" style="padding:7px 16px">恢复默认</button>
         <button class="hp-btn" id="setDone" style="padding:7px 20px">完成</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 案例库面板 -->
+  <div class="set-mask hide" id="caseMask">
+    <div class="set-panel" style="max-width:520px">
+      <div class="set-h">
+        <h3>我的案例</h3>
+        <button class="set-close" id="caseClose">×</button>
+      </div>
+      <div class="set-body" id="caseBody" style="padding:10px 16px 16px"></div>
+      <div class="set-f">
+        <button class="hp-btn ghost" id="caseClear" style="padding:7px 16px">清空全部</button>
+        <button class="hp-btn" id="caseDone" style="padding:7px 20px">关闭</button>
       </div>
     </div>
   </div>
@@ -635,6 +668,8 @@ title: 八字排盘
 <script src="/assets/js/bazi/lunar.js"></script>
 <script src="/assets/js/bazi/rysl.js"></script>
 <script src="/assets/js/bazi/ganzhi.js"></script>
+<script src="/assets/js/bazi/cases.js"></script>
+<script src="/assets/js/bazi/share.js"></script>
 <script src="/assets/js/bazi/settings.js"></script>
 <script src="/assets/js/bazi/shensha.js"></script>
 <script src="/assets/js/bazi/interpret-data.js"></script>
@@ -1267,6 +1302,104 @@ title: 八字排盘
     if (_lastC) render(_lastC, _lastLabel, _lastMs);
   }
 
+  // ───────────── 案例库 ─────────────
+  function renderCases() {
+    var box = $('caseBody');
+    if (!box) return;
+    var list = bzCases.list('bazi');
+    if (!list.length) {
+      box.innerHTML = '<div class="case-empty">还没有保存的命盘<br>' +
+        '排盘后点「保存命盘」即可存下来</div>';
+      return;
+    }
+    box.innerHTML = list.map(function (c) {
+      return '<div class="case-i" data-id="' + c.id + '">' +
+        '<span class="nm" title="点击载入">' + esc(c.name) + '</span>' +
+        '<span class="sub">' + c.date + ' ' + (c.sex == 2 ? '女' : '男') + '</span>' +
+        '<button class="x" data-del="' + c.id + '" title="删除">×</button>' +
+        '</div>';
+    }).join('') +
+    '<div class="case-tip">案例只存在本机浏览器，不上传、不同步。' +
+    '清理浏览器数据会一并清除。</div>';
+  }
+
+  function esc(s) {
+    return String(s || '').replace(/[&<>"]/g, function (m) {
+      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[m];
+    });
+  }
+
+  function openCases() {
+    renderCases();
+    $('caseMask').classList.remove('hide');
+  }
+  function closeCases() { $('caseMask').classList.add('hide'); }
+
+  if ($('bzSave')) $('bzSave').onclick = function () {
+    var date = ($('bzDate') || {}).value;
+    var time = ($('bzTime') || {}).value;
+    var sex = parseInt(($('bzSex') || {}).value || '1', 10);
+    if (!date) { alert('请先填写生日'); return; }
+
+    var dup = bzCases.exists({ kind: 'bazi', date: date, time: time || '00:00', sex: sex });
+    if (dup) {
+      alert('这个命盘已经保存过了：' + dup.name);
+      return;
+    }
+    var nm = prompt('给这个命盘起个名字（留空自动命名）：', '');
+    if (nm === null) return;
+    var it = bzCases.add({
+      kind: 'bazi', name: nm, date: date, time: time || '00:00', sex: sex
+    });
+    if (!it) { alert('保存失败，可能是浏览器存储已满'); return; }
+    // 轻微反馈
+    var btn = $('bzSave');
+    var old = btn.textContent;
+    btn.textContent = '已保存 ✓';
+    setTimeout(function () { btn.textContent = old; }, 1400);
+  };
+
+  if ($('bzShare')) $('bzShare').onclick = function () {
+    if (!_lastC) { alert('请先排盘'); return; }
+    try {
+      var cv = bzShare.baziCard(_lastC, { lunarText: _lastC._lunarText || '' });
+      bzShare.preview(cv, '八字命盘');
+    } catch (e) {
+      alert('生成失败：' + e.message);
+    }
+  };
+
+  if ($('bzCases')) $('bzCases').onclick = openCases;
+  if ($('caseClose')) $('caseClose').onclick = closeCases;
+  if ($('caseDone')) $('caseDone').onclick = closeCases;
+  if ($('caseMask')) $('caseMask').onclick = function (e) {
+    if (e.target === $('caseMask')) closeCases();
+  };
+  if ($('caseClear')) $('caseClear').onclick = function () {
+    if (!confirm('确定清空全部八字案例？此操作不可恢复。')) return;
+    bzCases.clear('bazi');
+    renderCases();
+  };
+  if ($('caseBody')) $('caseBody').onclick = function (e) {
+    var del = e.target.getAttribute && e.target.getAttribute('data-del');
+    if (del) {
+      bzCases.remove(del);
+      renderCases();
+      return;
+    }
+    var nm = e.target.classList && e.target.classList.contains('nm') ? e.target : null;
+    if (!nm) return;
+    var row = nm.parentNode;
+    var id = row.getAttribute('data-id');
+    var c = bzCases.get(id);
+    if (!c) return;
+    $('bzDate').value = c.date;
+    $('bzTime').value = c.time;
+    $('bzSex').value = String(c.sex);
+    closeCases();
+    $('bzGo').click();
+  };
+
   if ($('csAdd')) $('csAdd').onclick = function () {
     var nm = ($('csName').value || '').trim();
     var mp = ($('csMap').value || '').trim();
@@ -1635,6 +1768,7 @@ title: 八字排盘
     renderGuji(c);
     renderAppx(c);
     _lastC = c; _lastLabel = label; _lastMs = birthMs;
+    c._lunarText = lunarStr;
     var lunarStr = '';
     try {
       if (typeof bzLunar !== 'undefined' && birthMs != null) {

@@ -128,11 +128,83 @@ body{background:var(--paper)}
 .zw-sec h2 .n{color:var(--ink-4);font-size:.8rem;font-weight:400}
 .zw-caveat{padding:12px 14px;background:var(--rule-soft);border-radius:6px;
   font-size:.79rem;color:var(--ink-3);line-height:1.85;margin-top:16px}
+/* 案例库 */
+.set-mask{position:fixed;inset:0;background:rgba(28,26,23,.42);z-index:200;
+  display:flex;align-items:center;justify-content:center;padding:20px}
+.set-mask.hide{display:none}
+.set-panel{background:var(--paper);border-radius:10px;max-width:560px;width:100%;
+  max-height:86vh;display:flex;flex-direction:column;box-shadow:0 8px 40px rgba(0,0,0,.18)}
+.set-h{display:flex;align-items:center;justify-content:space-between;
+  padding:15px 18px;border-bottom:1px solid var(--rule)}
+.set-h h3{margin:0;font-size:.96rem}
+.set-close{border:none;background:none;font-size:1.4rem;cursor:pointer;
+  color:var(--ink-3);line-height:1;padding:0 4px}
+.set-body{padding:6px 18px 14px;overflow-y:auto;flex:1}
+.set-f{display:flex;justify-content:flex-end;gap:10px;padding:12px 18px;
+  border-top:1px solid var(--rule)}
+.hp-btn{padding:8px 18px;border:1px solid var(--zhu);background:var(--zhu);color:#fff;
+  border-radius:5px;cursor:pointer;font-size:.85rem;font-family:inherit}
+.hp-btn.ghost{background:none;color:var(--zhu)}
+.case-i{display:flex;align-items:center;gap:10px;padding:10px 12px;
+  border:1px solid var(--rule-soft);border-radius:6px;margin-bottom:7px;
+  background:var(--paper-2);font-size:.82rem}
+.case-i .nm{font-weight:600;flex:1;min-width:0;overflow:hidden;
+  text-overflow:ellipsis;white-space:nowrap;cursor:pointer}
+.case-i .sub{font-size:.72rem;color:var(--ink-4);white-space:nowrap}
+.case-i .x{border:none;background:none;color:var(--zhu);cursor:pointer;
+  font-size:1rem;line-height:1;padding:0 2px;flex-shrink:0}
+.case-empty{color:var(--ink-4);font-size:.8rem;text-align:center;padding:30px 0;line-height:1.9}
+.case-tip{font-size:.72rem;color:var(--ink-4);margin-top:10px;line-height:1.7;
+  padding:8px 10px;background:var(--rule-soft);border-radius:4px}
+
 @media(max-width:760px){
-  .zw-board{grid-template-columns:repeat(4,1fr);grid-template-rows:repeat(4,minmax(112px,auto))}
-  .zw-cell{padding:5px 6px}
-  .zw-cell .st{font-size:.74rem}
-  .zw-center .name{font-size:.92rem}
+  .zw{padding:0 10px}
+  .zw-head{padding:24px 0 14px;margin-bottom:16px}
+  .zw-head h1{font-size:1.28rem}
+  .zw-head p{font-size:.8rem}
+
+  .zw-form{padding:12px 13px}
+  .zw-frow label{width:44px;font-size:.78rem}
+  .zw-frow input,.zw-frow select{font-size:.82rem;padding:6px 8px}
+  .zw-frow input[type=date],.zw-frow input[type=time]{flex:1 1 40%}
+  .zw-btn{flex:1 1 100%;padding:9px}
+
+  .zw-meta{padding:10px 12px;gap:8px 14px;font-size:.76rem}
+  .zw-meta b{font-size:.8rem}
+
+  .zw-board{grid-template-columns:repeat(4,1fr);
+    grid-template-rows:repeat(4,minmax(96px,auto))}
+  .zw-cell{padding:4px 4px 5px}
+  .zw-cell .pal{font-size:.62rem;margin-bottom:3px;gap:2px}
+  .zw-cell .pal .gz{font-size:.6rem}
+  .zw-cell .st{font-size:.68rem;line-height:1.3}
+  .zw-cell .st .hua{font-size:.52rem;padding:0 1px;margin-left:1px}
+  .zw-cell .maj{font-size:.58rem}
+
+  .zw-cell.center{padding:8px 4px}
+  .zw-center .name{font-size:.8rem;letter-spacing:.04em;margin-bottom:5px}
+  .zw-center .row{font-size:.6rem;line-height:1.6}
+  .zw-center .sihua{font-size:.56rem;line-height:1.6;margin-top:6px;padding-top:6px}
+
+  .zw-detail{padding:12px 13px}
+  .zw-detail h3{font-size:.88rem}
+  .zw-detail .st-name{font-size:.92rem}
+  .zw-detail .st-name .kw{font-size:.64rem;display:block;margin:3px 0 0}
+  .zw-detail .st-desc{font-size:.79rem}
+  .zw-detail .st-note{font-size:.73rem}
+
+  .zw-dayun{grid-template-columns:repeat(3,1fr);gap:5px}
+  .zw-dy{padding:6px 4px;font-size:.7rem}
+  .zw-dy .p{font-size:.74rem}
+
+  .zw-sec h2{font-size:.94rem}
+  .zw-caveat{font-size:.75rem;padding:10px 12px}
+}
+@media(max-width:400px){
+  .zw-board{grid-template-rows:repeat(4,minmax(88px,auto))}
+  .zw-cell .st{font-size:.62rem}
+  .zw-cell .pal{font-size:.58rem}
+  .zw-dayun{grid-template-columns:repeat(2,1fr)}
 }
 </style>
 
@@ -153,9 +225,24 @@ body{background:var(--paper)}
     </div>
     <div class="zw-frow">
       <button class="zw-btn" id="zwGo">排盘</button>
+      <button class="zw-btn ghost" id="zwSave">保存</button>
+      <button class="zw-btn ghost" id="zwCases">我的案例</button>
+      <button class="zw-btn ghost" id="zwShare">分享卡片</button>
       <span style="font-size:.76rem;color:var(--ink-4)">
         农历、四柱、五行局自动换算
       </span>
+    </div>
+  </div>
+
+  <div class="set-mask hide" id="caseMask">
+    <div class="set-panel" style="max-width:520px">
+      <div class="set-h"><h3>我的紫微案例</h3>
+        <button class="set-close" id="caseClose">×</button></div>
+      <div class="set-body" id="caseBody" style="padding:10px 16px 16px"></div>
+      <div class="set-f">
+        <button class="hp-btn ghost" id="caseClear" style="padding:7px 16px">清空全部</button>
+        <button class="hp-btn" id="caseDone" style="padding:7px 20px">关闭</button>
+      </div>
     </div>
   </div>
 
@@ -193,6 +280,8 @@ body{background:var(--paper)}
 <script src="/assets/js/bazi/lunar.js"></script>
 <script src="/assets/js/bazi/ganzhi.js"></script>
 <script src="/assets/js/bazi/shensha.js"></script>
+<script src="/assets/js/bazi/cases.js"></script>
+<script src="/assets/js/bazi/share.js"></script>
 <script src="/assets/js/bazi/ziwei.js"></script>
 <script src="/assets/js/bazi/ziwei-text.js"></script>
 <script>
@@ -427,6 +516,83 @@ body{background:var(--paper)}
     cur = { pillars: c.pillars, lunarText: lunarText, zw: zw, age: age };
     render(cur);
   }
+
+  // ───────────── 案例库 ─────────────
+  function esc(s) {
+    return String(s || '').replace(/[&<>"]/g, function (m) {
+      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[m];
+    });
+  }
+
+  function renderCases() {
+    var box = $('caseBody');
+    if (!box) return;
+    var list = bzCases.list('ziwei');
+    if (!list.length) {
+      box.innerHTML = '<div class="case-empty">还没有保存的紫微盘<br>' +
+        '排盘后点「保存」即可存下来</div>';
+      return;
+    }
+    box.innerHTML = list.map(function (c) {
+      return '<div class="case-i" data-id="' + c.id + '">' +
+        '<span class="nm" title="点击载入">' + esc(c.name) + '</span>' +
+        '<span class="sub">' + c.date + ' ' + (c.sex == 2 ? '女' : '男') + '</span>' +
+        '<button class="x" data-del="' + c.id + '" title="删除">×</button></div>';
+    }).join('') +
+    '<div class="case-tip">案例只存在本机浏览器，不上传、不同步。' +
+    '清理浏览器数据会一并清除。</div>';
+  }
+
+  function openCases() { renderCases(); $('caseMask').classList.remove('hide'); }
+  function closeCases() { $('caseMask').classList.add('hide'); }
+
+  if ($('zwSave')) $('zwSave').onclick = function () {
+    var date = $('zwDate').value, time = $('zwTime').value;
+    var sex = parseInt($('zwSex').value, 10);
+    if (!date) { alert('请先填写生日'); return; }
+    var dup = bzCases.exists({ kind: 'ziwei', date: date, time: time || '00:00', sex: sex });
+    if (dup) { alert('这个紫微盘已经保存过了：' + dup.name); return; }
+    var nm = prompt('给这个盘起个名字（留空自动命名）：', '');
+    if (nm === null) return;
+    var it = bzCases.add({ kind: 'ziwei', name: nm, date: date, time: time || '00:00', sex: sex });
+    if (!it) { alert('保存失败，浏览器存储可能已满'); return; }
+    var b = $('zwSave'), o = b.textContent;
+    b.textContent = '已保存 ✓';
+    setTimeout(function () { b.textContent = o; }, 1400);
+  };
+
+  if ($('zwShare')) $('zwShare').onclick = function () {
+    if (!cur || !cur.zw) { alert('请先排盘'); return; }
+    try {
+      var cv = bzShare.ziweiCard(cur.zw, { lunarText: cur.lunarText || '' });
+      bzShare.preview(cv, '紫微斗数');
+    } catch (e) { alert('生成失败：' + e.message); }
+  };
+
+  if ($('zwCases')) $('zwCases').onclick = openCases;
+  if ($('caseClose')) $('caseClose').onclick = closeCases;
+  if ($('caseDone')) $('caseDone').onclick = closeCases;
+  if ($('caseMask')) $('caseMask').onclick = function (e) {
+    if (e.target === $('caseMask')) closeCases();
+  };
+  if ($('caseClear')) $('caseClear').onclick = function () {
+    if (!confirm('确定清空全部紫微案例？')) return;
+    bzCases.clear('ziwei');
+    renderCases();
+  };
+  if ($('caseBody')) $('caseBody').onclick = function (e) {
+    var del = e.target.getAttribute && e.target.getAttribute('data-del');
+    if (del) { bzCases.remove(del); renderCases(); return; }
+    var nm = e.target.classList && e.target.classList.contains('nm') ? e.target : null;
+    if (!nm) return;
+    var c = bzCases.get(nm.parentNode.getAttribute('data-id'));
+    if (!c) return;
+    $('zwDate').value = c.date;
+    $('zwTime').value = c.time;
+    $('zwSex').value = String(c.sex);
+    closeCases();
+    $('zwGo').click();
+  };
 
   $('zwGo').onclick = run;
   // 首屏自动排一次

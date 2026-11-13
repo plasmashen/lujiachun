@@ -19,6 +19,7 @@ permalink: /huangli/
 }
 body{background:var(--paper)}
 .hl{max-width:940px;margin:0 auto;padding:0 20px;font-family:var(--sans);color:var(--ink)}
+.hl *{min-width:0}
 .hl-head{padding:34px 0 20px;border-bottom:1px solid var(--rule);margin-bottom:22px}
 .hl-head h1{margin:0 0 6px;font-size:1.6rem;letter-spacing:.04em}
 .hl-head p{margin:0;color:var(--ink-3);font-size:.88rem;line-height:1.7}
@@ -125,6 +126,92 @@ body{background:var(--paper)}
 .hl-sec h2 .n{color:var(--ink-4);font-size:.8rem;font-weight:400}
 .hl-caveat{padding:12px 14px;background:var(--rule-soft);border-radius:6px;
   font-size:.79rem;color:var(--ink-3);line-height:1.85;margin-bottom:24px}
+
+/* 收藏面板 */
+.set-mask{position:fixed;inset:0;background:rgba(28,26,23,.42);z-index:200;
+  display:flex;align-items:center;justify-content:center;padding:20px}
+.set-mask.hide{display:none}
+.set-panel{background:var(--paper);border-radius:10px;max-width:560px;width:100%;
+  max-height:86vh;display:flex;flex-direction:column;box-shadow:0 8px 40px rgba(0,0,0,.18)}
+.set-h{display:flex;align-items:center;justify-content:space-between;
+  padding:15px 18px;border-bottom:1px solid var(--rule)}
+.set-h h3{margin:0;font-size:.96rem}
+.set-close{border:none;background:none;font-size:1.4rem;cursor:pointer;
+  color:var(--ink-3);line-height:1;padding:0 4px}
+.set-body{padding:6px 18px 14px;overflow-y:auto;flex:1}
+.set-f{display:flex;justify-content:flex-end;gap:10px;padding:12px 18px;
+  border-top:1px solid var(--rule)}
+.hp-btn{padding:8px 18px;border:1px solid var(--zhu);background:var(--zhu);color:#fff;
+  border-radius:5px;cursor:pointer;font-size:.85rem;font-family:inherit}
+.hp-btn.ghost{background:none;color:var(--zhu)}
+.case-i{display:flex;align-items:center;gap:10px;padding:10px 12px;
+  border:1px solid var(--rule-soft);border-radius:6px;margin-bottom:7px;
+  background:var(--paper-2);font-size:.82rem}
+.case-i .nm{font-weight:600;flex:1;min-width:0;overflow:hidden;
+  text-overflow:ellipsis;white-space:nowrap;cursor:pointer}
+.case-i .sub{font-size:.72rem;color:var(--ink-4);white-space:nowrap}
+.case-i .x{border:none;background:none;color:var(--zhu);cursor:pointer;
+  font-size:1rem;line-height:1;padding:0 2px;flex-shrink:0}
+.case-empty{color:var(--ink-4);font-size:.8rem;text-align:center;padding:30px 0;line-height:1.9}
+.case-tip{font-size:.72rem;color:var(--ink-4);margin-top:10px;line-height:1.7;
+  padding:8px 10px;background:var(--rule-soft);border-radius:4px}
+
+/* ── 移动端 ── */
+@media(max-width:720px){
+  .hl{padding:0 12px}
+  .hl-head{padding:24px 0 14px;margin-bottom:16px}
+  .hl-head h1{font-size:1.28rem}
+  .hl-head p{font-size:.8rem}
+
+  .hl-bar{padding:10px 12px;gap:6px}
+  .hl-bar input[type=date]{flex:1 1 100%;order:-1}
+  .hl-bar button{flex:1 1 0;padding:8px 4px;font-size:.76rem;white-space:nowrap}
+  .hl-bar .sp{display:none}
+  .hl-bar>span:last-child{flex:1 1 100%;text-align:center;font-size:.72rem}
+
+  .hl-date{padding:11px 13px;gap:6px}
+  .hl-date .big{font-size:1.28rem}
+  .hl-date .lunar{font-size:.88rem;flex:1 1 100%}
+  .hl-date .sub{font-size:.76rem;flex:1 1 100%}
+
+  .hl-badges{padding:11px 13px 0;gap:6px}
+  .hl-b{font-size:.72rem;padding:4px 9px}
+
+  .hl-grid{grid-template-columns:1fr 1fr}
+  .hl-gi{padding:9px 11px}
+  .hl-gi .v{font-size:.84rem}
+  .hl-gi .d{font-size:.66rem}
+
+  .hl-yiji{padding:12px 13px}
+  .hl-row{gap:9px}
+  .hl-row .tag{width:26px;height:26px;font-size:.88rem}
+  .hl-row .items{gap:4px}
+  .hl-row .items span{font-size:.76rem;padding:2px 7px}
+
+  .hl-hours{grid-template-columns:repeat(3,1fr);gap:4px}
+  .hl-h{padding:6px 5px;font-size:.7rem}
+  .hl-h .t{font-size:.76rem}
+  .hl-h .s{font-size:.64rem}
+
+  .hl-pick{padding:12px 13px}
+  .hl-pick .row{gap:6px}
+  .hl-pick label{width:100%;margin-bottom:2px}
+  .hl-pick input[type=date]{flex:1 1 0;min-width:0}
+  .hl-pick #hlFind{flex:1 1 100%}
+  .hl-evts button{padding:4px 10px;font-size:.74rem}
+
+  .hl-ri{gap:6px;padding:7px 9px;align-items:baseline}
+  .hl-ri .d{width:auto;font-size:.78rem;flex-shrink:0}
+  .hl-ri .gz{width:auto;font-size:.72rem;flex-shrink:0}
+  .hl-ri .why{flex:1 1 0;min-width:0;font-size:.68rem;line-height:1.4;
+    overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .hl-ri .sc{flex-shrink:0;font-size:.66rem;padding:2px 6px}
+}
+@media(max-width:400px){
+  .hl-grid{grid-template-columns:1fr}
+  .hl-hours{grid-template-columns:repeat(2,1fr)}
+  .hl-date .big{font-size:1.12rem}
+}
 </style>
 
 <div class="hl">
@@ -138,8 +225,23 @@ body{background:var(--paper)}
     <input type="date" id="hlDate">
     <button id="hlNext">后一天 →</button>
     <button class="primary" id="hlToday">今天</button>
+    <button id="hlFav">收藏此日</button>
+    <button id="hlFavs">我的吉日</button>
+    <button id="hlShare">分享卡片</button>
     <span class="sp"></span>
     <span style="font-size:.76rem;color:var(--ink-4)" id="hlWeek"></span>
+  </div>
+
+  <div class="set-mask hide" id="caseMask">
+    <div class="set-panel" style="max-width:520px">
+      <div class="set-h"><h3>收藏的吉日</h3>
+        <button class="set-close" id="caseClose">×</button></div>
+      <div class="set-body" id="caseBody" style="padding:10px 16px 16px"></div>
+      <div class="set-f">
+        <button class="hp-btn ghost" id="caseClear" style="padding:7px 16px">清空全部</button>
+        <button class="hp-btn" id="caseDone" style="padding:7px 20px">关闭</button>
+      </div>
+    </div>
   </div>
 
   <div class="hl-main" id="hlMain"></div>
@@ -181,6 +283,8 @@ body{background:var(--paper)}
 <script src="/assets/js/bazi/lunar.js"></script>
 <script src="/assets/js/bazi/ganzhi.js"></script>
 <script src="/assets/js/bazi/shensha.js"></script>
+<script src="/assets/js/bazi/cases.js"></script>
+<script src="/assets/js/bazi/share.js"></script>
 <script src="/assets/js/bazi/huangli.js"></script>
 <script>
 (function () {
@@ -415,6 +519,90 @@ body{background:var(--paper)}
     var dt = el.getAttribute('data-date');
     if (dt) { $('hlDate').value = dt; render(); window.scrollTo({top:0,behavior:'smooth'}); }
   });
+
+  // ───────────── 收藏吉日 ─────────────
+  function esc(s) {
+    return String(s || '').replace(/[&<>"]/g, function (m) {
+      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[m];
+    });
+  }
+
+  function renderCases() {
+    var box = $('caseBody');
+    if (!box) return;
+    var list = bzCases.list('huangli');
+    if (!list.length) {
+      box.innerHTML = '<div class="case-empty">还没有收藏的吉日<br>' +
+        '在日历上选某天后点「收藏此日」</div>';
+      return;
+    }
+    list.sort(function (a, b) { return a.date < b.date ? -1 : 1; });
+    box.innerHTML = list.map(function (c) {
+      return '<div class="case-i" data-id="' + c.id + '">' +
+        '<span class="nm" title="点击跳转">' + esc(c.name) + '</span>' +
+        '<span class="sub">' + c.date + '</span>' +
+        '<button class="x" data-del="' + c.id + '" title="删除">×</button></div>';
+    }).join('') +
+    '<div class="case-tip">收藏只存在本机浏览器，不上传、不同步。' +
+    '清理浏览器数据会一并清除。</div>';
+  }
+
+  function openCases() { renderCases(); $('caseMask').classList.remove('hide'); }
+  function closeCases() { $('caseMask').classList.add('hide'); }
+
+  if ($('hlFav')) $('hlFav').onclick = function () {
+    var d = $('hlDate').value;
+    if (!d) return;
+    var dup = bzCases.exists({ kind: 'huangli', date: d, time: '00:00', sex: 1 });
+    if (dup) { alert('这天已经收藏过了'); return; }
+    var info = cur;
+    var nm = (info ? (info.pillars.day + ' ' + info.tianshen + '·' + info.zhixing + '日') : d);
+    var it = bzCases.add({
+      kind: 'huangli', name: d + ' ' + nm, date: d, time: '00:00', sex: 1,
+      note: info ? ('宜：' + info.yi.slice(0, 8).join('、')) : ''
+    });
+    if (!it) { alert('保存失败，浏览器存储可能已满'); return; }
+    var b = $('hlFav'), o = b.textContent;
+    b.textContent = '已收藏 ✓';
+    setTimeout(function () { b.textContent = o; }, 1400);
+  };
+
+  if ($('hlShare')) $('hlShare').onclick = function () {
+    if (!cur) { alert('请先选择日期'); return; }
+    try {
+      var v = $('hlDate').value.split('-');
+      var cv = bzShare.huangliCard(cur, {
+        lunarText: cur.lunarText,
+        pillars: cur.pillars.year + '年 ' + cur.pillars.month + '月 ' + cur.pillars.day + '日',
+        dateParts: { year: v[0], md: v[1] + '.' + v[2] }
+      });
+      bzShare.preview(cv, '黄历');
+    } catch (e) { alert('生成失败：' + e.message); }
+  };
+
+  if ($('hlFavs')) $('hlFavs').onclick = openCases;
+  if ($('caseClose')) $('caseClose').onclick = closeCases;
+  if ($('caseDone')) $('caseDone').onclick = closeCases;
+  if ($('caseMask')) $('caseMask').onclick = function (e) {
+    if (e.target === $('caseMask')) closeCases();
+  };
+  if ($('caseClear')) $('caseClear').onclick = function () {
+    if (!confirm('确定清空全部收藏？')) return;
+    bzCases.clear('huangli');
+    renderCases();
+  };
+  if ($('caseBody')) $('caseBody').onclick = function (e) {
+    var del = e.target.getAttribute && e.target.getAttribute('data-del');
+    if (del) { bzCases.remove(del); renderCases(); return; }
+    var nm = e.target.classList && e.target.classList.contains('nm') ? e.target : null;
+    if (!nm) return;
+    var c = bzCases.get(nm.parentNode.getAttribute('data-id'));
+    if (!c) return;
+    $('hlDate').value = c.date;
+    closeCases();
+    render();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
 
   // 事件绑定
   $('hlDate').onchange = render;
