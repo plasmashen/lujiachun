@@ -1,0 +1,317 @@
+---
+layout: default
+title: 大六壬
+description: 大六壬在线排盘 · 月将加时 · 天地盘 · 四课三传 · 十二天将 · 旬空。离线可用。
+permalink: /liuren/
+---
+
+<style>
+:root{
+  --paper:#f7f4ed; --paper-2:#fdfcf8;
+  --ink:#1c1a17; --ink-2:#544f47; --ink-3:#797367; --ink-4:#a39c8f;
+  --rule:#ded7c8; --rule-soft:#f0ece2;
+  --zhu:#a8352a; --qing:#3f5d52; --jin:#9a7b3f;
+  --serif:"Songti SC","STSong","SimSun","Source Han Serif SC","Noto Serif CJK SC",serif;
+  --sans:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Microsoft YaHei","Source Han Sans SC","Noto Sans CJK SC",sans-serif;
+}
+.lr-wrap{max-width:900px;margin:0 auto;padding:0 20px 70px;
+  font-family:var(--sans);color:var(--ink);background:var(--paper);
+  font-size:.9rem;line-height:1.75}
+.lr-wrap *{box-sizing:border-box}
+
+.lr-form{background:var(--paper-2);border:1px solid var(--rule);border-radius:10px;
+  padding:18px 20px;margin:22px 0 24px}
+.lr-row{display:flex;flex-wrap:wrap;gap:10px;align-items:flex-end;margin-bottom:10px}
+.lr-row:last-child{margin-bottom:0}
+.lr-f{display:flex;flex-direction:column;gap:4px}
+.lr-f label{font-size:.7rem;color:var(--ink-4);letter-spacing:.06em}
+.lr-f input{font-family:var(--sans);font-size:.86rem;padding:7px 10px;
+  border:1px solid var(--rule);border-radius:5px;background:#fff;color:var(--ink);outline:none}
+.lr-f input:focus{border-color:var(--zhu)}
+.lr-f.d input{width:145px}
+.lr-f.t input{width:100px}
+.lr-btn{font-family:var(--sans);font-size:.86rem;padding:8px 24px;border:none;
+  border-radius:5px;background:var(--zhu);color:#fff;cursor:pointer;letter-spacing:.04em}
+.lr-btn:hover{opacity:.88}
+.lr-btn.ghost{background:none;border:1px solid var(--rule);color:var(--ink-2)}
+.lr-btn.ghost:hover{border-color:var(--zhu);color:var(--zhu)}
+.lr-hint{font-size:.7rem;color:var(--ink-4);margin-top:9px;line-height:1.7}
+
+/* ── 摘要 ── */
+.lr-big{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));
+  gap:9px;margin-bottom:20px}
+.lr-big .b{background:var(--paper-2);border:1px solid var(--rule);border-radius:7px;
+  padding:11px 14px}
+.lr-big .b .k{font-size:.66rem;color:var(--ink-4);letter-spacing:.06em;margin-bottom:3px}
+.lr-big .b .v{font-family:var(--serif);font-size:.94rem;color:var(--ink)}
+.lr-big .b .v.small{font-size:.8rem}
+
+/* ── 四课 ── */
+.lr-lessons{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:16px 0 20px}
+.lr-les{background:var(--paper-2);border:1px solid var(--rule);border-radius:7px;
+  padding:11px 10px;text-align:center}
+.lr-les .n{font-size:.64rem;color:var(--ink-4);letter-spacing:.05em;margin-bottom:7px}
+.lr-les .up{font-family:var(--serif);font-size:1.3rem;color:var(--zhu);margin-bottom:3px}
+.lr-les .ln{font-family:var(--serif);font-size:1.05rem;color:var(--ink)}
+.lr-les .rel{font-size:.64rem;color:var(--ink-3);margin-top:5px}
+
+/* ── 三传 ── */
+.lr-chuan{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:14px 0 20px}
+.lr-ch{background:var(--paper-2);border:1px solid var(--rule);border-radius:8px;
+  padding:13px 12px;text-align:center}
+.lr-ch .n{font-size:.66rem;color:var(--ink-4);letter-spacing:.06em;margin-bottom:6px}
+.lr-ch .z{font-family:var(--serif);font-size:1.6rem;color:var(--ink);line-height:1.2}
+.lr-ch .wx{font-size:.7rem;color:var(--ink-3);margin-top:3px}
+.lr-ch .jt{font-size:.72rem;color:var(--zhu);margin-top:5px}
+
+/* ── 十二宫 ── */
+.lr-plate{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;margin:14px 0 20px}
+.lr-pl{background:var(--paper-2);border:1px solid var(--rule);border-radius:6px;
+  padding:9px 7px;text-align:center;position:relative}
+.lr-pl.hit{border-color:var(--zhu);background:#faf3ee}
+.lr-pl .e{font-size:.62rem;color:var(--ink-4)}
+.lr-pl .h{font-family:var(--serif);font-size:.98rem;color:var(--ink);margin:2px 0}
+.lr-pl .j{font-size:.64rem;color:var(--ink-3)}
+.lr-pl .mk{position:absolute;top:4px;right:5px;font-size:.56rem;color:var(--zhu)}
+.lr-pl .kg{position:absolute;top:4px;left:5px;font-size:.56rem;color:var(--ink-4)}
+
+/* ── 区块 ── */
+.lr-sec{margin:26px 0 0}
+.lr-sec-h{display:flex;align-items:baseline;gap:9px;margin-bottom:12px;
+  padding-bottom:7px;border-bottom:1px solid var(--rule)}
+.lr-sec-h .no{font-family:var(--serif);color:var(--zhu);font-size:.8rem;opacity:.75}
+.lr-sec-h h2{font-family:var(--serif);font-size:1.04rem;margin:0;
+  letter-spacing:.05em;font-weight:600}
+.lr-sec-h .note{font-size:.68rem;color:var(--ink-4);margin-left:auto}
+
+.lr-card{background:var(--paper-2);border:1px solid var(--rule);border-radius:8px;
+  padding:14px 17px;margin-bottom:10px}
+.lr-card .d{font-size:.82rem;color:var(--ink-2);line-height:1.85}
+.lr-card .d+.d{margin-top:7px}
+.lr-card b{color:var(--ink)}
+
+.lr-tb{width:100%;border-collapse:collapse;font-size:.78rem}
+.lr-tb th,.lr-tb td{padding:7px 9px;text-align:left;border-bottom:1px solid var(--rule-soft)}
+.lr-tb th{font-size:.68rem;color:var(--ink-4);font-weight:500;background:var(--rule-soft)}
+
+.lr-empty{text-align:center;padding:44px 20px;color:var(--ink-4);font-size:.85rem}
+
+@media screen and (max-width:700px){
+  .lr-wrap{padding:0 14px 50px}
+  .lr-f.d input{width:100%}
+  .lr-f.d{flex:1 1 100%}
+  .lr-btn{flex:1 1 auto}
+  .lr-lessons{grid-template-columns:repeat(2,1fr);gap:6px}
+  .lr-chuan{gap:6px}
+  .lr-ch .z{font-size:1.35rem}
+  .lr-plate{grid-template-columns:repeat(3,1fr);gap:5px}
+  .lr-big{grid-template-columns:repeat(2,1fr);gap:7px}
+}
+</style>
+
+<div class="lr-wrap">
+
+  <div class="lr-form">
+    <div class="lr-row">
+      <div class="lr-f d"><label>占问日期</label><input type="date" id="lrDate"></div>
+      <div class="lr-f t"><label>时间</label><input type="time" id="lrTime"></div>
+      <button class="lr-btn" id="lrGo">起课</button>
+      <button class="lr-btn ghost" id="lrNow">用现在</button>
+      <button class="lr-btn ghost" id="lrSave">保存</button>
+    </div>
+    <div class="lr-hint">
+      大六壬以「月将加时」起课：把太阳所在宫（月将）加在占时上，生成天盘，再看四课三传。
+      三传的取法有九宗门，本页实现贼克、比用、遥克三种最常用的。
+    </div>
+  </div>
+
+  <div id="lrOut"><div class="lr-empty">选好时间后点「起课」</div></div>
+</div>
+
+<script src="/assets/js/bazi/liuren.js"></script>
+<script src="/assets/js/bazi/cases.js"></script>
+<script src="/assets/js/bazi/qrcode.js"></script>
+<script src="/assets/js/bazi/share.js"></script>
+<script src="/assets/js/bazi/pwa.js"></script>
+<script>
+(function(){
+  'use strict';
+  var $ = function(id){ return document.getElementById(id); };
+  var _last = null, _meta = null;
+
+  function esc(s){
+    return String(s==null?'':s).replace(/[&<>"]/g, function(m){
+      return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m];
+    });
+  }
+
+  (function init(){
+    var d = new Date(), p = function(n){ return n<10?'0'+n:n; };
+    $('lrDate').value = d.getFullYear()+'-'+p(d.getMonth()+1)+'-'+p(d.getDate());
+    $('lrTime').value = p(d.getHours())+':'+p(d.getMinutes());
+  })();
+
+  function render(r){
+    var H = [];
+
+    // 摘要
+    H.push('<div class="lr-big">');
+    H.push('<div class="b"><div class="k">日干支</div><div class="v">'+
+      r.summary.day + '</div></div>');
+    H.push('<div class="b"><div class="k">月将</div><div class="v small">'+
+      r.general.name + '（' + r.general.zhi + '）</div></div>');
+    H.push('<div class="b"><div class="k">占时</div><div class="v">'+
+      r.summary.hour + '</div></div>');
+    H.push('<div class="b"><div class="k">取传法</div><div class="v small">'+
+      r.transmissions.method + '</div></div>');
+    H.push('<div class="b"><div class="k">旬空</div><div class="v">'+
+      r.kong.join('') + '</div></div>');
+    if (r.jiang) {
+      H.push('<div class="b"><div class="k">贵人</div><div class="v small">'+
+        r.jiang.guiZhi + '（' + (r.jiang.isDay?'昼':'夜') + '贵，' +
+        (r.jiang.forward?'顺':'逆') + '行）</div></div>');
+    }
+    H.push('</div>');
+
+    // 一、四课
+    H.push('<div class="lr-sec"><div class="lr-sec-h"><span class="no">壹</span>'+
+      '<h2>四课</h2><span class="note">自右向左：一二三四课</span></div>');
+    H.push('<div class="lr-lessons">');
+    // 显示顺序：四三二一（右起）
+    [3,2,1,0].forEach(function(idx){
+      var L = r.lessons[idx];
+      var a = r.transmissions.analysis[idx];
+      H.push('<div class="lr-les">'+
+        '<div class="n">'+L.name+'</div>'+
+        '<div class="up">'+L.upper+'</div>'+
+        '<div class="ln">'+L.lower+'</div>'+
+        '<div class="rel">'+(a?a.rel:'')+'</div>'+
+        '</div>');
+    });
+    H.push('</div>');
+    H.push('<div class="lr-card"><div class="d">'+
+      '四课看的是「日干与日支各自的上神」。'+
+      '第一课是日干阳神（你自己），第三课是日支（所问之事/对方）。'+
+      '上下之间的克应关系，决定了三传从哪里取。</div></div>');
+    H.push('</div>');
+
+    // 二、三传
+    H.push('<div class="lr-sec"><div class="lr-sec-h"><span class="no">贰</span>'+
+      '<h2>三传</h2><span class="note">'+r.transmissions.method+'</span></div>');
+    H.push('<div class="lr-chuan">');
+    r.transmissions.chuan.forEach(function(z, i){
+      var wx = bzLiuren.ZHI_WX[z];
+      var jt = r.jiang ? (r.jiang.jiangs[z] || '') : '';
+      H.push('<div class="lr-ch">'+
+        '<div class="n">'+r.transmissions.names[i]+'</div>'+
+        '<div class="z">'+z+'</div>'+
+        '<div class="wx">'+wx+'</div>'+
+        (jt ? '<div class="jt">'+jt+'</div>' : '')+
+        '</div>');
+    });
+    H.push('</div>');
+    H.push('<div class="lr-card"><div class="d">'+
+      '三传是这一课的核心：<b>初传</b>看事情的起因，<b>中传</b>看发展过程，'+
+      '<b>末传</b>看最终结果。三者连起来读，才是一条完整的事态线。</div></div>');
+
+    // 课体
+    var kt = bzLiuren.keTi(r);
+    if (kt.length) {
+      H.push('<div class="lr-card">');
+      kt.forEach(function(k){
+        H.push('<div class="d"><b>'+k.name+'</b>：'+k.desc+'</div>');
+      });
+      H.push('</div>');
+    }
+    H.push('</div>');
+
+    // 三、天地盘
+    H.push('<div class="lr-sec"><div class="lr-sec-h"><span class="no">叁</span>'+
+      '<h2>天地盘</h2><span class="note">地盘 → 天盘 / 天将</span></div>');
+    H.push('<div class="lr-plate">');
+    var chuanZhi = r.transmissions.chuan;
+    r.palaces.forEach(function(p){
+      var mk = '';
+      var ci = chuanZhi.indexOf(p.heaven);
+      if (ci === 0) mk = '初';
+      else if (ci === 1) mk = '中';
+      else if (ci === 2) mk = '末';
+      H.push('<div class="lr-pl'+(mk?' hit':'')+'">'+
+        (p.kong ? '<span class="kg">空</span>' : '')+
+        (mk ? '<span class="mk">'+mk+'</span>' : '')+
+        '<div class="e">'+p.zhi+'</div>'+
+        '<div class="h">'+p.heaven+'</div>'+
+        '<div class="j">'+p.jiang+'</div>'+
+        '</div>');
+    });
+    H.push('</div>');
+    H.push('</div>');
+
+    // 四、说明
+    H.push('<div class="lr-sec"><div class="lr-sec-h"><span class="no">肆</span>'+
+      '<h2>怎么读这一课</h2></div>');
+    H.push('<div class="lr-card"><div class="d">'+
+      '<b>先看日干与日支</b>：日干代表你，日支代表所问的事。'+
+      '两者在上神处的关系（生、克、合），是判断吉凶的起点。</div>'+
+      '<div class="d"><b>再看三传</b>：初传的六亲与旺衰定事情的起点，'+
+      '末传定结局。三传若空亡，事多虚浮；三传若一气，事情单一而集中。</div>'+
+      '<div class="d"><b>最后看天将</b>：贵人、青龙、太常、六合为吉将；'+
+      '白虎、玄武、螣蛇、勾陈为凶将。天将落在哪一宫，那个方向的事就带上这个色彩。</div>'+
+      '<div class="d" style="color:var(--ink-3)">'+
+      '大六壬的九宗门（贼克、比用、涉害、遥克、昴星、别责、八专、伏吟、返吟）'+
+      '是这套体系的技术核心。本页实现了前三种最常用的取传法，'+
+      '遇到需要涉害、昴星的情形会标注出来。</div>'+
+      '</div>');
+    H.push('</div>');
+
+    $('lrOut').innerHTML = H.join('');
+  }
+
+  function go(){
+    var dateStr = $('lrDate').value, timeStr = $('lrTime').value;
+    if (!dateStr || !timeStr) { alert('请填写日期时间'); return; }
+    var d = dateStr.split('-').map(Number);
+    var t = timeStr.split(':').map(Number);
+    var ms = Date.UTC(d[0], d[1]-1, d[2], t[0]-8, t[1], 0);
+    try {
+      var r = bzLiuren.paipan({ ms: ms });
+      _last = r; _meta = { date: dateStr, time: timeStr };
+      render(r);
+    } catch (e) {
+      $('lrOut').innerHTML = '<div class="lr-empty">起课失败：'+esc(e.message)+'</div>';
+    }
+  }
+
+  $('lrGo').onclick = go;
+
+  $('lrNow').onclick = function(){
+    var d = new Date(), p = function(n){ return n<10?'0'+n:n; };
+    $('lrDate').value = d.getFullYear()+'-'+p(d.getMonth()+1)+'-'+p(d.getDate());
+    $('lrTime').value = p(d.getHours())+':'+p(d.getMinutes());
+    go();
+  };
+
+  $('lrSave').onclick = function(){
+    if (!_last) { alert('请先起课'); return; }
+    var nm = prompt('起个名字（留空自动命名）：', '');
+    if (nm === null) return;
+    if (!nm) nm = _last.summary.day + '日 ' + _last.summary.hour + ' ' + _last.summary.chuan;
+    var it = bzCases.add({
+      kind: 'liuren', name: nm, date: _meta.date, time: _meta.time, sex: 1,
+      note: JSON.stringify({
+        day: _last.summary.day,
+        general: _last.general.name,
+        hour: _last.summary.hour,
+        chuan: _last.summary.chuan,
+        method: _last.summary.method
+      })
+    });
+    if (!it) { alert('保存失败'); return; }
+    var b = $('lrSave'), o = b.textContent;
+    b.textContent = '已保存 ✓';
+    setTimeout(function(){ b.textContent = o; }, 1400);
+  };
+
+  go();
+})();
+</script>

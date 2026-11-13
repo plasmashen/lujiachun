@@ -1,0 +1,315 @@
+---
+layout: default
+title: 奇门遁甲
+description: 时家奇门在线排盘 · 阴阳遁定局 · 天地盘 · 九星八门八神 · 格局判断。离线可用。
+permalink: /qimen/
+---
+
+<style>
+:root{
+  --paper:#f7f4ed; --paper-2:#fdfcf8;
+  --ink:#1c1a17; --ink-2:#544f47; --ink-3:#797367; --ink-4:#a39c8f;
+  --rule:#ded7c8; --rule-soft:#f0ece2;
+  --zhu:#a8352a; --qing:#3f5d52; --jin:#9a7b3f;
+  --serif:"Songti SC","STSong","SimSun","Source Han Serif SC","Noto Serif CJK SC",serif;
+  --sans:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Microsoft YaHei","Source Han Sans SC","Noto Sans CJK SC",sans-serif;
+}
+.qm-wrap{max-width:900px;margin:0 auto;padding:0 20px 70px;
+  font-family:var(--sans);color:var(--ink);background:var(--paper);
+  font-size:.9rem;line-height:1.75}
+.qm-wrap *{box-sizing:border-box}
+
+.qm-form{background:var(--paper-2);border:1px solid var(--rule);border-radius:10px;
+  padding:18px 20px;margin:22px 0 24px}
+.qm-row{display:flex;flex-wrap:wrap;gap:10px;align-items:flex-end;margin-bottom:10px}
+.qm-row:last-child{margin-bottom:0}
+.qm-f{display:flex;flex-direction:column;gap:4px}
+.qm-f label{font-size:.7rem;color:var(--ink-4);letter-spacing:.06em}
+.qm-f input,.qm-f select{font-family:var(--sans);font-size:.86rem;padding:7px 10px;
+  border:1px solid var(--rule);border-radius:5px;background:#fff;color:var(--ink);outline:none}
+.qm-f input:focus,.qm-f select:focus{border-color:var(--zhu)}
+.qm-f.d input{width:145px}
+.qm-f.t input{width:100px}
+.qm-btn{font-family:var(--sans);font-size:.86rem;padding:8px 24px;border:none;
+  border-radius:5px;background:var(--zhu);color:#fff;cursor:pointer;letter-spacing:.04em}
+.qm-btn:hover{opacity:.88}
+.qm-btn.ghost{background:none;border:1px solid var(--rule);color:var(--ink-2)}
+.qm-btn.ghost:hover{border-color:var(--zhu);color:var(--zhu)}
+.qm-hint{font-size:.7rem;color:var(--ink-4);margin-top:9px;line-height:1.7}
+
+/* ── 九宫格 ── */
+.qm-board{display:grid;grid-template-columns:repeat(3,1fr);gap:2px;
+  background:var(--rule);border:1px solid var(--rule);border-radius:8px;
+  overflow:hidden;margin:18px 0 20px}
+.qm-cell{background:var(--paper-2);padding:12px 10px;min-height:118px;
+  display:flex;flex-direction:column;position:relative}
+.qm-cell.hidden{background:var(--rule-soft);visibility:hidden}
+.qm-cell .hd{display:flex;justify-content:space-between;align-items:baseline;
+  margin-bottom:7px;font-size:.66rem;color:var(--ink-4)}
+.qm-cell .hd .p{font-family:var(--serif);font-size:.82rem;color:var(--ink-2)}
+.qm-cell .gods{font-size:.7rem;color:var(--zhu);margin-bottom:5px;letter-spacing:.04em}
+.qm-cell .star{font-family:var(--serif);font-size:.86rem;color:var(--ink);margin-bottom:3px}
+.qm-cell .door{font-family:var(--serif);font-size:.86rem;color:var(--qing);margin-bottom:5px}
+.qm-cell .gans{display:flex;gap:8px;font-size:.74rem;margin-top:auto;flex-wrap:wrap}
+.qm-cell .gans .e{color:var(--ink-3)}
+.qm-cell .gans .h{color:var(--zhu);font-weight:600}
+.qm-cell .mark{position:absolute;top:8px;right:8px;font-size:.6rem;
+  padding:0 4px;border-radius:2px;border:1px solid currentColor}
+.qm-cell .mark.fu{color:var(--zhu)}
+.qm-cell .mark.shi{color:var(--jin)}
+.qm-cell .mark.xun{color:var(--qing)}
+
+/* ── 摘要 ── */
+.qm-big{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));
+  gap:9px;margin-bottom:20px}
+.qm-big .b{background:var(--paper-2);border:1px solid var(--rule);border-radius:7px;
+  padding:11px 14px}
+.qm-big .b .k{font-size:.66rem;color:var(--ink-4);letter-spacing:.06em;margin-bottom:3px}
+.qm-big .b .v{font-family:var(--serif);font-size:.94rem;color:var(--ink)}
+
+/* ── 区块 ── */
+.qm-sec{margin:26px 0 0}
+.qm-sec-h{display:flex;align-items:baseline;gap:9px;margin-bottom:12px;
+  padding-bottom:7px;border-bottom:1px solid var(--rule)}
+.qm-sec-h .no{font-family:var(--serif);color:var(--zhu);font-size:.8rem;opacity:.75}
+.qm-sec-h h2{font-family:var(--serif);font-size:1.04rem;margin:0;
+  letter-spacing:.05em;font-weight:600}
+.qm-sec-h .note{font-size:.68rem;color:var(--ink-4);margin-left:auto}
+
+.qm-card{background:var(--paper-2);border:1px solid var(--rule);border-radius:8px;
+  padding:14px 17px;margin-bottom:10px}
+.qm-card .d{font-size:.82rem;color:var(--ink-2);line-height:1.85}
+.qm-card .d+.d{margin-top:7px}
+.qm-card b{color:var(--ink)}
+
+.qm-tb{width:100%;border-collapse:collapse;font-size:.78rem}
+.qm-tb th,.qm-tb td{padding:7px 9px;text-align:left;border-bottom:1px solid var(--rule-soft)}
+.qm-tb th{font-size:.68rem;color:var(--ink-4);font-weight:500;background:var(--rule-soft)}
+
+.qm-empty{text-align:center;padding:44px 20px;color:var(--ink-4);font-size:.85rem}
+
+@media screen and (max-width:700px){
+  .qm-wrap{padding:0 14px 50px}
+  .qm-f.d input{width:100%}
+  .qm-f.d{flex:1 1 100%}
+  .qm-btn{flex:1 1 auto}
+  .qm-board{gap:1px}
+  .qm-cell{padding:8px 6px;min-height:96px}
+  .qm-cell .hd{font-size:.58rem;margin-bottom:5px}
+  .qm-cell .hd .p{font-size:.7rem}
+  .qm-cell .star,.qm-cell .door{font-size:.72rem;margin-bottom:2px}
+  .qm-cell .gods{font-size:.62rem;margin-bottom:3px}
+  .qm-cell .gans{font-size:.66rem;gap:5px}
+  .qm-cell .mark{font-size:.54rem;top:5px;right:5px}
+  .qm-big{grid-template-columns:repeat(2,1fr);gap:7px}
+}
+</style>
+
+<div class="qm-wrap">
+
+  <div class="qm-form">
+    <div class="qm-row">
+      <div class="qm-f d"><label>起局日期</label><input type="date" id="qmDate"></div>
+      <div class="qm-f t"><label>时间</label><input type="time" id="qmTime"></div>
+      <button class="qm-btn" id="qmGo">起局</button>
+      <button class="qm-btn ghost" id="qmNow">用现在</button>
+      <button class="qm-btn ghost" id="qmSave">保存</button>
+    </div>
+    <div class="qm-hint">
+      时家奇门 · 转盘 · 拆补法。定局按「节气 + 上中下元」，每个时辰一局。
+      中五宫寄坤二宫，天禽星永远随天芮同行。
+    </div>
+  </div>
+
+  <div id="qmOut"><div class="qm-empty">选好时间后点「起局」</div></div>
+</div>
+
+<script src="/assets/js/bazi/qimen.js"></script>
+<script src="/assets/js/bazi/cases.js"></script>
+<script src="/assets/js/bazi/qrcode.js"></script>
+<script src="/assets/js/bazi/share.js"></script>
+<script src="/assets/js/bazi/pwa.js"></script>
+<script>
+(function(){
+  'use strict';
+  var $ = function(id){ return document.getElementById(id); };
+  var _last = null, _meta = null;
+
+  function esc(s){
+    return String(s==null?'':s).replace(/[&<>"]/g, function(m){
+      return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m];
+    });
+  }
+
+  (function init(){
+    var d = new Date(), p = function(n){ return n<10?'0'+n:n; };
+    $('qmDate').value = d.getFullYear()+'-'+p(d.getMonth()+1)+'-'+p(d.getDate());
+    $('qmTime').value = p(d.getHours())+':'+p(d.getMinutes());
+  })();
+
+  // 洛书九宫布局（4 9 2 / 3 5 7 / 8 1 6）
+  var LAYOUT = [4, 9, 2, 3, 5, 7, 8, 1, 6];
+
+  var LUCK_COLOR = {
+    '大吉': '#3f5d52', '吉': '#3f5d52', '平': '#9a7b3f', '凶': '#a8352a'
+  };
+
+  function render(r){
+    var H = [];
+
+    // 摘要
+    H.push('<div class="qm-big">');
+    H.push('<div class="b"><div class="k">局</div><div class="v">'+
+      r.ju.dun + r.ju.ju + '局</div></div>');
+    H.push('<div class="b"><div class="k">节气</div><div class="v">'+
+      r.ju.term + r.ju.yuan+'</div></div>');
+    H.push('<div class="b"><div class="k">四柱</div><div class="v" style="font-size:.82rem">'+
+      r.fourPillars.day + '日 ' + r.fourPillars.hour + '时</div></div>');
+    H.push('<div class="b"><div class="k">旬首</div><div class="v">'+
+      r.xun.name + '（' + r.xun.qi + '）</div></div>');
+    H.push('<div class="b"><div class="k">值符</div><div class="v">'+
+      r.zhifu.star + '</div></div>');
+    H.push('<div class="b"><div class="k">值使</div><div class="v">'+
+      r.zhishi.door + '</div></div>');
+    H.push('<div class="b"><div class="k">旬空</div><div class="v">'+
+      r.kong.join('') + '</div></div>');
+    H.push('<div class="b"><div class="k">马星</div><div class="v">'+
+      (r.ma||'—') + '</div></div>');
+    H.push('</div>');
+
+    // 一、九宫盘
+    H.push('<div class="qm-sec"><div class="qm-sec-h"><span class="no">壹</span>'+
+      '<h2>九宫盘</h2><span class="note">上南下北，左东右西</span></div>');
+    H.push('<div class="qm-board">');
+    LAYOUT.forEach(function(p){
+      var c = r.cells[p];
+      var marks = '';
+      if (c.isZhifu) marks += '<span class="mark fu">符</span>';
+      if (c.isZhishi) marks += '<span class="mark shi">使</span>';
+      if (c.isXunHead) marks += '<span class="mark xun">旬</span>';
+
+      H.push('<div class="qm-cell">');
+      H.push('<div class="hd"><span class="p">'+c.name+'</span><span>'+p+'</span></div>');
+      if (c.god) H.push('<div class="gods">'+c.god+'</div>');
+      if (c.star) H.push('<div class="star">'+c.star+'</div>');
+      if (c.door) H.push('<div class="door">'+c.door+'</div>');
+      H.push('<div class="gans">'+
+        (c.heavenGan ? '<span class="h">天 '+c.heavenGan+'</span>' : '')+
+        (c.earthGan ? '<span class="e">地 '+c.earthGan+'</span>' : '')+
+        '</div>');
+      H.push(marks);
+      H.push('</div>');
+    });
+    H.push('</div>');
+    H.push('</div>');
+
+    // 二、格局
+    var pats = bzQimen.findPatterns(r);
+    H.push('<div class="qm-sec"><div class="qm-sec-h"><span class="no">贰</span>'+
+      '<h2>格局</h2><span class="note">天盘干加地盘干</span></div>');
+    if (pats.length) {
+      pats.forEach(function(pt){
+        var col = LUCK_COLOR[pt.luck] || '#544f47';
+        H.push('<div class="qm-card"><div class="d">'+
+          '<b style="color:'+col+'">'+pt.name+'</b>'+
+          '（'+pt.palaceName+'宫，'+pt.luck+'）<br>'+
+          esc(pt.desc)+'</div></div>');
+      });
+    } else {
+      H.push('<div class="qm-card"><div class="d">'+
+        '本局没有触发常见的吉凶格（青龙返首、飞鸟跌穴、白虎猖狂等）。'+
+        '这不代表没事发生——多数时候格局判断要看所问何事、用神落在哪一宫。</div></div>');
+    }
+    H.push('</div>');
+
+    // 三、八门吉凶
+    H.push('<div class="qm-sec"><div class="qm-sec-h"><span class="no">叁</span>'+
+      '<h2>八门九星八神</h2><span class="note">按落宫排列</span></div>');
+    H.push('<table class="qm-tb"><thead><tr>'+
+      '<th>宫</th><th>门</th><th>吉凶</th><th>星</th><th>吉凶</th><th>神</th><th>吉凶</th>'+
+      '</tr></thead><tbody>');
+    [1,2,3,4,6,7,8,9].forEach(function(p){
+      var c = r.cells[p];
+      if (!c.door && !c.star) return;
+      var dl = bzQimen.DOOR_LUCK[c.door] || '';
+      var sl = bzQimen.STAR_LUCK[c.star] || '';
+      var gl = bzQimen.GOD_LUCK[c.god] || '';
+      function colored(t, l){
+        if (!t) return '—';
+        var col = LUCK_COLOR[l] || 'inherit';
+        return t + (l ? ' <span style="color:'+col+';font-size:.7rem">'+l+'</span>' : '');
+      }
+      H.push('<tr><td>'+c.name+c.palace+'</td>'+
+        '<td>'+colored(c.door, dl)+'</td><td></td>'+
+        '<td>'+colored(c.star, sl)+'</td><td></td>'+
+        '<td>'+colored(c.god, gl)+'</td><td></td></tr>');
+    });
+    H.push('</tbody></table>');
+    H.push('</div>');
+
+    // 四、说明
+    H.push('<div class="qm-sec"><div class="qm-sec-h"><span class="no">肆</span>'+
+      '<h2>怎么用这个盘</h2></div>');
+    H.push('<div class="qm-card"><div class="d">'+
+      '<b>先看值符值使</b>：值符是这一时辰的主宰星，值使是当令之门。'+
+      '值符所落之宫，往往是这件事的「主动方」。</div>'+
+      '<div class="d"><b>再看用神</b>：问不同的事取不同的用神——'+
+      '问财看生门与戊，问官看开门与庚，问文书看景门与丁，'+
+      '问人看日干所在的宫。</div>'+
+      '<div class="d"><b>最后看门星神的组合</b>：同一个宫里有门、有星、有神、有天地盘干，'+
+      '四者合看才准。吉门配凶星，未必吉；凶门配吉神，未必凶。</div>'+
+      '<div class="d" style="color:var(--ink-3)">'+
+      '奇门重「用神落宫」，不在于找一个笼统的吉凶。同一个局，问不同的事结论完全不同。</div>'+
+      '</div>');
+    H.push('</div>');
+
+    $('qmOut').innerHTML = H.join('');
+  }
+
+  function go(){
+    var dateStr = $('qmDate').value, timeStr = $('qmTime').value;
+    if (!dateStr || !timeStr) { alert('请填写日期时间'); return; }
+    var d = dateStr.split('-').map(Number);
+    var t = timeStr.split(':').map(Number);
+    var ms = Date.UTC(d[0], d[1]-1, d[2], t[0]-8, t[1], 0);
+    try {
+      var r = bzQimen.paipan({ ms: ms });
+      _last = r;
+      _meta = { date: dateStr, time: timeStr };
+      render(r);
+    } catch (e) {
+      $('qmOut').innerHTML = '<div class="qm-empty">起局失败：'+esc(e.message)+'</div>';
+    }
+  }
+
+  $('qmGo').onclick = go;
+
+  $('qmNow').onclick = function(){
+    var d = new Date(), p = function(n){ return n<10?'0'+n:n; };
+    $('qmDate').value = d.getFullYear()+'-'+p(d.getMonth()+1)+'-'+p(d.getDate());
+    $('qmTime').value = p(d.getHours())+':'+p(d.getMinutes());
+    go();
+  };
+
+  $('qmSave').onclick = function(){
+    if (!_last) { alert('请先起局'); return; }
+    var nm = prompt('起个名字（留空自动命名）：', '');
+    if (nm === null) return;
+    if (!nm) nm = _last.ju.dun + _last.ju.ju + '局 ' + _meta.date + ' ' + _meta.time;
+    var it = bzCases.add({
+      kind: 'qimen', name: nm, date: _meta.date, time: _meta.time, sex: 1,
+      note: JSON.stringify({
+        ju: _last.ju.dun + _last.ju.ju,
+        term: _last.ju.term + _last.ju.yuan,
+        zhifu: _last.zhifu.star, zhishi: _last.zhishi.door
+      })
+    });
+    if (!it) { alert('保存失败'); return; }
+    var b = $('qmSave'), o = b.textContent;
+    b.textContent = '已保存 ✓';
+    setTimeout(function(){ b.textContent = o; }, 1400);
+  };
+
+  go();
+})();
+</script>

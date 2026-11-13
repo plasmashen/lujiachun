@@ -1,0 +1,295 @@
+---
+layout: default
+title: 姓名学
+description: 五格剖象在线测算 · 康熙笔画 · 三才配置 · 81 数理 · 三运。离线可用。
+permalink: /xingming/
+---
+
+<style>
+:root{
+  --paper:#f7f4ed; --paper-2:#fdfcf8;
+  --ink:#1c1a17; --ink-2:#544f47; --ink-3:#797367; --ink-4:#a39c8f;
+  --rule:#ded7c8; --rule-soft:#f0ece2;
+  --zhu:#a8352a; --qing:#3f5d52; --jin:#9a7b3f;
+  --serif:"Songti SC","STSong","SimSun","Source Han Serif SC","Noto Serif CJK SC",serif;
+  --sans:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Microsoft YaHei","Source Han Sans SC","Noto Sans CJK SC",sans-serif;
+}
+.xm-wrap{max-width:880px;margin:0 auto;padding:0 20px 70px;
+  font-family:var(--sans);color:var(--ink);background:var(--paper);
+  font-size:.9rem;line-height:1.75}
+.xm-wrap *{box-sizing:border-box}
+
+.xm-form{background:var(--paper-2);border:1px solid var(--rule);border-radius:10px;
+  padding:18px 20px;margin:22px 0 24px}
+.xm-row{display:flex;flex-wrap:wrap;gap:10px;align-items:flex-end;margin-bottom:10px}
+.xm-row:last-child{margin-bottom:0}
+.xm-f{display:flex;flex-direction:column;gap:4px}
+.xm-f label{font-size:.7rem;color:var(--ink-4);letter-spacing:.06em}
+.xm-f input{font-family:var(--sans);font-size:.92rem;padding:8px 11px;
+  border:1px solid var(--rule);border-radius:5px;background:#fff;color:var(--ink);outline:none}
+.xm-f input:focus{border-color:var(--zhu)}
+.xm-f.n input{width:200px;font-family:var(--serif)}
+.xm-btn{font-family:var(--sans);font-size:.86rem;padding:8px 24px;border:none;
+  border-radius:5px;background:var(--zhu);color:#fff;cursor:pointer;letter-spacing:.04em}
+.xm-btn:hover{opacity:.88}
+.xm-btn.ghost{background:none;border:1px solid var(--rule);color:var(--ink-2)}
+.xm-btn.ghost:hover{border-color:var(--zhu);color:var(--zhu)}
+.xm-hint{font-size:.7rem;color:var(--ink-4);margin-top:9px;line-height:1.7}
+
+/* ── 五格 ── */
+.xm-wuge{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin:16px 0 20px}
+.xm-g{background:var(--paper-2);border:1px solid var(--rule);border-radius:8px;
+  padding:13px 10px;text-align:center;position:relative}
+.xm-g.main{border-color:var(--zhu);background:#faf3ee}
+.xm-g .role{font-size:.62rem;color:var(--ink-4);letter-spacing:.05em}
+.xm-g .nm{font-family:var(--serif);font-size:.78rem;color:var(--ink-2);margin:2px 0 6px}
+.xm-g .n{font-family:var(--serif);font-size:1.7rem;color:var(--ink);line-height:1.1}
+.xm-g .wx{font-size:.66rem;color:var(--ink-3);margin-top:2px}
+.xm-g .lv{display:inline-block;margin-top:6px;font-size:.66rem;
+  padding:1px 7px;border-radius:2px;border:1px solid currentColor}
+.lv-大吉{color:#8a2020}
+.lv-吉{color:var(--qing)}
+.lv-半吉{color:var(--jin)}
+.lv-凶{color:#8a5a20}
+.lv-大凶{color:#5a4a44}
+.xm-g .poem{font-size:.62rem;color:var(--ink-4);margin-top:5px;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+/* ── 三才 ── */
+.xm-sancai{background:var(--paper-2);border:1px solid var(--rule);border-radius:8px;
+  padding:14px 17px;margin-bottom:12px;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.xm-sancai .combo{font-family:var(--serif);font-size:1.4rem;letter-spacing:.1em;color:var(--ink)}
+.xm-sancai .arrow{color:var(--ink-4);font-size:.8rem}
+.xm-sancai .lv{font-size:.78rem;padding:2px 9px;border-radius:2px;border:1px solid currentColor}
+
+/* ── 区块 ── */
+.xm-sec{margin:26px 0 0}
+.xm-sec-h{display:flex;align-items:baseline;gap:9px;margin-bottom:12px;
+  padding-bottom:7px;border-bottom:1px solid var(--rule)}
+.xm-sec-h .no{font-family:var(--serif);color:var(--zhu);font-size:.8rem;opacity:.75}
+.xm-sec-h h2{font-family:var(--serif);font-size:1.04rem;margin:0;
+  letter-spacing:.05em;font-weight:600}
+.xm-sec-h .note{font-size:.68rem;color:var(--ink-4);margin-left:auto}
+
+.xm-card{background:var(--paper-2);border:1px solid var(--rule);border-radius:8px;
+  padding:14px 17px;margin-bottom:10px}
+.xm-card .d{font-size:.82rem;color:var(--ink-2);line-height:1.85}
+.xm-card .d+.d{margin-top:8px}
+.xm-card b{color:var(--ink)}
+
+.xm-tb{width:100%;border-collapse:collapse;font-size:.78rem}
+.xm-tb th,.xm-tb td{padding:8px 9px;text-align:left;border-bottom:1px solid var(--rule-soft);
+  vertical-align:top}
+.xm-tb th{font-size:.68rem;color:var(--ink-4);font-weight:500;background:var(--rule-soft)}
+
+.xm-empty{text-align:center;padding:44px 20px;color:var(--ink-4);font-size:.85rem}
+.xm-err{background:#faf6ee;border:1px solid #e2cfc5;border-radius:8px;
+  padding:16px 18px;font-size:.84rem;color:var(--ink-2)}
+
+@media screen and (max-width:700px){
+  .xm-wrap{padding:0 14px 50px}
+  .xm-f.n input{width:100%}
+  .xm-f.n{flex:1 1 100%}
+  .xm-btn{flex:1 1 auto}
+  .xm-wuge{grid-template-columns:repeat(3,1fr);gap:6px}
+  .xm-g{padding:10px 6px}
+  .xm-g .n{font-size:1.35rem}
+  .xm-g .poem{display:none}
+  .xm-sancai{gap:8px;padding:11px 13px}
+  .xm-sancai .combo{font-size:1.15rem}
+}
+</style>
+
+<div class="xm-wrap">
+
+  <div class="xm-form">
+    <div class="xm-row">
+      <div class="xm-f n"><label>姓名（简体或繁体均可）</label>
+        <input type="text" id="xmName" placeholder="例：李伟强" maxlength="12"></div>
+      <button class="xm-btn" id="xmGo">测算</button>
+      <button class="xm-btn ghost" id="xmSave">保存</button>
+    </div>
+    <div class="xm-hint">
+      五格剖象法（熊崎健翁，1928）。笔画用<b>康熙口径</b>——万 15 画、学 16 画、华 14 画，不是简体笔画。
+      三才与三运均<b>查表</b>，不按五行生克推导。
+    </div>
+  </div>
+
+  <div id="xmOut"><div class="xm-empty">输入姓名后点「测算」</div></div>
+</div>
+
+<script src="/assets/js/bazi/kangxi.js"></script>
+<script src="/assets/js/bazi/sancai125.js"></script>
+<script src="/assets/js/bazi/yunshi75.js"></script>
+<script src="/assets/js/bazi/shuli81.js"></script>
+<script src="/assets/js/bazi/xingming.js"></script>
+<script src="/assets/js/bazi/cases.js"></script>
+<script src="/assets/js/bazi/qrcode.js"></script>
+<script src="/assets/js/bazi/share.js"></script>
+<script src="/assets/js/bazi/pwa.js"></script>
+<script>
+(function(){
+  'use strict';
+  var $ = function(id){ return document.getElementById(id); };
+  var _last = null;
+
+  function esc(s){
+    return String(s==null?'':s).replace(/[&<>"]/g, function(m){
+      return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m];
+    });
+  }
+
+  function lvCls(lv){ return 'lv-' + lv; }
+
+  function render(r){
+    var H = [];
+
+    // 五格
+    H.push('<div class="xm-wuge">');
+    ['tian','ren','di','wai','zong'].forEach(function(k){
+      var g = r.ge[k];
+      H.push('<div class="xm-g'+(k==='ren'?' main':'')+'">'+
+        '<div class="role">'+g.role+'</div>'+
+        '<div class="nm">'+g.name+'</div>'+
+        '<div class="n">'+g.n+'</div>'+
+        '<div class="wx">'+g.wx+'</div>'+
+        '<div class="lv '+lvCls(g.level)+'">'+g.level+'</div>'+
+        (g.poem ? '<div class="poem">'+esc(g.poem)+'</div>' : '')+
+        '</div>');
+    });
+    H.push('</div>');
+
+    // 笔画明细
+    H.push('<div class="xm-card"><div class="d" style="font-size:.76rem;color:var(--ink-3)">'+
+      '笔画：' + r.chars.map(function(c,i){
+        return c + ' ' + (r.nums.xing[i] || r.nums.ming[i-r.nums.xing.length]) + '画';
+      }).join('　') +
+      (r.isFu ? '　（复姓）' : '') +
+      '</div></div>');
+
+    // 三才
+    H.push('<div class="xm-sancai">'+
+      '<span style="font-size:.72rem;color:var(--ink-4)">三才</span>'+
+      '<span class="combo">'+r.sancai.combo+'</span>'+
+      '<span class="arrow">天→人 '+r.sancai.tian_ren+' ／ 人→地 '+r.sancai.ren_di+'</span>'+
+      '<span class="lv '+lvCls(r.sancai.level)+'">'+r.sancai.level+'</span>'+
+      '</div>');
+    if (r.sancai.text) {
+      H.push('<div class="xm-card"><div class="d">'+esc(r.sancai.text)+'</div></div>');
+    }
+
+    // 一、五格详解
+    H.push('<div class="xm-sec"><div class="xm-sec-h"><span class="no">壹</span>'+
+      '<h2>五格详解</h2><span class="note">康熙笔画 · 81 数理</span></div>');
+    ['ren','di','zong','wai','tian'].forEach(function(k){
+      var g = r.ge[k];
+      H.push('<div class="xm-card">'+
+        '<div class="d"><b>'+g.name+' '+g.n+'（'+g.wx+'）· '+g.level+'</b>'+
+        (g.poem ? '　「'+esc(g.poem)+'」' : '')+'</div>'+
+        (g.text ? '<div class="d">'+esc(g.text)+'</div>' : '')+
+        (g.keywords ? '<div class="d" style="color:var(--ink-4);font-size:.74rem">'+
+          esc(g.keywords)+'</div>' : '')+
+        '<div class="d" style="color:var(--ink-3);font-size:.75rem">'+esc(g.note)+'</div>'+
+        '</div>');
+    });
+    H.push('</div>');
+
+    // 二、三运
+    H.push('<div class="xm-sec"><div class="xm-sec-h"><span class="no">贰</span>'+
+      '<h2>三运</h2><span class="note">人格为主，分别对地/天/外</span></div>');
+    r.yunshi.forEach(function(t){
+      H.push('<div class="xm-card">'+
+        '<div class="d"><b>'+t.name+'</b>　'+t.combo+'（'+t.relation+'）· '+
+        '<span class="'+lvCls(t.level)+'">'+t.level+'</span></div>'+
+        (t.text ? '<div class="d">'+esc(t.text)+'</div>' : '')+
+        '<div class="d" style="color:var(--ink-3);font-size:.75rem">'+esc(t.basis)+'</div>'+
+        '</div>');
+    });
+    H.push('</div>');
+
+    // 三、五格总览表
+    H.push('<div class="xm-sec"><div class="xm-sec-h"><span class="no">叁</span>'+
+      '<h2>五格总览</h2></div>');
+    H.push('<table class="xm-tb"><thead><tr>'+
+      '<th>格</th><th>数</th><th>五行</th><th>吉凶</th><th>数理</th>'+
+      '</tr></thead><tbody>');
+    ['tian','ren','di','wai','zong'].forEach(function(k){
+      var g=r.ge[k];
+      H.push('<tr><td>'+g.name+'<br><span style="font-size:.66rem;color:var(--ink-4)">'+
+        g.role+'</span></td>'+
+        '<td>'+g.n+'</td><td>'+g.wx+'</td>'+
+        '<td class="'+lvCls(g.level)+'">'+g.level+'</td>'+
+        '<td style="font-size:.74rem">'+esc(g.text||'')+'</td></tr>');
+    });
+    H.push('</tbody></table>');
+    H.push('</div>');
+
+    // 四、方法与局限
+    H.push('<div class="xm-sec"><div class="xm-sec-h"><span class="no">肆</span>'+
+      '<h2>这套算法怎么来的</h2></div>');
+    H.push('<div class="xm-card">'+
+      '<div class="d"><b>五格</b>：熊崎健翁 1928 年提出，把姓名按笔画分为天、人、地、外、总五格。'+
+      '人格为主运，最重要；天格由姓氏决定，一般不论吉凶。</div>'+
+      '<div class="d"><b>笔画</b>：必须用康熙笔画。日文的「旧字体・康熙字典系」笔画与现代简体笔画差别很大——'+
+      '万 15 画（简体 3）、学 16 画（简体 8）、华 14 画（简体 6）。用错口径整盘全错。</div>'+
+      '<div class="d"><b>三才</b>：天人地三格的五行组合，共 125 种。吉凶<b>查表</b>，不按生克推导。'+
+      '木金水按生克算是一克一生（半吉），但各家一致判大凶——这是几百年积累的判断，不是规则。</div>'+
+      '<div class="d"><b>三运</b>：75 条表。同为「比和」，木木判吉、金金判凶，'+
+      '同一个关系落在不同五行上结果不同，所以也只能查表。</div>'+
+      '<div class="d" style="color:var(--ink-3)">'+
+      '五格剖象法在学界有争议：它把汉字简化为笔画数字，忽略了字义、字音与整体结构。'+
+      '本页给出的是这套体系的完整计算结果，是否认同它的判断，另当别论。</div>'+
+      '</div>');
+    H.push('</div>');
+
+    $('xmOut').innerHTML = H.join('');
+  }
+
+  function go(){
+    var nm = ($('xmName').value || '').trim();
+    if (!nm) { alert('请输入姓名'); return; }
+    if (!bzXingming.ready()) { alert('数据未加载完成，请刷新'); return; }
+    var r = bzXingming.paipan(nm);
+    if (!r) {
+      $('xmOut').innerHTML = '<div class="xm-empty">姓名至少需要两个字</div>';
+      return;
+    }
+    if (r.error === 'unknown') {
+      $('xmOut').innerHTML = '<div class="xm-err">' +
+        '以下字不在康熙笔画表中，无法计算：<b>' + esc(r.unknown.join('、')) + '</b><br>' +
+        '笔画表收录 15,353 字（含简繁），生僻字与异体字可能缺失。' +
+        '试试换成常用写法，或用繁体输入。</div>';
+      return;
+    }
+    _last = r;
+    render(r);
+  }
+
+  $('xmGo').onclick = go;
+
+  $('xmName').addEventListener('keydown', function(e){
+    if (e.key === 'Enter') go();
+  });
+
+  $('xmSave').onclick = function(){
+    if (!_last) { alert('请先测算'); return; }
+    var it = bzCases.add({
+      kind: 'xingming', name: _last.name,
+      date: new Date().toISOString().slice(0,10), time: '', sex: 1,
+      note: JSON.stringify({
+        wuge: _last.raw,
+        sancai: _last.sancai.combo,
+        sancaiLevel: _last.sancai.level
+      })
+    });
+    if (!it) { alert('保存失败'); return; }
+    var b = $('xmSave'), o = b.textContent;
+    b.textContent = '已保存 ✓';
+    setTimeout(function(){ b.textContent = o; }, 1400);
+  };
+
+  // 默认示例
+  $('xmName').value = '李伟强';
+  go();
+})();
+</script>

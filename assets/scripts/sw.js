@@ -33,7 +33,11 @@ const OFFLINE_PAGE = '/offline/';
 const CORE_PAGES = [
   {%- for p in site.pages -%}
     {%- if p.url == '/bazi/' or p.url == '/ziwei/' or p.url == '/huangli/'
-        or p.url == '/hepan/' or p.url == '/books/' or p.url == '/offline/' or p.url == '/' -%}
+        or p.url == '/hepan/' or p.url == '/astro/' or p.url == '/divination/'
+        or p.url == '/liuyao/' or p.url == '/meihua/' or p.url == '/horary/'
+        or p.url == '/tarot/' or p.url == '/numerology/' or p.url == '/xingming/'
+        or p.url == '/qimen/' or p.url == '/liuren/' or p.url == '/qizheng/'
+        or p.url == '/books/' or p.url == '/offline/' or p.url == '/' -%}
       "{{ p.url | relative_url }}",
     {%- endif -%}
   {%- endfor -%}

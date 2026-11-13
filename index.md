@@ -177,7 +177,7 @@ section.bz-hub {
   </div>
   <p class="bz-hub-sub">
     六套排盘工具共用同一套历法内核 —— 同一时刻、同一地点算出来的结果不会互相打架。
-    再加六种占卜体系，全部断网可用，可装到手机桌面。
+    再加九种占卜体系，含奇门遁甲、大六壬、七政四余三式，全部断网可用，可装到手机桌面。
   </p>
 
   <div class="bz-hub-grid">
@@ -220,8 +220,8 @@ section.bz-hub {
     <a class="bz-card" href="/divination/">
       <span class="glyph">卜</span>
       <span class="name">占卜</span>
-      <span class="desc">六爻 · 梅花易数 · 塔罗 · 卜卦择时 · 数字命理 · 姓名五格</span>
-      <span class="meta"><span>6 种体系<b>全部离线</b></span></span>
+      <span class="desc">六爻 · 梅花 · 奇门 · 六壬 · 七政四余 · 塔罗 · 卜卦 · 数字 · 姓名</span>
+      <span class="meta"><span>9 种体系<b>全部离线</b></span></span>
     </a>
 
     <a class="bz-card" href="/books/">

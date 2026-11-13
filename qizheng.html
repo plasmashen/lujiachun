@@ -1,0 +1,338 @@
+---
+layout: default
+title: 七政四余
+description: 七政四余在线排盘 · 十一曜 · 二十八宿入度 · 十二宫 · 四余虚星 · 果老星宗。离线可用。
+permalink: /qizheng/
+---
+
+<style>
+:root{
+  --paper:#f7f4ed; --paper-2:#fdfcf8;
+  --ink:#1c1a17; --ink-2:#544f47; --ink-3:#797367; --ink-4:#a39c8f;
+  --rule:#ded7c8; --rule-soft:#f0ece2;
+  --zhu:#a8352a; --qing:#3f5d52; --jin:#9a7b3f;
+  --serif:"Songti SC","STSong","SimSun","Source Han Serif SC","Noto Serif CJK SC",serif;
+  --sans:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Microsoft YaHei","Source Han Sans SC","Noto Sans CJK SC",sans-serif;
+}
+.qz-wrap{max-width:920px;margin:0 auto;padding:0 20px 70px;
+  font-family:var(--sans);color:var(--ink);background:var(--paper);
+  font-size:.9rem;line-height:1.75}
+.qz-wrap *{box-sizing:border-box}
+
+.qz-form{background:var(--paper-2);border:1px solid var(--rule);border-radius:10px;
+  padding:18px 20px;margin:22px 0 24px}
+.qz-row{display:flex;flex-wrap:wrap;gap:10px;align-items:flex-end;margin-bottom:10px}
+.qz-row:last-child{margin-bottom:0}
+.qz-f{display:flex;flex-direction:column;gap:4px}
+.qz-f label{font-size:.7rem;color:var(--ink-4);letter-spacing:.06em}
+.qz-f input,.qz-f select{font-family:var(--sans);font-size:.86rem;padding:7px 10px;
+  border:1px solid var(--rule);border-radius:5px;background:#fff;color:var(--ink);outline:none}
+.qz-f input:focus{border-color:var(--zhu)}
+.qz-f.d input{width:145px}
+.qz-f.t input{width:100px}
+.qz-f.n input{width:88px}
+.qz-btn{font-family:var(--sans);font-size:.86rem;padding:8px 24px;border:none;
+  border-radius:5px;background:var(--zhu);color:#fff;cursor:pointer;letter-spacing:.04em}
+.qz-btn:hover{opacity:.88}
+.qz-btn.ghost{background:none;border:1px solid var(--rule);color:var(--ink-2)}
+.qz-btn.ghost:hover{border-color:var(--zhu);color:var(--zhu)}
+.qz-hint{font-size:.7rem;color:var(--ink-4);margin-top:9px;line-height:1.7}
+
+/* ── 摘要 ── */
+.qz-big{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));
+  gap:9px;margin-bottom:20px}
+.qz-big .b{background:var(--paper-2);border:1px solid var(--rule);border-radius:7px;
+  padding:11px 14px}
+.qz-big .b .k{font-size:.66rem;color:var(--ink-4);letter-spacing:.06em;margin-bottom:3px}
+.qz-big .b .v{font-family:var(--serif);font-size:.94rem;color:var(--ink)}
+.qz-big .b .v.small{font-size:.78rem}
+
+/* ── 十曜表 ── */
+.qz-list{display:grid;gap:7px;margin:14px 0 20px}
+.qz-item{display:grid;grid-template-columns:44px 1fr auto auto auto;
+  gap:10px;align-items:center;background:var(--paper-2);
+  border:1px solid var(--rule);border-radius:6px;padding:9px 13px;font-size:.79rem}
+.qz-item.siyu{background:#faf7f2;border-style:dashed}
+.qz-item .nm{font-family:var(--serif);font-size:.92rem;color:var(--ink)}
+.qz-item .nm .badge{font-size:.6rem;color:var(--jin);margin-left:4px;
+  border:1px solid currentColor;border-radius:2px;padding:0 3px}
+.qz-item .sign{color:var(--ink-2);font-family:var(--serif)}
+.qz-item .deg{color:var(--ink-3);font-size:.72rem;font-variant-numeric:tabular-nums}
+.qz-item .xiu{color:var(--qing);font-size:.74rem}
+.qz-item .dig{font-size:.66rem;padding:1px 5px;border-radius:2px;border:1px solid currentColor}
+.qz-item .dig.miao{color:var(--qing)}
+.qz-item .dig.wang{color:var(--jin)}
+.qz-item .dig.xian{color:var(--zhu)}
+
+/* ── 宿界条 ── */
+.qz-xiu-bar{display:flex;height:26px;border-radius:4px;overflow:hidden;
+  border:1px solid var(--rule);margin:12px 0 8px;font-size:.55rem}
+.qz-xiu-bar .s{display:flex;align-items:center;justify-content:center;
+  color:#fff;overflow:hidden;white-space:nowrap}
+
+/* ── 区块 ── */
+.qz-sec{margin:26px 0 0}
+.qz-sec-h{display:flex;align-items:baseline;gap:9px;margin-bottom:12px;
+  padding-bottom:7px;border-bottom:1px solid var(--rule)}
+.qz-sec-h .no{font-family:var(--serif);color:var(--zhu);font-size:.8rem;opacity:.75}
+.qz-sec-h h2{font-family:var(--serif);font-size:1.04rem;margin:0;
+  letter-spacing:.05em;font-weight:600}
+.qz-sec-h .note{font-size:.68rem;color:var(--ink-4);margin-left:auto}
+
+.qz-card{background:var(--paper-2);border:1px solid var(--rule);border-radius:8px;
+  padding:14px 17px;margin-bottom:10px}
+.qz-card .d{font-size:.82rem;color:var(--ink-2);line-height:1.85}
+.qz-card .d+.d{margin-top:7px}
+.qz-card b{color:var(--ink)}
+.qz-card.warn{border-color:#e2cfc5;background:#faf6ee}
+
+.qz-tb{width:100%;border-collapse:collapse;font-size:.76rem}
+.qz-tb th,.qz-tb td{padding:6px 8px;text-align:left;border-bottom:1px solid var(--rule-soft)}
+.qz-tb th{font-size:.66rem;color:var(--ink-4);font-weight:500;background:var(--rule-soft)}
+
+.qz-empty{text-align:center;padding:44px 20px;color:var(--ink-4);font-size:.85rem}
+
+@media screen and (max-width:700px){
+  .qz-wrap{padding:0 14px 50px}
+  .qz-f.d input{width:100%}
+  .qz-f.d{flex:1 1 100%}
+  .qz-f.n{flex:1 1 28%}
+  .qz-f.n input{width:100%}
+  .qz-btn{flex:1 1 auto}
+  .qz-item{grid-template-columns:38px 1fr auto;gap:7px;padding:8px 10px;font-size:.74rem}
+  .qz-item .deg,.qz-item .dig{display:none}
+  .qz-big{grid-template-columns:repeat(2,1fr);gap:7px}
+  .qz-xiu-bar{height:20px;font-size:.48rem}
+}
+</style>
+
+<div class="qz-wrap">
+
+  <div class="qz-form">
+    <div class="qz-row">
+      <div class="qz-f d"><label>出生日期</label><input type="date" id="qzDate" value="1990-05-15"></div>
+      <div class="qz-f t"><label>时间</label><input type="time" id="qzTime" value="10:30"></div>
+      <div class="qz-f n"><label>纬度</label><input type="number" id="qzLat" value="39.90" step="0.01"></div>
+      <div class="qz-f n"><label>经度</label><input type="number" id="qzLon" value="116.40" step="0.01"></div>
+      <button class="qz-btn" id="qzGo">起盘</button>
+      <button class="qz-btn ghost" id="qzSave">保存</button>
+    </div>
+    <div class="qz-hint">
+      七政四余（果老星宗）。十一曜 = 七政（日月水金火木土）+ 四余（紫气、月孛、罗睺、计都）。
+      <b>宫位用回归黄道，入宿用恒星黄道</b> —— 这是本盘最容易错的地方。
+    </div>
+  </div>
+
+  <div id="qzOut"><div class="qz-empty">填好后点「起盘」</div></div>
+</div>
+
+<script src="/assets/js/bazi/astronomy.min.js"></script>
+<script src="/assets/js/bazi/qizheng.js"></script>
+<script src="/assets/js/bazi/cases.js"></script>
+<script src="/assets/js/bazi/qrcode.js"></script>
+<script src="/assets/js/bazi/share.js"></script>
+<script src="/assets/js/bazi/pwa.js"></script>
+<script>
+(function(){
+  'use strict';
+  var $ = function(id){ return document.getElementById(id); };
+  var _last = null, _meta = null;
+
+  function esc(s){
+    return String(s==null?'':s).replace(/[&<>"]/g, function(m){
+      return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m];
+    });
+  }
+
+  // 四象配色
+  var GROUP_COLOR = {
+    '东方青龙': '#3f5d52', '南方朱雀': '#a8352a',
+    '西方白虎': '#8a7440', '北方玄武': '#3f5d74'
+  };
+
+  function render(r){
+    var H = [];
+
+    // 摘要
+    H.push('<div class="qz-big">');
+    H.push('<div class="b"><div class="k">命宫</div><div class="v">'+
+      r.ming.sign.name + '宫（' + r.ming.sign.west + '）</div></div>');
+    H.push('<div class="b"><div class="k">身宫</div><div class="v">'+
+      r.shen.sign.name + '宫（' + r.shen.sign.west + '）</div></div>');
+    H.push('<div class="b"><div class="k">岁差</div><div class="v small">'+
+      r.ayanamsa.toFixed(2) + '°</div></div>');
+    H.push('<div class="b"><div class="k">十一曜</div><div class="v small">'+
+      r.bodies.length + ' 曜</div></div>');
+    H.push('</div>');
+
+    // 一、十一曜
+    H.push('<div class="qz-sec"><div class="qz-sec-h"><span class="no">壹</span>'+
+      '<h2>十一曜</h2><span class="note">七政 + 四余</span></div>');
+    H.push('<div class="qz-list">');
+    r.bodies.forEach(function(b){
+      var dig = bzQizheng.dignity(b);
+      var digCls = dig === '庙' ? 'miao' : dig === '旺' ? 'wang' : dig === '陷' ? 'xian' : '';
+      H.push('<div class="qz-item'+(b.kind==='siyu'?' siyu':'')+'">'+
+        '<span class="nm">'+b.zh+(b.kind==='siyu'?'<span class="badge">余</span>':'')+'</span>'+
+        '<span class="sign">'+b.sign.sign.name+'宫</span>'+
+        '<span class="deg">'+b.sign.deg.toFixed(1)+'°</span>'+
+        '<span class="xiu">'+b.xiu.name+'宿'+b.xiu.ruDu.toFixed(1)+'度</span>'+
+        (dig ? '<span class="dig '+digCls+'">'+dig+'</span>' : '<span></span>')+
+        '</div>');
+    });
+    H.push('</div>');
+    H.push('<div class="qz-card"><div class="d">'+
+      '七政是实体天体，四余是「虚星」——它们不是能看见的星，'+
+      '而是月亮轨道上的几个关键点（交点、远地点）与一个按周期推算的紫气。'+
+      '虚线框标出的就是四余。</div></div>');
+    H.push('</div>');
+
+    // 二、入宿
+    H.push('<div class="qz-sec"><div class="qz-sec-h"><span class="no">贰</span>'+
+      '<h2>二十八宿入度</h2><span class="note">宿界整体平移 180°（角宿起点 = 角宿一）</span></div>');
+    // 宿界条
+    H.push('<div class="qz-xiu-bar">');
+    var bounds = bzQizheng.XIU_BOUNDS.slice().sort(function(a,b){ return a.start-b.start; });
+    // 从 0° 开始排列，处理跨界
+    var sorted = [];
+    bounds.forEach(function(b){
+      sorted.push(b);
+    });
+    sorted.sort(function(a,b){
+      var A = a.start < 0 ? a.start+360 : a.start;
+      var B = b.start < 0 ? b.start+360 : b.start;
+      return A - B;
+    });
+    sorted.forEach(function(b){
+      var col = GROUP_COLOR[qzGroupOf(b.name)] || '#797367';
+      H.push('<div class="s" style="flex:'+b.width+';background:'+col+'" title="'+b.name+'宿">'+b.name+'</div>');
+    });
+    H.push('</div>');
+    H.push('<div class="qz-card"><div class="d" style="font-size:.76rem">'+
+      '各宿宽度不等（最宽的井宿 33 古度，最窄的觜宿 2 古度），'+
+      '这是古人对实际天区的真实测量，不是等分。颜色对应四象。</div></div>');
+
+    // 入宿表
+    H.push('<table class="qz-tb" style="margin-top:12px"><thead><tr>'+
+      '<th>曜</th><th>宿</th><th>入度</th><th>宿总度</th><th>四象</th><th>度主</th>'+
+      '</tr></thead><tbody>');
+    r.bodies.forEach(function(b){
+      H.push('<tr><td>'+b.zh+'</td>'+
+        '<td>'+b.xiu.name+'宿</td>'+
+        '<td>'+b.xiu.ruDu.toFixed(2)+'</td>'+
+        '<td>'+b.xiu.totalDu+'</td>'+
+        '<td style="font-size:.72rem;color:var(--ink-3)">'+b.xiu.group+'</td>'+
+        '<td>'+bzQizheng.XIU_RULER[b.xiu.name]+'</td></tr>');
+    });
+    H.push('</tbody></table>');
+    H.push('</div>');
+
+    // 三、十二宫
+    H.push('<div class="qz-sec"><div class="qz-sec-h"><span class="no">叁</span>'+
+      '<h2>十二宫</h2><span class="note">宫位用回归黄道</span></div>');
+    H.push('<table class="qz-tb"><thead><tr>'+
+      '<th>宫</th><th>西名</th><th>宫主</th><th>入宫之曜</th>'+
+      '</tr></thead><tbody>');
+    bzQizheng.SIGNS.forEach(function(s, i){
+      var inSign = r.bodies.filter(function(b){ return b.sign.index === i; });
+      var isMing = r.ming.index === i;
+      var isShen = r.shen.index === i;
+      H.push('<tr'+(isMing||isShen?' style="background:#faf3ee"':'')+'>'+
+        '<td>'+s.name+(isMing?' <span style="font-size:.6rem;color:var(--zhu)">命</span>':'')+
+        (isShen?' <span style="font-size:.6rem;color:var(--jin)">身</span>':'')+'</td>'+
+        '<td>'+s.west+'</td>'+
+        '<td>'+s.ruler+'</td>'+
+        '<td style="font-size:.74rem">'+
+        (inSign.length ? inSign.map(function(b){return b.zh;}).join(' ') : '—')+
+        '</td></tr>');
+    });
+    H.push('</tbody></table>');
+    H.push('</div>');
+
+    // 四、流派说明（重要）
+    H.push('<div class="qz-sec"><div class="qz-sec-h"><span class="no">肆</span>'+
+      '<h2>本盘采用的流派</h2><span class="note">七政四余分歧最大的地方</span></div>');
+    H.push('<div class="qz-card warn"><div class="d">'+
+      '<b>罗睺／计都</b>：采用星命家旧法 —— 罗睺为降交点、计都为升交点。'+
+      '清初汤若望推行新法时把两者反过来（罗睺为升、计都为降），'+
+      '但星命家至今沿用旧法。</div>'+
+      '<div class="d"><b>交点</b>：用平交点（平均交点），不是真交点。'+
+      '两者相差约 1°，会影响入宿的临界判断。</div>'+
+      '<div class="d"><b>宿度</b>：用《礼记要义》引《律历志》的古度（总 365 古度），'+
+      '不是现代等分。宿界整体平移 180°，因为角宿起点是角宿一（Spica），'+
+      '它在恒星黄道上的位置约 180°。</div>'+
+      '<div class="d"><b>紫气</b>：按「二十八年十闰、气行一周天」的 28 年周期推算，'+
+      '历元取 1900 年，属近似值。各家历法的紫气历元不同，结果会有差异。</div>'+
+      '</div>');
+    H.push('<div class="qz-card"><div class="d">'+
+      '七政四余自清代以来几近失传，各家传承的差异比紫微斗数更大。'+
+      '本盘给出的是可以逐项复核的计算结果，但「哪个流派更正统」没有标准答案。'+
+      '如果你有师承或特定历法口径，上述四项都可以按你的口径调整。</div></div>');
+    H.push('</div>');
+
+    // 五、说明
+    H.push('<div class="qz-sec"><div class="qz-sec-h"><span class="no">伍</span>'+
+      '<h2>怎么读这张盘</h2></div>');
+    H.push('<div class="qz-card"><div class="d">'+
+      '<b>先看命宫与身宫</b>：命宫是立极点，身宫看后天际遇。'+
+      '命宫的宫主星（宫主）与命宫所在宿的度主，是这张盘的两个关键星。</div>'+
+      '<div class="d"><b>再看七政的庙旺落陷</b>：日居午为庙、月居未为庙，'+
+      '以此类推。庙旺的星力量强，落陷的星力量弱甚至带凶。</div>'+
+      '<div class="d"><b>后看四余</b>：罗睺主火、计都主土、月孛主水、紫气主木。'+
+      '四余与七政同论，但性质更「隐」——它们带来的是暗中的推动或阻碍。</div>'+
+      '<div class="d" style="color:var(--ink-3)">'+
+      '果老星宗的核心是「三主」：宫主、度主、身主。三主得局则命格高，'+
+      '三主受克则多波折。这套判断需要结合具体古籍条文，本页只给出盘面数据。</div>'+
+      '</div>');
+    H.push('</div>');
+
+    $('qzOut').innerHTML = H.join('');
+  }
+
+  function qzGroupOf(name){
+    return bzQizheng.XIU_GROUP[name] || '';
+  }
+
+  function go(){
+    var dateStr = $('qzDate').value, timeStr = $('qzTime').value;
+    if (!dateStr || !timeStr) { alert('请填写日期时间'); return; }
+    var d = dateStr.split('-').map(Number);
+    var t = timeStr.split(':').map(Number);
+    var ms = Date.UTC(d[0], d[1]-1, d[2], t[0]-8, t[1], 0);
+    try {
+      var r = bzQizheng.paipan({
+        ms: ms,
+        lat: parseFloat($('qzLat').value) || 39.9,
+        lon: parseFloat($('qzLon').value) || 116.4
+      });
+      _last = r; _meta = { date: dateStr, time: timeStr };
+      render(r);
+    } catch (e) {
+      $('qzOut').innerHTML = '<div class="qz-empty">起盘失败：'+esc(e.message)+'</div>';
+    }
+  }
+
+  $('qzGo').onclick = go;
+
+  $('qzSave').onclick = function(){
+    if (!_last) { alert('请先起盘'); return; }
+    var nm = prompt('起个名字（留空自动命名）：', '');
+    if (nm === null) return;
+    if (!nm) nm = _meta.date + ' ' + _last.ming.sign.name + '宫命';
+    var it = bzCases.add({
+      kind: 'qizheng', name: nm, date: _meta.date, time: _meta.time, sex: 1,
+      note: JSON.stringify({
+        ming: _last.ming.sign.name,
+        shen: _last.shen.sign.name,
+        ayanamsa: _last.ayanamsa.toFixed(2)
+      })
+    });
+    if (!it) { alert('保存失败'); return; }
+    var b = $('qzSave'), o = b.textContent;
+    b.textContent = '已保存 ✓';
+    setTimeout(function(){ b.textContent = o; }, 1400);
+  };
+
+  go();
+})();
+</script>

@@ -7,6 +7,8 @@
  *   ]
  *
  * kind: 'bazi' | 'ziwei' | 'hepan'(双人) | 'huangli'
+ *     | 'liuyao' | 'meihua' | 'horary' | 'tarot' | 'numerology'
+ *     | 'xingming' | 'qimen' | 'liuren' | 'qizheng' | 'astro'
  * date: 'YYYY-MM-DD'   time: 'HH:MM'
  * 双人盘用 person2: {date, time, sex}
  *
@@ -17,6 +19,11 @@
 
   var KEY = 'bz_cases_v1';
   var MAX = 200;
+
+  // 支持的案例类型（导入时白名单校验）
+  var KINDS = ['bazi','ziwei','hepan','huangli',
+    'liuyao','meihua','horary','tarot','numerology',
+    'xingming','qimen','liuren','qizheng','astro'];
 
   function load() {
     try {
@@ -156,7 +163,7 @@
   function validItem(x) {
     return x && typeof x === 'object' &&
       typeof x.date === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(x.date) &&
-      ['bazi', 'ziwei', 'hepan', 'huangli'].indexOf(x.kind) >= 0;
+      KINDS.indexOf(x.kind) >= 0;
   }
 
   /**

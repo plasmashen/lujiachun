@@ -1,0 +1,45 @@
+# PWA 预缓存清单 —— 由 scripts/gen_pwa.py 生成，勿手改
+
+# 核心脚本：缺一个就排不了盘，必须预缓存
+pwa_core:
+- /assets/js/bazi/astro.js
+- /assets/js/bazi/astronomy.min.js
+- /assets/js/bazi/cases.js
+- /assets/js/bazi/ganzhi.js
+- /assets/js/bazi/guji.js
+- /assets/js/bazi/hepan.js
+- /assets/js/bazi/horary.js
+- /assets/js/bazi/huangli.js
+- /assets/js/bazi/interpret.js
+- /assets/js/bazi/jieqi-delta.js
+- /assets/js/bazi/kangxi.js
+- /assets/js/bazi/liuren.js
+- /assets/js/bazi/liuri.js
+- /assets/js/bazi/liuyao.js
+- /assets/js/bazi/lunar.js
+- /assets/js/bazi/meihua.js
+- /assets/js/bazi/numerology.js
+- /assets/js/bazi/pwa.js
+- /assets/js/bazi/qimen.js
+- /assets/js/bazi/qizheng.js
+- /assets/js/bazi/qrcode.js
+- /assets/js/bazi/rysl.js
+- /assets/js/bazi/sancai125.js
+- /assets/js/bazi/settings.js
+- /assets/js/bazi/share.js
+- /assets/js/bazi/shensha.js
+- /assets/js/bazi/shuli81.js
+- /assets/js/bazi/tarot.js
+- /assets/js/bazi/western-text.js
+- /assets/js/bazi/western.js
+- /assets/js/bazi/wuxing-energy.js
+- /assets/js/bazi/xingming.js
+- /assets/js/bazi/yunshi75.js
+- /assets/js/bazi/ziwei-text.js
+- /assets/js/bazi/ziwei.js
+
+# 重型数据：单独 cache，预缓存失败不影响主功能
+pwa_heavy:
+- /assets/js/bazi/guji-index.js
+- /assets/js/bazi/interpret-data.js
+- /assets/js/bazi/vsop-data.js
