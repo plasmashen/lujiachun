@@ -1,3 +1,7 @@
+---
+sitemap: false
+---
+
 # 问真八字 · 会员体系完整分析
 
 数据来源：`pcbz.iwzwh.com` 前端包 `app.1f1cb0a9.js` + 会员中心分包 `667.db0a1d38.js`，

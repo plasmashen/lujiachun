@@ -238,6 +238,8 @@ body{background:var(--paper)}
         <button class="set-close" id="caseClose">×</button></div>
       <div class="set-body" id="caseBody" style="padding:10px 16px 16px"></div>
       <div class="set-f">
+        <button class="hp-btn ghost" id="caseExport" style="padding:7px 14px">导出</button>
+        <button class="hp-btn ghost" id="caseImport" style="padding:7px 14px">导入</button>
         <button class="hp-btn ghost" id="caseClear" style="padding:7px 16px">清空全部</button>
         <button class="hp-btn" id="caseDone" style="padding:7px 20px">关闭</button>
       </div>
@@ -284,6 +286,7 @@ body{background:var(--paper)}
 <script src="/assets/js/bazi/ganzhi.js"></script>
 <script src="/assets/js/bazi/shensha.js"></script>
 <script src="/assets/js/bazi/cases.js"></script>
+<script src="/assets/js/bazi/qrcode.js"></script>
 <script src="/assets/js/bazi/share.js"></script>
 <script src="/assets/js/bazi/huangli.js"></script>
 <script>
@@ -586,6 +589,22 @@ body{background:var(--paper)}
   if ($('caseMask')) $('caseMask').onclick = function (e) {
     if (e.target === $('caseMask')) closeCases();
   };
+  if ($('caseExport')) $('caseExport').onclick = function () {
+    var n = bzCases.list('huangli').length;
+    if (!n) { alert('还没有可导出的吉日'); return; }
+    bzCases.downloadJSON(['huangli']);
+  };
+
+  if ($('caseImport')) $('caseImport').onclick = function () {
+    bzCases.pickAndImport({ merge: true }, function (r) {
+      if (!r.ok) { alert('导入失败：' + (r.error || '未知错误')); return; }
+      alert('导入完成\n新增 ' + r.added + ' 条' +
+        (r.skipped ? '，跳过重复 ' + r.skipped + ' 条' : '') +
+        '\n当前共 ' + r.total + ' 条');
+      renderCases();
+    });
+  };
+
   if ($('caseClear')) $('caseClear').onclick = function () {
     if (!confirm('确定清空全部收藏？')) return;
     bzCases.clear('huangli');

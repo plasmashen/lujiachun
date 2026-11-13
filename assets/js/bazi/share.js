@@ -50,6 +50,31 @@
     return { cv: cv, ctx: ctx, w: w, h: h };
   }
 
+  /** 在卡片右下角画二维码 + 标题 */
+  function drawQR(ctx, url, x, y, size, label) {
+    if (!global.bzQR) return false;
+    var qcv = null;
+    try { qcv = global.bzQR.toCanvas(url, { size: size, margin: 2, dark: C.ink }); } catch (e) { return false; }
+    if (!qcv) return false;
+
+    // 白底 + 细边
+    ctx.fillStyle = '#fff';
+    ctx.fillRect(x - 3, y - 3, size + 6, size + 6);
+    ctx.strokeStyle = C.rule;
+    ctx.lineWidth = 1;
+    ctx.strokeRect(x - 3, y - 3, size + 6, size + 6);
+    ctx.drawImage(qcv, x, y);
+
+    if (label) {
+      ctx.fillStyle = C.ink4;
+      ctx.font = '10px ' + SANS;
+      ctx.textAlign = 'center';
+      ctx.fillText(label, x + size / 2, y + size + 17);
+      ctx.textAlign = 'left';
+    }
+    return true;
+  }
+
   /** 页脚品牌 */
   function footer(ctx, w, h) {
     ctx.fillStyle = C.ink4;
@@ -215,6 +240,9 @@
       if (ln) ctx.fillText(ln, pad, ly);
     }
 
+    // 二维码（右下角）
+    drawQR(ctx, (opt && opt.url) || 'https://lujiachun.top/bazi/', W - 44 - 84, H - 130, 84, '扫码排自己的');
+
     footer(ctx, W, H);
     return b.cv;
   }
@@ -323,6 +351,10 @@
       ctx.font = '14px ' + SERIF;
       ctx.fillText((star || '—') + '化' + h, xx, y + 26);
     });
+
+    // 二维码（右下角）
+    drawQR(ctx, (opt && opt.url) || 'https://lujiachun.top/ziwei/',
+           W - 40 - 84, H - 132, 84, '扫码排自己的');
 
     footer(ctx, W, H);
     return b.cv;
@@ -450,6 +482,9 @@
     ctx.fillStyle = C.ink2;
     ctx.font = '12px ' + SERIF;
     ctx.fillText((info.pengzuGan || '') + '　' + (info.pengzuZhi || ''), pad + 62, y + 26);
+
+    // 二维码（右下角）
+    drawQR(ctx, (opt && opt.url) || 'https://lujiachun.top/huangli/', W - 44 - 78, y - 12, 78, '扫码查吉日');
 
     footer(ctx, W, H);
     return b.cv;

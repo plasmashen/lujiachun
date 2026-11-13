@@ -1,0 +1,15 @@
+---
+layout: null
+sitemap: false
+permalink: /robots.txt
+---
+User-agent: *
+Allow: /
+
+# 内部文档不索引
+Disallow: /bazi/NOT-DONE/
+Disallow: /bazi/docs/
+Disallow: /CLAUDE/
+Disallow: /REPLICATION_STATUS/
+
+Sitemap: https://lujiachun.top/sitemap.xml
