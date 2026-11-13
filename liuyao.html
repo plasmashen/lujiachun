@@ -1,0 +1,508 @@
+---
+layout: default
+title: 六爻
+description: 在线六爻起卦 · 摇钱法 · 纳甲装卦 · 六亲六神 · 世应 · 旬空 · 旺衰断卦。离线可用。
+permalink: /liuyao/
+---
+
+<style>
+:root{
+  --paper:#f7f4ed; --paper-2:#fdfcf8;
+  --ink:#1c1a17; --ink-2:#544f47; --ink-3:#797367; --ink-4:#a39c8f;
+  --rule:#ded7c8; --rule-soft:#f0ece2;
+  --zhu:#a8352a; --qing:#3f5d52; --jin:#9a7b3f;
+  --serif:"Songti SC","STSong","SimSun","Source Han Serif SC","Noto Serif CJK SC",serif;
+  --sans:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Microsoft YaHei","Source Han Sans SC","Noto Sans CJK SC",sans-serif;
+}
+.ly-wrap{max-width:900px;margin:0 auto;padding:0 20px 70px;
+  font-family:var(--sans);color:var(--ink);background:var(--paper);
+  font-size:.9rem;line-height:1.75}
+.ly-wrap *{box-sizing:border-box}
+
+/* ── 起卦区 ── */
+.ly-form{background:var(--paper-2);border:1px solid var(--rule);border-radius:10px;
+  padding:18px 20px;margin:22px 0 24px}
+.ly-row{display:flex;flex-wrap:wrap;gap:10px;align-items:flex-end;margin-bottom:11px}
+.ly-row:last-child{margin-bottom:0}
+.ly-f{display:flex;flex-direction:column;gap:4px}
+.ly-f label{font-size:.7rem;color:var(--ink-4);letter-spacing:.06em}
+.ly-f input,.ly-f select{font-family:var(--sans);font-size:.86rem;padding:7px 10px;
+  border:1px solid var(--rule);border-radius:5px;background:#fff;color:var(--ink);outline:none}
+.ly-f input:focus,.ly-f select:focus{border-color:var(--zhu)}
+.ly-f.q input{width:280px}
+.ly-f.d input{width:145px}
+.ly-f.t input{width:100px}
+.ly-btn{font-family:var(--sans);font-size:.86rem;padding:8px 24px;border:none;
+  border-radius:5px;background:var(--zhu);color:#fff;cursor:pointer;letter-spacing:.04em}
+.ly-btn:hover{opacity:.88}
+.ly-btn.ghost{background:none;border:1px solid var(--rule);color:var(--ink-2)}
+.ly-btn.ghost:hover{border-color:var(--zhu);color:var(--zhu)}
+.ly-hint{font-size:.7rem;color:var(--ink-4);margin-top:9px;line-height:1.7}
+
+/* ── 摇卦动画 ── */
+.ly-toss{display:flex;gap:8px;margin:14px 0 0;flex-wrap:wrap}
+.ly-toss .coin{width:44px;height:44px;border-radius:50%;border:1px solid var(--rule);
+  display:flex;align-items:center;justify-content:center;font-size:.8rem;
+  background:#fff;color:var(--ink-3);transition:.3s;font-family:var(--serif)}
+.ly-toss .coin.yang{background:var(--zhu);color:#fff;border-color:var(--zhu)}
+
+/* ── 卦象 ── */
+.ly-result{display:flex;gap:28px;flex-wrap:wrap;margin-bottom:24px}
+.ly-gua{flex:1 1 320px;min-width:0}
+.ly-gua-h{font-family:var(--serif);font-size:1.06rem;margin-bottom:12px;
+  display:flex;align-items:baseline;gap:9px}
+.ly-gua-h .tag{font-size:.68rem;color:var(--zhu);border:1px solid currentColor;
+  border-radius:3px;padding:1px 6px;letter-spacing:.05em}
+
+.ly-lines{background:var(--paper-2);border:1px solid var(--rule);border-radius:8px;
+  padding:12px 14px}
+.ly-line{display:grid;grid-template-columns:20px 1fr 78px 1fr 58px;
+  align-items:center;gap:8px;padding:5px 0;font-size:.78rem;
+  border-bottom:1px dashed var(--rule-soft)}
+.ly-line:last-child{border-bottom:none}
+.ly-line .sh{font-size:.7rem;color:var(--ink-4);text-align:center}
+.ly-line .y{font-family:monospace;font-size:1rem;letter-spacing:1px;text-align:center;
+  color:var(--ink-2)}
+.ly-line .y.moving{color:var(--zhu);font-weight:700}
+.ly-line .lq{font-size:.74rem;color:var(--ink-2);white-space:nowrap}
+.ly-line .gz{font-family:var(--serif);color:var(--ink);white-space:nowrap}
+.ly-line .bz{font-size:.72rem;color:var(--ink-3);white-space:nowrap}
+.ly-line .ls{font-size:.68rem;color:var(--ink-4);text-align:right;white-space:nowrap}
+.ly-line .mk{font-size:.62rem;color:var(--zhu);margin-left:3px}
+
+/* ── 信息格 ── */
+.ly-meta{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));
+  gap:8px;margin-bottom:22px}
+.ly-meta .i{background:var(--paper-2);border:1px solid var(--rule);border-radius:6px;
+  padding:9px 11px}
+.ly-meta .i .k{font-size:.66rem;color:var(--ink-4);letter-spacing:.06em;margin-bottom:3px}
+.ly-meta .i .v{font-family:var(--serif);font-size:.92rem;color:var(--ink)}
+
+/* ── 区块 ── */
+.ly-sec{margin:28px 0 0}
+.ly-sec-h{display:flex;align-items:baseline;gap:9px;margin-bottom:12px;
+  padding-bottom:7px;border-bottom:1px solid var(--rule)}
+.ly-sec-h .no{font-family:var(--serif);color:var(--zhu);font-size:.8rem;opacity:.75}
+.ly-sec-h h2{font-family:var(--serif);font-size:1.04rem;margin:0;
+  letter-spacing:.05em;font-weight:600}
+.ly-sec-h .note{font-size:.68rem;color:var(--ink-4);margin-left:auto}
+
+.ly-card{background:var(--paper-2);border:1px solid var(--rule);border-radius:8px;
+  padding:14px 17px;margin-bottom:10px}
+.ly-card .d{font-size:.82rem;color:var(--ink-2);line-height:1.85}
+.ly-card .d+.d{margin-top:7px}
+.ly-card b{color:var(--ink)}
+
+.ly-tb{width:100%;border-collapse:collapse;font-size:.78rem}
+.ly-tb th,.ly-tb td{padding:7px 9px;text-align:left;border-bottom:1px solid var(--rule-soft)}
+.ly-tb th{font-size:.68rem;color:var(--ink-4);font-weight:500;background:var(--rule-soft)}
+
+.ly-empty{text-align:center;padding:44px 20px;color:var(--ink-4);font-size:.85rem}
+
+@media screen and (max-width:700px){
+  .ly-wrap{padding:0 14px 50px}
+  .ly-f.q input{width:100%}
+  .ly-f.q{flex:1 1 100%}
+  .ly-result{gap:18px}
+  .ly-line{grid-template-columns:16px 1fr 68px 1fr 48px;font-size:.74rem;gap:5px}
+  .ly-line .ls{font-size:.62rem}
+  .ly-btn{flex:1 1 auto}
+  .ly-gua-h{font-size:.98rem}
+}
+</style>
+
+<div class="ly-wrap">
+
+  <div class="ly-form">
+    <div class="ly-row">
+      <div class="ly-f q"><label>所问何事（可留空）</label>
+        <input type="text" id="lyQ" placeholder="如：财运、事业、感情、考试、寻物" list="lyQList"></div>
+      <datalist id="lyQList">
+        <option value="财运"><option value="事业"><option value="感情">
+        <option value="考试"><option value="健康"><option value="寻物">
+        <option value="出行"><option value="求职"><option value="诉讼">
+      </datalist>
+    </div>
+    <div class="ly-row">
+      <div class="ly-f d"><label>起卦日期</label>
+        <input type="date" id="lyDate"></div>
+      <div class="ly-f t"><label>时间</label>
+        <input type="time" id="lyTime"></div>
+      <button class="ly-btn" id="lyGo">摇卦</button>
+      <button class="ly-btn ghost" id="lyManual">手动起卦</button>
+      <button class="ly-btn ghost" id="lySave">保存</button>
+      <button class="ly-btn ghost" id="lyShare">分享卡片</button>
+    </div>
+    <div class="ly-toss" id="lyToss"></div>
+    <div class="ly-hint">
+      摇卦法：三枚铜钱同掷六次，自下而上成卦。三背为老阳（动）、两背为少阴、
+      一背为少阳、无背为老阴（动）。动爻会变出变卦，断卦时两者合看。
+    </div>
+  </div>
+
+  <div id="lyOut"><div class="ly-empty">点「摇卦」开始</div></div>
+</div>
+
+<script src="/assets/js/bazi/liuyao.js"></script>
+<script src="/assets/js/bazi/cases.js"></script>
+<script src="/assets/js/bazi/qrcode.js"></script>
+<script src="/assets/js/bazi/share.js"></script>
+<script src="/assets/js/bazi/pwa.js"></script>
+<script>
+(function(){
+  'use strict';
+  var $ = function(id){ return document.getElementById(id); };
+  var _last = null, _lastMeta = null;
+
+  function esc(s){
+    return String(s==null?'':s).replace(/[&<>"]/g, function(m){
+      return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m];
+    });
+  }
+
+  // 默认当前时间
+  (function initTime(){
+    var d = new Date();
+    var p = function(n){ return n<10?'0'+n:n; };
+    $('lyDate').value = d.getFullYear()+'-'+p(d.getMonth()+1)+'-'+p(d.getDate());
+    $('lyTime').value = p(d.getHours())+':'+p(d.getMinutes());
+  })();
+
+  // ── 干支（自算，不依赖 ganzhi.js）──
+  var GAN = ['甲','乙','丙','丁','戊','己','庚','辛','壬','癸'];
+  var ZHI = ['子','丑','寅','卯','辰','巳','午','未','申','酉','戌','亥'];
+  var JIEQI_MONTH_ZHI = ['寅','卯','辰','巳','午','未','申','酉','戌','亥','子','丑'];
+
+  /** 儒略日（UT） */
+  function jdFromMs(ms){ return ms / 86400000 + 2440587.5; }
+
+  /** 日柱：以 1970-01-01 为甲子日基准推算 */
+  function dayGanzhi(ms){
+    // 1970-01-01 是「甲寅」日（六十甲子第 50 位，0-based=50? 实为庚戌）
+    // 用权威基准：2000-01-01 是戊午日
+    var base = Date.UTC(2000, 0, 1);          // 2000-01-01 00:00 UTC
+    var baseIdx = 54;                          // 戊午 = 54（甲子=0）
+    var days = Math.floor((ms + 8*3600000) / 86400000) - Math.floor((base + 8*3600000) / 86400000);
+    // 注意：应基于北京时间的日期边界
+    var d = new Date(ms + 8*3600000);
+    var bjDay = Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate());
+    var bd = new Date(base + 8*3600000);
+    var baseDay = Date.UTC(bd.getUTCFullYear(), bd.getUTCMonth(), bd.getUTCDate());
+    var diff = Math.round((bjDay - baseDay) / 86400000);
+    var idx = ((baseIdx + diff) % 60 + 60) % 60;
+    return { gan: GAN[idx % 10], zhi: ZHI[idx % 12], idx: idx };
+  }
+
+  /** 月支：按节气，这里用简化近似（每月节气约在 5~7 日） */
+  function monthZhi(ms){
+    var d = new Date(ms + 8*3600000);
+    var m = d.getUTCMonth() + 1;
+    var day = d.getUTCDate();
+    // 节：立春(2/4)寅月起
+    var idx = m - 1;
+    if (day < 6) idx = (idx - 1 + 12) % 12;   // 未过节气，仍属上月
+    // 节气月序：2月=寅
+    var order = [10, 11, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9];  // 1..12 月 → 地支索引
+    return ZHI[order[idx]];
+  }
+
+  function getGanzhi(dateStr, timeStr){
+    var d = dateStr.split('-').map(Number);
+    var t = timeStr.split(':').map(Number);
+    var ms = Date.UTC(d[0], d[1]-1, d[2], t[0]-8, t[1], 0);
+    var dp = dayGanzhi(ms);
+    return {
+      dayGan: dp.gan, dayZhi: dp.zhi,
+      dayName: dp.gan + dp.zhi,
+      monthZhi: monthZhi(ms),
+      ms: ms
+    };
+  }
+
+  var YAO_ART = {
+    yang: '━━━━━',
+    yin:  '━━ ━━'
+  };
+
+  function render(d){
+    var H = [];
+    var yq = window.bzLiuyao.pickYongshen(d.question);
+
+    // 卦象对比
+    H.push('<div class="ly-result">');
+
+    function guaBlock(gua, title, tag, useLines){
+      var src = useLines || d.lines;
+      var s = ['<div class="ly-gua"><div class="ly-gua-h">'+title+
+        (tag?' <span class="tag">'+tag+'</span>':'')+'</div>'];
+      s.push('<div class="ly-lines">');
+      // 自上而下显示（第 6 爻在上）
+      for (var i = 5; i >= 0; i--) {
+        var l = src[i];
+        var art = l.yao ? YAO_ART.yang : YAO_ART.yin;
+        var marks = '';
+        if (l.shi) marks += '<span class="mk">世</span>';
+        if (l.ying) marks += '<span class="mk">应</span>';
+        if (l.kong) marks += '<span class="mk">空</span>';
+        if (l.changing && useLines === undefined) marks += '<span class="mk">动</span>';
+        s.push('<div class="ly-line">'+
+          '<span class="sh">'+(['初','二','三','四','五','上'][i])+'</span>'+
+          '<span class="y'+(l.changing?' moving':'')+'">'+art+'</span>'+
+          '<span class="lq">'+l.liuqin+'</span>'+
+          '<span class="gz">'+l.gan+l.zhi+'<span style="color:var(--ink-4);font-size:.7rem">'+l.wx+'</span>'+marks+'</span>'+
+          '<span class="ls">'+l.liushen+'</span></div>');
+      }
+      s.push('</div></div>');
+      return s.join('');
+    }
+
+    H.push(guaBlock(d.ben, d.ben.name, d.hasChange ? '本卦' : '', d.lines));
+    if (d.bian && d.bianLines) H.push(guaBlock(d.bian, d.bian.name, '变卦', d.bianLines));
+    H.push('</div>');
+
+    // 基本信息
+    H.push('<div class="ly-meta">');
+    H.push('<div class="i"><div class="k">卦宫</div><div class="v">'+d.palace.palace+'宫 '+d.palace.palaceWx+'</div></div>');
+    H.push('<div class="i"><div class="k">卦位</div><div class="v">'+d.palace.type+'</div></div>');
+    H.push('<div class="i"><div class="k">世应</div><div class="v">世'+d.palace.shi+' 应'+d.palace.ying+'</div></div>');
+    H.push('<div class="i"><div class="k">日辰</div><div class="v">'+d.dayGan+d.dayZhi+'</div></div>');
+    H.push('<div class="i"><div class="k">旬空</div><div class="v">'+d.kong.join('')+'</div></div>');
+    H.push('<div class="i"><div class="k">动爻</div><div class="v">'+(d.moving.length?d.moving.join(','):'无')+'</div></div>');
+    H.push('</div>');
+
+    // 一、卦象
+    H.push('<div class="ly-sec"><div class="ly-sec-h"><span class="no">壹</span>'+
+      '<h2>卦象</h2><span class="note">'+
+      d.ben.upper.name+'上'+d.ben.lower.name+'下</span></div>');
+    H.push('<div class="ly-card"><div class="d">'+
+      '<b>'+d.ben.name+'</b>（'+d.ben.upper.nature+'上'+d.ben.lower.nature+'下，'+
+      d.palace.palace+'宫'+d.palace.palaceWx+'，'+d.palace.type+'）'+
+      (d.bian ? '，变<b>'+d.bian.name+'</b>' : '，六爻安静')+'。</div>');
+    H.push('<div class="d">上卦 '+d.ben.upper.name+'（'+d.ben.upper.sym+'）属'+
+      d.ben.upper.wx+'，下卦 '+d.ben.lower.name+'（'+d.ben.lower.sym+'）属'+
+      d.ben.lower.wx+'。卦宫五行是判断六亲的基准——全卦六亲都以「'+
+      d.palace.palaceWx+'」为我。</div></div>');
+    H.push('</div>');
+
+    // 二、用神
+    H.push('<div class="ly-sec"><div class="ly-sec-h"><span class="no">贰</span>'+
+      '<h2>用神与断卦</h2><span class="note">'+
+      (d.question ? '所问：'+esc(d.question) : '未填所问')+'</span></div>');
+    if (yq) {
+      H.push('<div class="ly-card"><div class="d">你问的是<b>'+esc(d.question)+
+        '</b>，取<b>'+yq+'</b>为用神。用神旺相、得生扶则吉；休囚、受克则不利。'+
+        '用神若不上卦，看伏神或借他爻论断。</div>');
+      // 找用神爻
+      var ys = d.lines.filter(function(l){ return l.liuqin === yq; });
+      if (ys.length) {
+        ys.forEach(function(l){
+          var st = window.bzLiuyao.strength(l, d.monthZhi || '', d.dayZhi);
+          H.push('<div class="d">用神在<b>第'+l.pos+'爻</b>：'+l.gan+l.zhi+' '+l.wx+
+            '，'+(l.shi?'临世爻（所求就在自己身上）':l.ying?'临应爻（所求在对方/外处）':'')+
+            '，旺衰<b>'+st.level+'</b>'+
+            (st.notes.length?'（'+st.notes.join('、')+'）':'')+
+            (l.changing?'，<b>发动</b>——此事正在变化中':'')+'。</div>');
+        });
+      } else {
+        H.push('<div class="d">用神「'+yq+'」<b>不上卦</b>，此事目前无着落，'+
+          '或需从伏神、飞神另寻。传统断法认为用神不上卦多主事难成，'+
+          '但也可能表示所问之事尚未成形。</div>');
+      }
+      H.push('</div>');
+    } else {
+      H.push('<div class="ly-card"><div class="d">没有填所问之事。'+
+        '六爻断卦必须先定用神——问财看妻财、问事业看官鬼、问文书看父母、'+
+        '问健康看子孙、问竞争看兄弟。填上问题后上面会给出对应断语。</div></div>');
+    }
+    H.push('</div>');
+
+    // 三、世应
+    H.push('<div class="ly-sec"><div class="ly-sec-h"><span class="no">叁</span>'+
+      '<h2>世应关系</h2><span class="note">世为自己，应为对方</span></div>');
+    var shiLine = d.lines[d.palace.shi-1];
+    var yingLine = d.lines[d.palace.ying-1];
+    if (shiLine && yingLine) {
+      var rel = '';
+      var sWx = shiLine.wx, yWx = yingLine.wx;
+      if (sWx === yWx) rel = '世应同气，双方立场接近，事情容易谈拢。';
+      else if ((sWx==='木'&&yWx==='火')||(sWx==='火'&&yWx==='土')||
+               (sWx==='土'&&yWx==='金')||(sWx==='金'&&yWx==='水')||
+               (sWx==='水'&&yWx==='木'))
+        rel = '世生应，你付出多、对方受益，主动在你这边。';
+      else if ((yWx==='木'&&sWx==='火')||(yWx==='火'&&sWx==='土')||
+               (yWx==='土'&&sWx==='金')||(yWx==='金'&&sWx==='水')||
+               (yWx==='水'&&sWx==='木'))
+        rel = '应生世，对方愿意帮你，助力在外部。';
+      else if ((sWx==='木'&&yWx==='土')||(sWx==='土'&&yWx==='水')||
+               (sWx==='水'&&yWx==='火')||(sWx==='火'&&yWx==='金')||
+               (sWx==='金'&&yWx==='木'))
+        rel = '世克应，你能主导，但过程要费力。';
+      else
+        rel = '应克世，压力来自对方或外部环境，宜守不宜攻。';
+
+      H.push('<div class="ly-card"><div class="d">'+
+        '世爻在第'+d.palace.shi+'爻：'+shiLine.liuqin+shiLine.gan+shiLine.zhi+'（'+sWx+'）；'+
+        '应爻在第'+d.palace.ying+'爻：'+yingLine.liuqin+yingLine.gan+yingLine.zhi+'（'+yWx+'）。</div>'+
+        '<div class="d">'+rel+'</div></div>');
+    }
+    H.push('</div>');
+
+    // 四、动爻
+    if (d.moving.length) {
+      H.push('<div class="ly-sec"><div class="ly-sec-h"><span class="no">肆</span>'+
+        '<h2>动爻</h2><span class="note">'+d.moving.length+' 爻发动</span></div>');
+      d.moving.forEach(function(pos){
+        var l = d.lines[pos-1];
+        var bl = l.bian;
+        H.push('<div class="ly-card"><div class="d">'+
+          '<b>第'+pos+'爻</b> '+l.liuqin+l.gan+l.zhi+'（'+l.wx+'）'+
+          (l.changing?'<b>发动</b>':'')+' → 变为 '+
+          (bl ? bl.liuqin+bl.gan+bl.zhi+'（'+bl.wx+'）' : '—')+'</div>');
+        if (bl) {
+          var wasEmpty = l.kong, nowEmpty = bl.kong;
+          if (wasEmpty && !nowEmpty) H.push('<div class="d">此爻原为旬空，动而化出实支——<b>空而不空</b>，事情有转机。</div>');
+          if (!wasEmpty && nowEmpty) H.push('<div class="d">动而化空，<b>看似有实则落空</b>，需谨慎。</div>');
+          if (l.liuqin !== bl.liuqin) {
+            H.push('<div class="d">六亲由 <b>'+l.liuqin+'</b> 变为 <b>'+bl.liuqin+
+              '</b>，意味着此事的性质会转向「'+bl.liuqin+'」所主的方面。</div>');
+          }
+        }
+        H.push('</div>');
+      });
+      H.push('</div>');
+    }
+
+    // 五、全爻表
+    H.push('<div class="ly-sec"><div class="ly-sec-h"><span class="no">伍</span>'+
+      '<h2>六爻全览</h2><span class="note">自下而上，六亲+干支+六神</span></div>');
+    H.push('<table class="ly-tb"><thead><tr><th>爻位</th><th>阴阳</th>'+
+      '<th>六亲</th><th>纳甲</th><th>六神</th><th>世应</th><th>旬空</th><th>变爻</th></tr></thead><tbody>');
+    for (var k = 5; k >= 0; k--) {
+      var ln = d.lines[k];
+      H.push('<tr><td>'+['初','二','三','四','五','上'][k]+'</td>'+
+        '<td>'+(ln.yao?'阳':'阴')+(ln.changing?' 动':'')+'</td>'+
+        '<td>'+ln.liuqin+'</td>'+
+        '<td>'+ln.gan+ln.zhi+' '+ln.wx+'</td>'+
+        '<td>'+ln.liushen+'</td>'+
+        '<td>'+(ln.shi?'世':ln.ying?'应':'')+'</td>'+
+        '<td>'+(ln.kong?'空':'')+'</td>'+
+        '<td>'+(ln.bian?ln.bian.liuqin+ln.bian.gan+ln.bian.zhi:'—')+'</td></tr>');
+    }
+    H.push('</tbody></table></div>');
+
+    // 六、说明
+    H.push('<div class="ly-sec"><div class="ly-sec-h"><span class="no">陆</span>'+
+      '<h2>读卦说明</h2></div>');
+    H.push('<div class="ly-card"><div class="d">'+
+      '六爻断卦的核心不是「吉凶」两个字，而是看<b>用神的状态</b>——'+
+      '它在第几爻、旺不旺、动不动、空不空、有没有被克。同样一个卦，'+
+      '问不同的事结论可以完全相反。'+
+      '</div><div class="d">'+
+      '本页给出的是装卦结果与基础判断。传统上还会看日月建、'+
+      '伏神飞神、卦身、六冲六合，这些需要更多上下文，'+
+      '不同流派取舍也不同，这里不做过度解读。'+
+      '</div></div>');
+    H.push('</div>');
+
+    $('lyOut').innerHTML = H.join('');
+  }
+
+  // ── 摇卦 ──
+  function doToss(){
+    var dateStr = $('lyDate').value, timeStr = $('lyTime').value;
+    if (!dateStr || !timeStr) { alert('请填写日期时间'); return; }
+    var gz = getGanzhi(dateStr, timeStr);
+
+    // 逐爻动画
+    $('lyToss').innerHTML = '';
+    var coins = [];
+    for (var i = 0; i < 3; i++) {
+      var c = document.createElement('div');
+      c.className = 'coin';
+      c.textContent = '钱';
+      $('lyToss').appendChild(c);
+      coins.push(c);
+    }
+
+    var d = window.bzLiuyao.divinate({
+      dayGan: gz.dayGan, dayZhi: gz.dayZhi,
+      question: $('lyQ').value.trim()
+    });
+    d.monthZhi = gz.monthZhi;
+
+    _last = d;
+    _lastMeta = { date: dateStr, time: timeStr, question: d.question };
+
+    // 动画：三次翻转后显示结果
+    var step = 0;
+    var timer = setInterval(function(){
+      step++;
+      coins.forEach(function(c, idx){
+        c.classList.toggle('yang', Math.random() < 0.5);
+      });
+      if (step >= 8) {
+        clearInterval(timer);
+        render(d);
+      }
+    }, 70);
+  }
+
+  $('lyGo').onclick = doToss;
+
+  // ── 手动起卦 ──
+  $('lyManual').onclick = function(){
+    var s = prompt('输入六爻（自下而上），6/7/8/9 用空格或逗号分隔\n6=老阴(动) 7=少阳 8=少阴 9=老阳(动)\n例：7 8 7 9 7 8', '7 8 7 9 7 8');
+    if (!s) return;
+    var nums = s.replace(/[,，]/g, ' ').split(/\s+/).filter(Boolean).map(Number);
+    if (nums.length !== 6 || nums.some(function(n){ return n<6 || n>9; })) {
+      alert('需要 6 个 6~9 的数字');
+      return;
+    }
+    var dateStr = $('lyDate').value, timeStr = $('lyTime').value;
+    var gz = getGanzhi(dateStr, timeStr);
+    var d = window.bzLiuyao.divinate({
+      yaos: nums, dayGan: gz.dayGan, dayZhi: gz.dayZhi,
+      question: $('lyQ').value.trim()
+    });
+    d.monthZhi = gz.monthZhi;
+    _last = d;
+    _lastMeta = { date: dateStr, time: timeStr, question: d.question };
+    render(d);
+  };
+
+  // ── 保存 ──
+  $('lySave').onclick = function(){
+    if (!_last) { alert('请先起卦'); return; }
+    var nm = prompt('给这一卦起个名字（留空自动命名）：', '');
+    if (nm === null) return;
+    if (!nm) nm = _last.ben.name + (_lastMeta.question ? ' · ' + _lastMeta.question : '');
+    var it = bzCases.add({
+      kind: 'liuyao', name: nm,
+      date: _lastMeta.date, time: _lastMeta.time,
+      sex: 1,
+      note: JSON.stringify({
+        yaos: _last.tosses.map(function(t){ return t.num; }),
+        question: _lastMeta.question,
+        ben: _last.ben.name,
+        bian: _last.bian ? _last.bian.name : null
+      })
+    });
+    if (!it) { alert('保存失败'); return; }
+    var b = $('lySave'), o = b.textContent;
+    b.textContent = '已保存 ✓';
+    setTimeout(function(){ b.textContent = o; }, 1400);
+  };
+
+  // ── 分享 ──
+  $('lyShare').onclick = function(){
+    if (!_last) { alert('请先起卦'); return; }
+    try {
+      var cv = bzShare.liuyaoCard(_last, _lastMeta);
+      bzShare.preview(cv, '六爻');
+    } catch (e) { alert('生成失败：' + e.message); }
+  };
+
+  // 首屏自动起一卦（让用户直接看到效果，可再点摇卦重摇）
+  doToss();
+})();
+</script>

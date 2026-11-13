@@ -1,0 +1,458 @@
+---
+layout: default
+title: 卜卦 · 择时
+description: 卜卦占星（Horary）· 择时占星（Electional）· 以提问时刻起盘断事 · 为计划挑选吉时。离线可用。
+permalink: /horary/
+---
+
+<style>
+:root{
+  --paper:#f7f4ed; --paper-2:#fdfcf8;
+  --ink:#1c1a17; --ink-2:#544f47; --ink-3:#797367; --ink-4:#a39c8f;
+  --rule:#ded7c8; --rule-soft:#f0ece2;
+  --zhu:#a8352a; --qing:#3f5d52; --jin:#9a7b3f;
+  --fire:#b04a3a; --earth:#8a7440; --air:#5b7a8c; --water:#3f5d74;
+  --serif:"Songti SC","STSong","SimSun","Source Han Serif SC","Noto Serif CJK SC",serif;
+  --sans:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Microsoft YaHei","Source Han Sans SC","Noto Sans CJK SC",sans-serif;
+}
+.hy-wrap{max-width:900px;margin:0 auto;padding:0 20px 70px;
+  font-family:var(--sans);color:var(--ink);background:var(--paper);
+  font-size:.9rem;line-height:1.75}
+.hy-wrap *{box-sizing:border-box}
+
+.hy-tabs{display:flex;gap:6px;margin:22px 0 0;flex-wrap:wrap}
+.hy-tab{font-family:var(--sans);font-size:.82rem;padding:7px 18px;
+  border:1px solid var(--rule);border-radius:5px 5px 0 0;background:#fff;
+  color:var(--ink-3);cursor:pointer;border-bottom:none}
+.hy-tab.on{background:var(--paper-2);color:var(--zhu);font-weight:600;
+  border-color:var(--zhu);position:relative;top:1px}
+
+.hy-form{background:var(--paper-2);border:1px solid var(--zhu);border-radius:0 8px 8px 8px;
+  padding:18px 20px;margin:0 0 24px}
+.hy-row{display:flex;flex-wrap:wrap;gap:10px;align-items:flex-end;margin-bottom:10px}
+.hy-row:last-child{margin-bottom:0}
+.hy-f{display:flex;flex-direction:column;gap:4px}
+.hy-f label{font-size:.7rem;color:var(--ink-4);letter-spacing:.06em}
+.hy-f input,.hy-f select{font-family:var(--sans);font-size:.86rem;padding:7px 10px;
+  border:1px solid var(--rule);border-radius:5px;background:#fff;color:var(--ink);outline:none}
+.hy-f input:focus,.hy-f select:focus{border-color:var(--zhu)}
+.hy-f.q input{width:270px}
+.hy-f.d input{width:145px}
+.hy-f.t input{width:100px}
+.hy-f.city input{width:120px}
+.hy-f.n input{width:88px}
+.hy-btn{font-family:var(--sans);font-size:.86rem;padding:8px 24px;border:none;
+  border-radius:5px;background:var(--zhu);color:#fff;cursor:pointer;letter-spacing:.04em}
+.hy-btn:hover{opacity:.88}
+.hy-btn.ghost{background:none;border:1px solid var(--rule);color:var(--ink-2)}
+.hy-btn.ghost:hover{border-color:var(--zhu);color:var(--zhu)}
+.hy-hint{font-size:.7rem;color:var(--ink-4);margin-top:9px;line-height:1.7}
+
+/* ── 摘要 ── */
+.hy-big{background:var(--paper-2);border:1px solid var(--rule);border-radius:8px;
+  padding:16px 19px;margin-bottom:18px}
+.hy-big .v{font-family:var(--serif);font-size:1.15rem;margin-bottom:6px;
+  display:flex;align-items:baseline;gap:9px;flex-wrap:wrap}
+.hy-big .v .badge{font-size:.68rem;padding:2px 8px;border-radius:3px;
+  border:1px solid currentColor;letter-spacing:.05em}
+.hy-big .t{font-size:.83rem;color:var(--ink-2);line-height:1.85}
+
+/* ── 区块 ── */
+.hy-sec{margin:26px 0 0}
+.hy-sec-h{display:flex;align-items:baseline;gap:9px;margin-bottom:12px;
+  padding-bottom:7px;border-bottom:1px solid var(--rule)}
+.hy-sec-h .no{font-family:var(--serif);color:var(--zhu);font-size:.8rem;opacity:.75}
+.hy-sec-h h2{font-family:var(--serif);font-size:1.04rem;margin:0;
+  letter-spacing:.05em;font-weight:600}
+.hy-sec-h .note{font-size:.68rem;color:var(--ink-4);margin-left:auto}
+
+.hy-card{background:var(--paper-2);border:1px solid var(--rule);border-radius:8px;
+  padding:13px 16px;margin-bottom:10px}
+.hy-card .d{font-size:.81rem;color:var(--ink-2);line-height:1.85}
+.hy-card .d+.d{margin-top:6px}
+.hy-card b{color:var(--ink)}
+
+.hy-tb{width:100%;border-collapse:collapse;font-size:.78rem}
+.hy-tb th,.hy-tb td{padding:7px 9px;text-align:left;border-bottom:1px solid var(--rule-soft)}
+.hy-tb th{font-size:.68rem;color:var(--ink-4);font-weight:500;background:var(--rule-soft)}
+
+/* ── 择时小时卡 ── */
+.hy-hours{display:grid;grid-template-columns:repeat(auto-fill,minmax(96px,1fr));gap:7px}
+.hy-hour{background:var(--paper-2);border:1px solid var(--rule);border-radius:6px;
+  padding:9px 8px;text-align:center;cursor:default;transition:.15s}
+.hy-hour.best{border-color:var(--qing);background:#f2f7f4}
+.hy-hour .h{font-family:var(--serif);font-size:.92rem;color:var(--ink)}
+.hy-hour .s{font-size:.68rem;color:var(--ink-3);margin-top:2px}
+.hy-hour .bar{height:3px;border-radius:2px;margin-top:5px;background:var(--rule-soft);
+  overflow:hidden}
+.hy-hour .bar i{display:block;height:100%;border-radius:2px}
+
+.hy-empty{text-align:center;padding:44px 20px;color:var(--ink-4);font-size:.85rem}
+
+@media screen and (max-width:700px){
+  .hy-wrap{padding:0 14px 50px}
+  .hy-f.q input{width:100%}
+  .hy-f.q{flex:1 1 100%}
+  .hy-f.city input{width:100%}
+  .hy-f.city{flex:1 1 100%}
+  .hy-f.n{flex:1 1 28%}
+  .hy-f.n input{width:100%}
+  .hy-btn{flex:1 1 auto}
+  .hy-hours{grid-template-columns:repeat(4,1fr)}
+}
+</style>
+
+<div class="hy-wrap">
+
+  <div class="hy-tabs">
+    <button class="hy-tab on" data-mode="horary">卜卦（断事）</button>
+    <button class="hy-tab" data-mode="elective">择时（挑时间）</button>
+  </div>
+
+  <div class="hy-form">
+    <!-- 卜卦 -->
+    <div id="hyHorary">
+      <div class="hy-row">
+        <div class="hy-f q"><label>所问何事</label>
+          <input type="text" id="hyQ" placeholder="如：这笔生意能不能成" list="hyQList"></div>
+        <datalist id="hyQList">
+          <option value="财运"><option value="事业"><option value="感情"><option value="婚姻">
+          <option value="考试"><option value="健康"><option value="房产"><option value="出行">
+          <option value="诉讼"><option value="合作"><option value="找工作"><option value="寻物">
+        </datalist>
+      </div>
+      <div class="hy-row">
+        <div class="hy-f d"><label>提问日期</label><input type="date" id="hyDate"></div>
+        <div class="hy-f t"><label>时间</label><input type="time" id="hyTime"></div>
+        <div class="hy-f city"><label>地点</label><input type="text" id="hyCity" value="北京"></div>
+        <div class="hy-f n"><label>纬度</label><input type="number" id="hyLat" value="39.90" step="0.01"></div>
+        <div class="hy-f n"><label>经度</label><input type="number" id="hyLon" value="116.40" step="0.01"></div>
+      </div>
+    </div>
+
+    <!-- 择时 -->
+    <div id="hyElect" style="display:none">
+      <div class="hy-row">
+        <div class="hy-f"><label>要做什么事</label>
+          <select id="hyAct"></select></div>
+        <div class="hy-f d"><label>候选日期</label><input type="date" id="hyEDate"></div>
+        <div class="hy-f city"><label>地点</label><input type="text" id="hyECity" value="北京"></div>
+        <div class="hy-f n"><label>纬度</label><input type="number" id="hyELat" value="39.90" step="0.01"></div>
+        <div class="hy-f n"><label>经度</label><input type="number" id="hyELon" value="116.40" step="0.01"></div>
+      </div>
+    </div>
+
+    <div class="hy-row" style="margin-top:12px">
+      <button class="hy-btn" id="hyGo">起盘</button>
+      <button class="hy-btn ghost" id="hyNow">用现在时间</button>
+      <button class="hy-btn ghost" id="hySave">保存</button>
+    </div>
+    <div class="hy-hint" id="hyHint">
+      卜卦占星不看出生，看<b>提问的那一刻</b>——心里真正起疑的时间就是起盘时间。
+      同一个问题不要反复问，一问一盘。
+    </div>
+  </div>
+
+  <div id="hyOut"><div class="hy-empty">填好后点「起盘」</div></div>
+</div>
+
+<script src="/assets/js/bazi/astronomy.min.js"></script>
+<script src="/assets/js/bazi/western.js"></script>
+<script src="/assets/js/bazi/western-text.js"></script>
+<script src="/assets/js/bazi/horary.js"></script>
+<script src="/assets/js/bazi/cases.js"></script>
+<script src="/assets/js/bazi/qrcode.js"></script>
+<script src="/assets/js/bazi/share.js"></script>
+<script src="/assets/js/bazi/pwa.js"></script>
+<script>
+(function(){
+  'use strict';
+  var $ = function(id){ return document.getElementById(id); };
+  var _mode = 'horary', _last = null;
+
+  var CITIES = {
+    '北京':[116.40,39.90], '上海':[121.47,31.23], '广州':[113.26,23.13],
+    '深圳':[114.06,22.55], '成都':[104.07,30.66], '杭州':[120.16,30.27],
+    '武汉':[114.31,30.59], '西安':[108.94,34.34], '南京':[118.80,32.06],
+    '重庆':[106.55,29.56], '天津':[117.20,39.13], '香港':[114.17,22.32],
+    '台北':[121.52,25.03], '东京':[139.69,35.69], '首尔':[126.98,37.57],
+    '新加坡':[103.82,1.35], '纽约':[-74.01,40.71], '洛杉矶':[-118.24,34.05],
+    '伦敦':[-0.13,51.51], '巴黎':[2.35,48.86], '悉尼':[151.21,-33.87]
+  };
+
+  function esc(s){
+    return String(s==null?'':s).replace(/[&<>"]/g, function(m){
+      return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m];
+    });
+  }
+
+  (function init(){
+    var d = new Date(), p = function(n){ return n<10?'0'+n:n; };
+    var dateStr = d.getFullYear()+'-'+p(d.getMonth()+1)+'-'+p(d.getDate());
+    $('hyDate').value = dateStr;
+    $('hyTime').value = p(d.getHours())+':'+p(d.getMinutes());
+    $('hyEDate').value = dateStr;
+    // 活动选项
+    window.bzHorary.ACTIVITY_KEYS.forEach(function(k){
+      var o = document.createElement('option'); o.value = k; o.textContent = k;
+      $('hyAct').appendChild(o);
+    });
+  })();
+
+  function syncCity(inputId, latId, lonId){
+    var c = CITIES[$(inputId).value.trim()];
+    if (c) { $(latId).value = c[1].toFixed(2); $(lonId).value = c[0].toFixed(2); }
+  }
+  ['hyCity','hyECity'].forEach(function(id){
+    $(id).addEventListener('change', function(){
+      syncCity(id, id==='hyCity'?'hyLat':'hyELat', id==='hyCity'?'hyLon':'hyELon');
+    });
+  });
+
+  Array.prototype.forEach.call(document.querySelectorAll('.hy-tab'), function(t){
+    t.onclick = function(){
+      Array.prototype.forEach.call(document.querySelectorAll('.hy-tab'), function(x){
+        x.classList.remove('on');
+      });
+      t.classList.add('on');
+      _mode = t.getAttribute('data-mode');
+      $('hyHorary').style.display = _mode==='horary' ? '' : 'none';
+      $('hyElect').style.display = _mode==='elective' ? '' : 'none';
+      $('hyHint').innerHTML = _mode==='horary'
+        ? '卜卦占星不看出生，看<b>提问的那一刻</b>——心里真正起疑的时间就是起盘时间。同一个问题不要反复问，一问一盘。'
+        : '择时占星替你在一整天里挑出最合适的时段。评分综合了月相盈亏、月亮星座与相位、上升星座、月亮落宫。';
+    };
+  });
+
+  function toUTC(dateStr, timeStr){
+    var d = dateStr.split('-').map(Number);
+    var t = (timeStr||'12:00').split(':').map(Number);
+    return Date.UTC(d[0], d[1]-1, d[2], (t[0]||12)-8, t[1]||0, 0);
+  }
+
+  // ── 卜卦渲染 ──
+  function renderHorary(r){
+    var H = [];
+    var ch = r.chart;
+
+    H.push('<div class="hy-big">');
+    H.push('<div class="v">'+esc(r.question || '未填所问')+
+      (r.target ? '<span class="badge">'+r.target.label+'</span>' : '')+'</div>');
+    if (r.answer) {
+      H.push('<div class="v" style="font-size:1rem;color:var(--zhu)">'+r.answer.verdict+'</div>');
+      H.push('<div class="t">'+r.answer.text+'</div>');
+    } else {
+      H.push('<div class="t">没有识别出问题类型。加上「财运 / 事业 / 感情 / 考试 / 健康」等关键词，就能对应到具体宫位。</div>');
+    }
+    H.push('</div>');
+
+    // 一、主星
+    H.push('<div class="hy-sec"><div class="hy-sec-h"><span class="no">壹</span>'+
+      '<h2>主星</h2><span class="note">卜卦看两颗星的关系</span></div>');
+    H.push('<table class="hy-tb"><thead><tr><th>角色</th><th>主星</th><th>落座</th><th>落宫</th><th>状态</th></tr></thead><tbody>');
+    if (r.querent.pos) {
+      H.push('<tr><td>求问者（你）</td><td>'+r.querent.pos.zh+'</td>'+
+        '<td>'+bzAstro.dms(r.querent.pos.sign.deg)+r.querent.pos.sign.sign.zh+'</td>'+
+        '<td>'+r.querent.pos.house+'宫</td>'+
+        '<td>'+(r.querent.pos.retro?'逆行':'顺行')+'</td></tr>');
+    }
+    if (r.quesited.pos) {
+      var dupMoon = r.quesited.pos.key === 'Moon';
+      H.push('<tr><td>所问之事'+(dupMoon?' <span style="font-size:.66rem;color:var(--ink-4)">（与月亮同星）</span>':'')+
+        '</td><td>'+r.quesited.pos.zh+'</td>'+
+        '<td>'+bzAstro.dms(r.quesited.pos.sign.deg)+r.quesited.pos.sign.sign.zh+'</td>'+
+        '<td>'+r.quesited.pos.house+'宫</td>'+
+        '<td>'+(r.quesited.pos.retro?'逆行':'顺行')+'</td></tr>');
+    }
+    H.push('<tr><td>月亮（趋势）</td><td>月亮</td>'+
+      '<td>'+bzAstro.dms(r.moon.sign.deg)+r.moon.sign.sign.zh+'</td>'+
+      '<td>'+r.moon.house+'宫</td>'+
+      '<td>'+(r.moon.retro?'逆行':'顺行')+'</td></tr>');
+    H.push('</tbody></table></div>');
+    if (r.quesited.pos && r.quesited.pos.key === 'Moon') {
+      H.push('<div class="hy-card"><div class="d" style="font-size:.78rem">'+
+        '这一盘的所问之事恰好也由月亮主事——说明你问的这件事和你当下的情绪是同一回事，'+
+        '两者无法分开。此时月亮的每一个状态（空亡、相位、落宫）都同时代表你和这件事。</div></div>');
+    }
+
+    // 二、月亮状态
+    H.push('<div class="hy-sec"><div class="hy-sec-h"><span class="no">贰</span>'+
+      '<h2>月亮状态</h2><span class="note">看事情怎么发展</span></div>');
+    if (r.moonNote) {
+      r.moonNote.forEach(function(n){
+        H.push('<div class="hy-card"><div class="d"><b>'+n.k+'</b>：'+n.v+'</div></div>');
+      });
+    }
+    H.push('</div>');
+
+    // 三、相位
+    if (r.answer && r.answer.aspects && r.answer.aspects.length) {
+      H.push('<div class="hy-sec"><div class="hy-sec-h"><span class="no">叁</span>'+
+        '<h2>两主星的相位</h2></div>');
+      r.answer.aspects.forEach(function(a){
+        H.push('<div class="hy-card"><div class="d">'+
+          a.aZh+' '+a.name+' '+a.bZh+'（orb '+a.orb.toFixed(1)+'°）——'+
+          (window.bzAstroText.ASPECT_NOTE[a.name]||'')+'</div></div>');
+      });
+      H.push('</div>');
+    }
+
+    // 四、盘面
+    H.push('<div class="hy-sec"><div class="hy-sec-h"><span class="no">肆</span>'+
+      '<h2>盘面</h2><span class="note">提问时刻的星体位置</span></div>');
+    H.push('<table class="hy-tb"><thead><tr><th>星体</th><th>位置</th><th>宫位</th></tr></thead><tbody>');
+    ch.points.forEach(function(p){
+      H.push('<tr><td>'+p.glyph+' '+p.zh+'</td>'+
+        '<td>'+bzAstro.dms(p.sign.deg)+p.sign.sign.zh+(p.retro?' 逆':'')+'</td>'+
+        '<td>'+p.house+'宫</td></tr>');
+    });
+    H.push('<tr><td>AC 上升</td><td>'+bzAstro.dms(ch.asc.sign.deg)+ch.asc.sign.sign.zh+'</td><td>—</td></tr>');
+    H.push('<tr><td>MC 中天</td><td>'+bzAstro.dms(ch.mc.sign.deg)+ch.mc.sign.sign.zh+'</td><td>—</td></tr>');
+    H.push('</tbody></table></div>');
+
+    // 五、说明
+    H.push('<div class="hy-sec"><div class="hy-sec-h"><span class="no">伍</span>'+
+      '<h2>读盘说明</h2></div>');
+    H.push('<div class="hy-card"><div class="d">'+
+      '卜卦占星的逻辑很直接：你（1 宫主星）和所问之事（对应宫的主星）'+
+      '能不能「搭上话」。两星成合相、三分相、六分相 = 能，'+
+      '成刑相、对分相 = 有阻碍，完全无相 = 目前没有交集。</div>'+
+      '<div class="d">月亮代表事情的走向和你的情绪。月亮空亡'+
+      '（不与任何行星成相）是该体系里最重要的「无果」信号。</div>'+
+      '<div class="d">这套判断源自 William Lilly《Christian Astrology》(1647)，'+
+      '是卜卦占星的通行标准。不同流派的宫位取用略有差异。</div></div>');
+    H.push('</div>');
+
+    $('hyOut').innerHTML = H.join('');
+  }
+
+  // ── 择时渲染 ──
+  function renderElective(r){
+    var H = [];
+    H.push('<div class="hy-big">');
+    H.push('<div class="v">'+esc(r.activity)+'<span class="badge">'+r.date+'</span></div>');
+    H.push('<div class="t">在这一天里挑出最适合的时段。评分综合了月相盈亏、'+
+      '月亮星座与相位、上升星座、月亮落宫——不是玄学打分，每一项都能在盘上查到。</div>');
+    H.push('</div>');
+
+    // 最佳时段
+    H.push('<div class="hy-sec"><div class="hy-sec-h"><span class="no">壹</span>'+
+      '<h2>最佳时段</h2><span class="note">前三名</span></div>');
+    r.best.forEach(function(b, i){
+      H.push('<div class="hy-card" style="border-color:'+(i===0?'var(--qing)':'var(--rule)')+'">');
+      H.push('<div class="d"><b>'+String(b.hour).padStart(2,'0')+':00 — '+
+        String(b.hour).padStart(2,'0')+':59</b>　得分 <b>'+b.score+'</b>'+
+        (i===0?'　<span style="color:var(--qing)">推荐</span>':'')+'</div>');
+      if (b.reasons.length) {
+        H.push('<div class="d" style="color:var(--ink-3);font-size:.76rem">'+
+          b.reasons.join('；')+'</div>');
+      }
+      H.push('<div class="d" style="font-size:.76rem">月亮 '+bzAstro.dms(b.chart.moon.sign.deg)+
+        b.chart.moon.sign.sign.zh+'（'+b.chart.moon.sign.sign.el+'象，第'+b.chart.moon.house+'宫）　'+
+        '上升 '+bzAstro.dms(b.chart.asc.sign.deg)+b.chart.asc.sign.sign.zh+
+        '（'+b.chart.asc.sign.sign.el+'象）</div>');
+      H.push('</div>');
+    });
+    H.push('</div>');
+
+    // 全天分布
+    H.push('<div class="hy-sec"><div class="hy-sec-h"><span class="no">贰</span>'+
+      '<h2>全天分布</h2><span class="note">24 小时评分</span></div>');
+    H.push('<div class="hy-hours">');
+    var bestHours = r.best.map(function(b){ return b.hour; });
+    r.all.slice().sort(function(a,b){ return a.hour-b.hour; }).forEach(function(h){
+      var isBest = bestHours.indexOf(h.hour) >= 0;
+      var color = h.score >= 70 ? '#3f5d52' : h.score >= 50 ? '#9a7b3f' : '#a8352a';
+      H.push('<div class="hy-hour'+(isBest?' best':'')+'">'+
+        '<div class="h">'+String(h.hour).padStart(2,'0')+':00</div>'+
+        '<div class="s">'+h.score+'</div>'+
+        '<div class="bar"><i style="width:'+h.score+'%;background:'+color+'"></i></div>'+
+        '</div>');
+    });
+    H.push('</div>');
+    H.push('<div class="hy-card" style="margin-top:12px"><div class="d" style="font-size:.76rem">'+
+      '绿色 ≥70 分可用，土黄 50–69 一般，朱红 &lt;50 建议避开。</div></div>');
+    H.push('</div>');
+
+    // 判据
+    H.push('<div class="hy-sec"><div class="hy-sec-h"><span class="no">叁</span>'+
+      '<h2>评分依据</h2></div>');
+    H.push('<div class="hy-card"><div class="d">'+
+      '这件「'+r.activity+'」适合 <b>'+r.act.goodSigns.join('、')+'象</b>，'+
+      '忌讳 <b>'+r.act.badAspects.join('、')+'</b>，'+
+      '偏好 <b>'+r.act.prefer+'</b>。</div>');
+    H.push('<div class="d" style="font-size:.78rem">'+
+      '加分项：月相符合、月亮与上升落在合适元素、月亮不在 6/8/12 宫、金星木星吉相。<br>'+
+      '扣分项：月亮紧凶相、月亮空亡、月亮落不吉之宫。</div></div>');
+    H.push('</div>');
+
+    // 说明
+    H.push('<div class="hy-sec"><div class="hy-sec-h"><span class="no">肆</span>'+
+      '<h2>说明</h2></div>');
+    H.push('<div class="hy-card"><div class="d">'+
+      '择时占星不预测结果，只告诉你「什么时候开始更顺」。'+
+      '它挑的是那一刻的星象状态，不改变事情本身。</div>'+
+      '<div class="d">如果你有必须遵守的日期（比如对方的档期），'+
+      '可以在那天里挑分数最高的时段，而不是硬换日期。</div></div>');
+    H.push('</div>');
+
+    $('hyOut').innerHTML = H.join('');
+  }
+
+  function go(){
+    try {
+      if (_mode === 'horary') {
+        var q = $('hyQ').value.trim();
+        var dateStr = $('hyDate').value, timeStr = $('hyTime').value;
+        if (!dateStr || !timeStr) { alert('请填完整'); return; }
+        var lat = parseFloat($('hyLat').value), lon = parseFloat($('hyLon').value);
+        if (isNaN(lat) || isNaN(lon)) { alert('请填经纬度'); return; }
+        var ms = toUTC(dateStr, timeStr);
+        var r = bzHorary.horary({ ms: ms, lat: lat, lon: lon, question: q });
+        _last = { type:'horary', data:r, meta:{date:dateStr, time:timeStr, q:q} };
+        renderHorary(r);
+      } else {
+        var act = $('hyAct').value;
+        var ed = $('hyEDate').value;
+        var elat = parseFloat($('hyELat').value), elon = parseFloat($('hyELon').value);
+        if (!ed) { alert('请选日期'); return; }
+        var r2 = bzHorary.elective({ dateStr: ed, lat: elat, lon: elon, activity: act });
+        _last = { type:'elective', data:r2, meta:{date:ed, act:act} };
+        renderElective(r2);
+      }
+    } catch (e) {
+      $('hyOut').innerHTML = '<div class="hy-empty">起盘失败：'+esc(e.message)+'</div>';
+    }
+  }
+
+  $('hyGo').onclick = go;
+
+  $('hyNow').onclick = function(){
+    var d = new Date(), p = function(n){ return n<10?'0'+n:n; };
+    var ds = d.getFullYear()+'-'+p(d.getMonth()+1)+'-'+p(d.getDate());
+    var ts = p(d.getHours())+':'+p(d.getMinutes());
+    if (_mode === 'horary') { $('hyDate').value = ds; $('hyTime').value = ts; }
+    else { $('hyEDate').value = ds; }
+    go();
+  };
+
+  $('hySave').onclick = function(){
+    if (!_last) { alert('请先起盘'); return; }
+    var nm = prompt('给这次占问起个名字（留空自动命名）：', '');
+    if (nm === null) return;
+    var m = _last.meta;
+    if (!nm) nm = (_last.type==='horary' ? (m.q || '卜卦') : (m.act + ' ' + m.date));
+    var it = bzCases.add({
+      kind: 'horary', name: nm,
+      date: m.date, time: m.time || '12:00', sex: 1,
+      note: JSON.stringify({ type:_last.type, question:m.q||null, activity:m.act||null })
+    });
+    if (!it) { alert('保存失败'); return; }
+    var b = $('hySave'), o = b.textContent;
+    b.textContent = '已保存 ✓';
+    setTimeout(function(){ b.textContent = o; }, 1400);
+  };
+
+  go();
+})();
+</script>

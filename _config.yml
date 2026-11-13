@@ -149,6 +149,8 @@ navigation_header:
   url: /hepan/
 - title: 星盘
   url: /astro/
+- title: 占卜
+  url: /divination/
 - title: 古籍
   url: /books/
 - title: Fork Lujiachun
@@ -207,6 +209,11 @@ pwa_core:
   - /assets/js/bazi/astronomy.min.js
   - /assets/js/bazi/western.js
   - /assets/js/bazi/western-text.js
+  - /assets/js/bazi/liuyao.js
+  - /assets/js/bazi/meihua.js
+  - /assets/js/bazi/horary.js
+  - /assets/js/bazi/tarot.js
+  - /assets/js/bazi/numerology.js
 
 pwa_heavy:
   - /assets/js/bazi/guji-index.js

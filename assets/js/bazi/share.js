@@ -694,6 +694,260 @@
     return b.cv;
   }
 
+
+  /**
+   * 六爻分享卡
+   */
+  function liuyaoCard(d, meta) {
+    var W = 620;
+    // 高度按内容算：标题区 152 + 六爻 6*34 + 用神/动爻 60 + 二维码区 110 + 页脚
+    var H = 152 + 58 + 6 * 34 + 96 + 78;
+    var b = baseCanvas(W, H);
+    var ctx = b.ctx;
+    var pad = 42;
+
+    ctx.fillStyle = C.ink;
+    ctx.font = 'bold 26px ' + SERIF;
+    ctx.fillText('六爻', pad, 64);
+
+    ctx.fillStyle = C.ink3;
+    ctx.font = '12px ' + SANS;
+    var sub = (meta && meta.date ? meta.date + ' ' + meta.time + '　' : '') +
+      '日辰 ' + d.dayGan + d.dayZhi;
+    ctx.fillText(sub, pad, 86);
+
+    // 所问
+    if (meta && meta.question) {
+      ctx.fillStyle = C.ink2;
+      ctx.font = '13px ' + SERIF;
+      ctx.fillText('问：' + String(meta.question).slice(0, 24), pad, 108);
+    }
+
+    ctx.strokeStyle = C.rule;
+    ctx.beginPath();
+    ctx.moveTo(pad, 122);
+    ctx.lineTo(W - pad, 122);
+    ctx.stroke();
+
+    // 卦名
+    var y = 152;
+    ctx.fillStyle = C.ink;
+    ctx.font = 'bold 22px ' + SERIF;
+    ctx.fillText(d.ben.name, pad, y);
+    if (d.bian) {
+      var w1 = ctx.measureText(d.ben.name).width;
+      ctx.fillStyle = C.zhu;
+      ctx.font = '14px ' + SERIF;
+      ctx.fillText('→', pad + w1 + 10, y - 2);
+      ctx.fillStyle = C.ink;
+      ctx.font = 'bold 22px ' + SERIF;
+      ctx.fillText(d.bian.name, pad + w1 + 36, y);
+    }
+
+    // 卦宫信息
+    ctx.fillStyle = C.ink3;
+    ctx.font = '11px ' + SANS;
+    ctx.fillText(d.palace.palace + '宫 ' + d.palace.palaceWx + '　' +
+      d.palace.type + '　世' + d.palace.shi + ' 应' + d.palace.ying +
+      '　旬空 ' + d.kong.join(''), pad, y + 22);
+
+    // 六爻
+    var ly = y + 58;
+    for (var i = 5; i >= 0; i--) {
+      var l = d.lines[i];
+      var yy = ly + (5 - i) * 34;
+
+      // 爻位
+      ctx.fillStyle = C.ink4;
+      ctx.font = '10px ' + SANS;
+      ctx.fillText(['初','二','三','四','五','上'][i], pad, yy);
+
+      // 阴阳符号
+      var yy2 = yy - 5;
+      ctx.strokeStyle = l.changing ? C.zhu : C.ink2;
+      ctx.lineWidth = l.changing ? 3 : 2;
+      if (l.yao) {
+        ctx.beginPath(); ctx.moveTo(pad + 20, yy2); ctx.lineTo(pad + 92, yy2); ctx.stroke();
+      } else {
+        ctx.beginPath(); ctx.moveTo(pad + 20, yy2); ctx.lineTo(pad + 50, yy2); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(pad + 62, yy2); ctx.lineTo(pad + 92, yy2); ctx.stroke();
+      }
+      ctx.lineWidth = 1;
+
+      // 六亲 + 纳甲
+      ctx.fillStyle = C.ink;
+      ctx.font = '12px ' + SERIF;
+      ctx.fillText(l.liuqin, pad + 104, yy);
+      ctx.fillStyle = C.ink2;
+      ctx.fillText(l.gan + l.zhi + ' ' + l.wx, pad + 150, yy);
+
+      // 世应 / 空
+      var mark = l.shi ? '世' : l.ying ? '应' : '';
+      if (mark) {
+        ctx.fillStyle = C.zhu;
+        ctx.font = '11px ' + SANS;
+        ctx.fillText(mark, pad + 202, yy);
+      }
+      if (l.kong) {
+        ctx.fillStyle = C.ink4;
+        ctx.font = '10px ' + SANS;
+        ctx.fillText('空', pad + 220, yy);
+      }
+
+      // 六神
+      ctx.fillStyle = C.ink4;
+      ctx.font = '10px ' + SANS;
+      ctx.fillText(l.liushen, pad + 246, yy);
+
+      // 变爻
+      if (l.bian) {
+        ctx.fillStyle = C.ink3;
+        ctx.font = '10px ' + SERIF;
+        ctx.fillText('→ ' + l.bian.liuqin + l.bian.gan + l.bian.zhi, pad + 290, yy);
+      }
+    }
+
+    // 用神提示
+    var yq = global.bzLiuyao ? global.bzLiuyao.pickYongshen(meta && meta.question) : null;
+    var by = ly + 6 * 34 + 20;
+    if (yq) {
+      var ys = d.lines.filter(function (l) { return l.liuqin === yq; });
+      ctx.fillStyle = C.ink4;
+      ctx.font = '11px ' + SANS;
+      ctx.fillText('用神', pad, by);
+      ctx.fillStyle = C.ink2;
+      ctx.font = '13px ' + SERIF;
+      ctx.fillText(yq + (ys.length ? '（第' + ys.map(function (l) { return l.pos; }).join('、') + '爻）' : '（不上卦）'), pad + 40, by);
+    }
+
+    // 动爻
+    if (d.moving.length) {
+      ctx.fillStyle = C.ink4;
+      ctx.font = '11px ' + SANS;
+      ctx.fillText('动爻', pad, by + 24);
+      ctx.fillStyle = C.zhu;
+      ctx.font = '13px ' + SERIF;
+      ctx.fillText(d.moving.map(function (p) { return '第' + p + '爻'; }).join('　'), pad + 40, by + 24);
+    }
+
+    // 二维码
+    drawQR(ctx, (meta && meta.url) || 'https://lujiachun.top/liuyao/',
+      W - 40 - 78, H - 108, 78, '扫码起一卦');
+
+    footer(ctx, W, H);
+    return b.cv;
+  }
+
+
+  /**
+   * 塔罗分享卡
+   */
+  function tarotCard(r, question) {
+    var W = 640;
+    var n = r.cards.length;
+    var cols = n <= 1 ? 1 : n <= 3 ? 3 : n <= 5 ? 3 : 4;
+    var rows = Math.ceil(n / cols);
+    var cw = 130, chh = 208, gap = 14;
+    var gridH = rows * (chh + 30) + (rows - 1) * gap;
+    var H = 150 + gridH + 90 + 70;
+
+    var b = baseCanvas(W, H);
+    var ctx = b.ctx;
+    var pad = 42;
+
+    ctx.fillStyle = C.ink;
+    ctx.font = 'bold 26px ' + SERIF;
+    ctx.fillText('塔罗 · ' + r.spread.name, pad, 62);
+
+    ctx.fillStyle = C.ink3;
+    ctx.font = '12px ' + SANS;
+    if (question) {
+      ctx.fillText('问：' + String(question).slice(0, 26), pad, 86);
+    }
+    ctx.fillText(r.cards.map(function (c) {
+      return (c.card.fullName || c.card.name) + (c.reversed ? '逆' : '正');
+    }).join('　'), pad, question ? 106 : 86);
+
+    ctx.strokeStyle = C.rule;
+    ctx.beginPath();
+    ctx.moveTo(pad, 124);
+    ctx.lineTo(W - pad, 124);
+    ctx.stroke();
+
+    // 牌阵网格
+    var totalW = cols * cw + (cols - 1) * gap;
+    var sx = (W - totalW) / 2;
+    var sy = 150;
+
+    r.cards.forEach(function (c, i) {
+      var col = i % cols, row = Math.floor(i / cols);
+      var x = sx + col * (cw + gap);
+      var y = sy + row * (chh + 30 + gap);
+
+      // 位置名
+      ctx.fillStyle = C.ink4;
+      ctx.font = '10px ' + SANS;
+      ctx.textAlign = 'center';
+      ctx.fillText(String(c.posName).slice(0, 10), x + cw / 2, y - 6);
+
+      // 卡面
+      ctx.fillStyle = c.reversed ? '#faf3ee' : C.paper2;
+      roundRect(ctx, x, y, cw, chh, 6);
+      ctx.fill();
+      ctx.strokeStyle = c.reversed ? C.zhu : C.rule;
+      ctx.lineWidth = c.reversed ? 1.5 : 1;
+      ctx.stroke();
+      ctx.lineWidth = 1;
+
+      // 符号
+      ctx.fillStyle = C.zhu;
+      ctx.font = '26px ' + SERIF;
+      ctx.fillText(c.card.glyph, x + cw / 2, y + chh / 2 - 8);
+
+      // 牌名
+      ctx.fillStyle = C.ink;
+      ctx.font = '12px ' + SERIF;
+      var nm = c.card.fullName || c.card.name;
+      if (nm.length > 6) nm = nm.slice(0, 6);
+      ctx.fillText(nm, x + cw / 2, y + chh / 2 + 22);
+
+      // 正逆
+      ctx.fillStyle = c.reversed ? C.zhu : C.ink3;
+      ctx.font = '10px ' + SANS;
+      ctx.fillText(c.reversed ? '逆位' : '正位', x + cw / 2, y + chh / 2 + 40);
+    });
+    ctx.textAlign = 'left';
+
+    // 底部：大牌/逆位统计
+    var sm = global.bzTarot.summary(r);
+    var by = sy + gridH + 18;
+    ctx.fillStyle = C.ink4;
+    ctx.font = '11px ' + SANS;
+    ctx.fillText('大阿卡纳 ' + sm.stat.major + '/' + n +
+      '　逆位 ' + sm.stat.reversed + '/' + n, pad, by);
+
+    // 一句话提示
+    if (sm.notes.length) {
+      ctx.fillStyle = C.ink2;
+      ctx.font = '11px ' + SERIF;
+      var note = sm.notes[0];
+      var line = '', ly2 = by + 22;
+      for (var i = 0; i < note.length; i++) {
+        var test = line + note[i];
+        if (ctx.measureText(test).width > W - pad * 2 - 100) {
+          ctx.fillText(line, pad, ly2); ly2 += 18; line = note[i];
+        } else { line = test; }
+      }
+      if (line) ctx.fillText(line, pad, ly2);
+    }
+
+    // 二维码
+    drawQR(ctx, 'https://lujiachun.top/tarot/', W - 40 - 78, H - 118, 78, '扫码抽一次');
+
+    footer(ctx, W, H);
+    return b.cv;
+  }
+
   /** 下载 canvas 为 png */
   function download(cv, name) {
     try {
@@ -759,6 +1013,8 @@
     ziweiCard: ziweiCard,
     huangliCard: huangliCard,
     astroCard: astroCard,
+    liuyaoCard: liuyaoCard,
+    tarotCard: tarotCard,
     download: download,
     preview: preview
   };

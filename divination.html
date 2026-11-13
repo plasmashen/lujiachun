@@ -1,0 +1,187 @@
+---
+layout: default
+title: 占卜
+description: 六爻 · 梅花易数 · 塔罗 · 卜卦占星 · 择时占星 · 数字命理 · 姓名五格。离线可用。
+permalink: /divination/
+---
+
+<style>
+:root{
+  --paper:#f7f4ed; --paper-2:#fdfcf8;
+  --ink:#1c1a17; --ink-2:#544f47; --ink-3:#797367; --ink-4:#a39c8f;
+  --rule:#ded7c8; --rule-soft:#f0ece2;
+  --zhu:#a8352a; --qing:#3f5d52; --jin:#9a7b3f;
+  --serif:"Songti SC","STSong","SimSun","Source Han Serif SC","Noto Serif CJK SC",serif;
+  --sans:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Microsoft YaHei","Source Han Sans SC","Noto Sans CJK SC",sans-serif;
+}
+.dv-wrap{max-width:920px;margin:0 auto;padding:0 20px 70px;
+  font-family:var(--sans);color:var(--ink);background:var(--paper);
+  font-size:.9rem;line-height:1.75}
+.dv-wrap *{box-sizing:border-box}
+
+.dv-hero{margin:26px 0 4px}
+.dv-hero h1{font-family:var(--serif);font-size:1.5rem;margin:0 0 8px;
+  letter-spacing:.06em;font-weight:600}
+.dv-hero p{color:var(--ink-3);font-size:.84rem;line-height:1.85;margin:0}
+
+/* ── 分类 ── */
+.dv-group{margin-top:34px}
+.dv-group-h{display:flex;align-items:baseline;gap:9px;margin-bottom:14px;
+  padding-bottom:8px;border-bottom:1px solid var(--rule)}
+.dv-group-h .no{font-family:var(--serif);color:var(--zhu);font-size:.8rem;opacity:.75}
+.dv-group-h h2{font-family:var(--serif);font-size:1.06rem;margin:0;
+  letter-spacing:.05em;font-weight:600}
+.dv-group-h .note{font-size:.68rem;color:var(--ink-4);margin-left:auto}
+
+.dv-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:12px}
+
+.dv-card{display:flex;flex-direction:column;background:var(--paper-2);
+  border:1px solid var(--rule);border-radius:8px;padding:17px 18px 15px;
+  text-decoration:none;color:inherit;transition:.18s;position:relative}
+.dv-card:hover{border-color:var(--zhu);box-shadow:0 4px 18px rgba(28,26,23,.07);
+  transform:translateY(-2px)}
+.dv-card .glyph{font-family:var(--serif);font-size:1.5rem;color:var(--zhu);
+  line-height:1;margin-bottom:9px;display:block}
+.dv-card .nm{font-family:var(--serif);font-size:1.02rem;font-weight:600;
+  letter-spacing:.04em;margin-bottom:4px;display:block}
+.dv-card .en{font-size:.64rem;color:var(--ink-4);letter-spacing:.04em;
+  margin-bottom:8px;display:block}
+.dv-card .ds{font-size:.78rem;color:var(--ink-3);line-height:1.72;display:block;
+  flex:1 1 auto}
+.dv-card .tg{margin-top:11px;padding-top:10px;border-top:1px dashed var(--rule-soft);
+  display:flex;gap:6px;flex-wrap:wrap}
+.dv-card .tg span{font-size:.65rem;color:var(--ink-4);background:var(--rule-soft);
+  border-radius:3px;padding:2px 7px}
+
+.dv-card.accent{background:linear-gradient(160deg,#fdfcf8 0%,#faf3ee 100%);
+  border-color:#e2cfc5}
+.dv-card.accent .nm{color:var(--zhu)}
+
+/* ── 说明条 ── */
+.dv-note{margin-top:34px;background:var(--rule-soft);border-radius:8px;
+  padding:15px 18px;font-size:.78rem;color:var(--ink-3);line-height:1.9}
+.dv-note b{color:var(--ink-2)}
+
+@media screen and (max-width:700px){
+  .dv-wrap{padding:0 14px 50px}
+  .dv-grid{grid-template-columns:1fr;gap:10px}
+  .dv-card{padding:14px 15px 12px}
+  .dv-card .glyph{font-size:1.3rem;margin-bottom:7px}
+  .dv-hero h1{font-size:1.28rem}
+  .dv-group-h h2{font-size:.98rem}
+  .dv-group-h .note{display:none}
+}
+</style>
+
+<div class="dv-wrap">
+
+  <div class="dv-hero">
+    <h1>占卜</h1>
+    <p>
+      六个体系，三种思路：<b>卦</b>（六爻、梅花）看当下的结构，
+      <b>牌</b>（塔罗）看心理的投射，<b>盘</b>（卜卦、择时）看时刻的星象。
+      另有数字与姓名两套纯算术的方法。
+    </p>
+  </div>
+
+  <!-- 一、起卦 -->
+  <div class="dv-group">
+    <div class="dv-group-h"><span class="no">壹</span><h2>起卦</h2>
+      <span class="note">中国传统的象数体系</span></div>
+    <div class="dv-grid">
+
+      <a class="dv-card accent" href="/liuyao/">
+        <span class="glyph">爻</span>
+        <span class="nm">六爻</span>
+        <span class="en">Six Lines · Najia</span>
+        <span class="ds">摇钱成卦，纳甲装卦，配六亲六神，定世应旬空，按用神断吉凶。</span>
+        <span class="tg"><span>摇钱法</span><span>64 卦</span><span>六亲六神</span></span>
+      </a>
+
+      <a class="dv-card" href="/meihua/">
+        <span class="glyph">梅</span>
+        <span class="nm">梅花易数</span>
+        <span class="en">Plum Blossom</span>
+        <span class="ds">时间、数字、字数皆可起卦。分体用，以五行生克定吉凶，兼看互卦变卦。</span>
+        <span class="tg"><span>时间卦</span><span>数字卦</span><span>体用生克</span></span>
+      </a>
+
+    </div>
+  </div>
+
+  <!-- 二、牌 -->
+  <div class="dv-group">
+    <div class="dv-group-h"><span class="no">贰</span><h2>牌</h2>
+      <span class="note">投射与象征</span></div>
+    <div class="dv-grid">
+
+      <a class="dv-card" href="/tarot/">
+        <span class="glyph">牌</span>
+        <span class="nm">塔罗</span>
+        <span class="en">Tarot · Rider-Waite</span>
+        <span class="ds">78 张韦特牌，正逆位皆有解读。支持单张、三张、五张、凯尔特十字四种牌阵。</span>
+        <span class="tg"><span>78 张全牌义</span><span>4 种牌阵</span><span>整体构成分析</span></span>
+      </a>
+
+    </div>
+  </div>
+
+  <!-- 三、盘 -->
+  <div class="dv-group">
+    <div class="dv-group-h"><span class="no">叁</span><h2>盘</h2>
+      <span class="note">以时刻起盘</span></div>
+    <div class="dv-grid">
+
+      <a class="dv-card" href="/horary/">
+        <span class="glyph">卜</span>
+        <span class="nm">卜卦占星</span>
+        <span class="en">Horary Astrology</span>
+        <span class="ds">以提问那一刻起盘，看求问者主星与所问之事主星能不能「搭上话」。</span>
+        <span class="tg"><span>宫位取用</span><span>主星关系</span><span>月亮状态</span></span>
+      </a>
+
+      <a class="dv-card" href="/horary/#elective">
+        <span class="glyph">择</span>
+        <span class="nm">择时占星</span>
+        <span class="en">Electional Astrology</span>
+        <span class="ds">为签约、开业、搬家等事由，在一天里逐小时评分，挑出最合适的时段。</span>
+        <span class="tg"><span>24 小时评分</span><span>7 类事由</span></span>
+      </a>
+
+    </div>
+  </div>
+
+  <!-- 四、数 -->
+  <div class="dv-group">
+    <div class="dv-group-h"><span class="no">肆</span><h2>数</h2>
+      <span class="note">纯算术，不需要时辰</span></div>
+    <div class="dv-grid">
+
+      <a class="dv-card" href="/numerology/">
+        <span class="glyph">数</span>
+        <span class="nm">数字命理</span>
+        <span class="en">Numerology</span>
+        <span class="ds">生命灵数、生日数、表达数、灵魂数、个人年。毕达哥拉斯体系，保留 11/22/33 主数。</span>
+        <span class="tg"><span>生命灵数</span><span>主数</span><span>个人年</span></span>
+      </a>
+
+      <a class="dv-card" href="/numerology/#name">
+        <span class="glyph">名</span>
+        <span class="nm">姓名五格</span>
+        <span class="en">Name Analysis</span>
+        <span class="ds">天格、人格、地格、外格、总格，按繁体笔画计算，附三才配置与 81 数吉凶。</span>
+        <span class="tg"><span>五格剖象</span><span>三才</span><span>81 数理</span></span>
+      </a>
+
+    </div>
+  </div>
+
+  <div class="dv-note">
+    <b>关于这些体系的定位</b><br>
+    六爻与梅花走的是「象数」——把当下的处境抽象成卦，再按生克关系推演。越具体的问题越好用。<br>
+    塔罗走的是「投射」——牌面是镜子，你从模糊图像里读到的，往往是你已经知道但没说出口的。<br>
+    卜卦与择时走的是「时机」——同一个问题在不同时刻问，盘面不同，结论也可能不同。<br>
+    数字与姓名最简单，适合当参考，不适合当依据。
+  </div>
+
+</div>

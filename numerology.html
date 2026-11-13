@@ -1,0 +1,405 @@
+---
+layout: default
+title: 数字命理 · 姓名
+description: 生命灵数 · 表达数 · 灵魂数 · 个人年 · 姓名五格剖象 · 三才配置。离线可用。
+permalink: /numerology/
+---
+
+<style>
+:root{
+  --paper:#f7f4ed; --paper-2:#fdfcf8;
+  --ink:#1c1a17; --ink-2:#544f47; --ink-3:#797367; --ink-4:#a39c8f;
+  --rule:#ded7c8; --rule-soft:#f0ece2;
+  --zhu:#a8352a; --qing:#3f5d52; --jin:#9a7b3f;
+  --serif:"Songti SC","STSong","SimSun","Source Han Serif SC","Noto Serif CJK SC",serif;
+  --sans:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Microsoft YaHei","Source Han Sans SC","Noto Sans CJK SC",sans-serif;
+}
+.nu-wrap{max-width:880px;margin:0 auto;padding:0 20px 70px;
+  font-family:var(--sans);color:var(--ink);background:var(--paper);
+  font-size:.9rem;line-height:1.75}
+.nu-wrap *{box-sizing:border-box}
+
+.nu-tabs{display:flex;gap:6px;margin:22px 0 0;flex-wrap:wrap}
+.nu-tab{font-family:var(--sans);font-size:.82rem;padding:7px 18px;
+  border:1px solid var(--rule);border-radius:5px 5px 0 0;background:#fff;
+  color:var(--ink-3);cursor:pointer;border-bottom:none}
+.nu-tab.on{background:var(--paper-2);color:var(--zhu);font-weight:600;
+  border-color:var(--zhu);position:relative;top:1px}
+
+.nu-form{background:var(--paper-2);border:1px solid var(--zhu);border-radius:0 8px 8px 8px;
+  padding:18px 20px;margin:0 0 24px}
+.nu-row{display:flex;flex-wrap:wrap;gap:10px;align-items:flex-end;margin-bottom:10px}
+.nu-row:last-child{margin-bottom:0}
+.nu-f{display:flex;flex-direction:column;gap:4px}
+.nu-f label{font-size:.7rem;color:var(--ink-4);letter-spacing:.06em}
+.nu-f input{font-family:var(--sans);font-size:.86rem;padding:7px 10px;
+  border:1px solid var(--rule);border-radius:5px;background:#fff;color:var(--ink);outline:none}
+.nu-f input:focus{border-color:var(--zhu)}
+.nu-f.d input{width:145px}
+.nu-f.nm input{width:180px}
+.nu-btn{font-family:var(--sans);font-size:.86rem;padding:8px 24px;border:none;
+  border-radius:5px;background:var(--zhu);color:#fff;cursor:pointer;letter-spacing:.04em}
+.nu-btn:hover{opacity:.88}
+.nu-btn.ghost{background:none;border:1px solid var(--rule);color:var(--ink-2)}
+.nu-btn.ghost:hover{border-color:var(--zhu);color:var(--zhu)}
+.nu-hint{font-size:.7rem;color:var(--ink-4);margin-top:9px;line-height:1.7}
+
+/* ── 大数字展示 ── */
+.nu-hero{display:flex;gap:16px;flex-wrap:wrap;margin-bottom:22px}
+.nu-num{flex:1 1 150px;background:var(--paper-2);border:1px solid var(--rule);
+  border-radius:9px;padding:16px 18px;text-align:center;position:relative}
+.nu-num.master{border-color:var(--jin);background:linear-gradient(160deg,#fdfcf8,#faf6ec)}
+.nu-num .k{font-size:.68rem;color:var(--ink-4);letter-spacing:.08em;margin-bottom:6px}
+.nu-num .v{font-family:var(--serif);font-size:2.5rem;line-height:1;color:var(--zhu);
+  margin-bottom:6px}
+.nu-num .kw{font-size:.8rem;color:var(--ink-2)}
+.nu-num .m{position:absolute;top:8px;right:10px;font-size:.6rem;color:var(--jin);
+  border:1px solid currentColor;border-radius:2px;padding:0 4px}
+
+/* ── 区块 ── */
+.nu-sec{margin:26px 0 0}
+.nu-sec-h{display:flex;align-items:baseline;gap:9px;margin-bottom:12px;
+  padding-bottom:7px;border-bottom:1px solid var(--rule)}
+.nu-sec-h .no{font-family:var(--serif);color:var(--zhu);font-size:.8rem;opacity:.75}
+.nu-sec-h h2{font-family:var(--serif);font-size:1.04rem;margin:0;
+  letter-spacing:.05em;font-weight:600}
+.nu-sec-h .note{font-size:.68rem;color:var(--ink-4);margin-left:auto}
+
+.nu-card{background:var(--paper-2);border:1px solid var(--rule);border-radius:8px;
+  padding:14px 17px;margin-bottom:10px}
+.nu-card .d{font-size:.82rem;color:var(--ink-2);line-height:1.85}
+.nu-card .d+.d{margin-top:7px}
+.nu-card b{color:var(--ink)}
+
+.nu-tb{width:100%;border-collapse:collapse;font-size:.79rem}
+.nu-tb th,.nu-tb td{padding:8px 10px;text-align:left;border-bottom:1px solid var(--rule-soft)}
+.nu-tb th{font-size:.68rem;color:var(--ink-4);font-weight:500;background:var(--rule-soft)}
+.nu-tb td.c{text-align:center;font-family:var(--serif);font-size:.92rem}
+.nu-tb .good{color:var(--qing);font-weight:600}
+.nu-tb .bad{color:var(--zhu);font-weight:600}
+.nu-tb .mid{color:var(--jin)}
+
+.nu-wx{display:inline-block;padding:1px 7px;border-radius:3px;font-size:.7rem;
+  border:1px solid currentColor}
+
+.nu-empty{text-align:center;padding:44px 20px;color:var(--ink-4);font-size:.85rem}
+
+@media screen and (max-width:700px){
+  .nu-wrap{padding:0 14px 50px}
+  .nu-f.d input{width:100%}
+  .nu-f.d{flex:1 1 100%}
+  .nu-f.nm{flex:1 1 100%}
+  .nu-f.nm input{width:100%}
+  .nu-btn{flex:1 1 auto}
+  .nu-num{flex:1 1 100%;display:flex;align-items:center;gap:14px;text-align:left;padding:12px 16px}
+  .nu-num .k{margin-bottom:0;min-width:4.5em}
+  .nu-num .v{font-size:1.9rem;margin-bottom:0}
+}
+</style>
+
+<div class="nu-wrap">
+
+  <div class="nu-tabs">
+    <button class="nu-tab on" data-mode="num">数字命理</button>
+    <button class="nu-tab" data-mode="name">姓名五格</button>
+  </div>
+
+  <div class="nu-form">
+    <!-- 数字命理 -->
+    <div id="nuNum">
+      <div class="nu-row">
+        <div class="nu-f d"><label>出生日期</label><input type="date" id="nuDate" value="1990-05-15"></div>
+        <div class="nu-f nm" style="margin-left:8px"><label>英文名（可选，算表达数）</label>
+          <input type="text" id="nuName" placeholder="如 Zhang Wei"></div>
+      </div>
+    </div>
+
+    <!-- 姓名五格 -->
+    <div id="nuNm" style="display:none">
+      <div class="nu-row">
+        <div class="nu-f nm"><label>姓</label><input type="text" id="nuSurname" value="王" maxlength="2"></div>
+        <div class="nu-f nm"><label>名</label><input type="text" id="nuGiven" value="小明" maxlength="2"></div>
+      </div>
+    </div>
+
+    <div class="nu-row" style="margin-top:12px">
+      <button class="nu-btn" id="nuGo">计算</button>
+      <button class="nu-btn ghost" id="nuSave">保存</button>
+    </div>
+    <div class="nu-hint" id="nuHint">
+      数字命理用毕达哥拉斯体系：把日期或姓名折算成 1–9，遇到 11/22/33 保留为主数（不加到个位）。
+      主数代表更强的能量，也更难驾驭。
+    </div>
+  </div>
+
+  <div id="nuOut"><div class="nu-empty">填好后点「计算」</div></div>
+</div>
+
+<script src="/assets/js/bazi/numerology.js"></script>
+<script src="/assets/js/bazi/cases.js"></script>
+<script src="/assets/js/bazi/qrcode.js"></script>
+<script src="/assets/js/bazi/share.js"></script>
+<script src="/assets/js/bazi/pwa.js"></script>
+<script>
+(function(){
+  'use strict';
+  var $ = function(id){ return document.getElementById(id); };
+  var _mode = 'num', _last = null;
+
+  function esc(s){
+    return String(s==null?'':s).replace(/[&<>"]/g, function(m){
+      return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m];
+    });
+  }
+
+  Array.prototype.forEach.call(document.querySelectorAll('.nu-tab'), function(t){
+    t.onclick = function(){
+      Array.prototype.forEach.call(document.querySelectorAll('.nu-tab'), function(x){
+        x.classList.remove('on');
+      });
+      t.classList.add('on');
+      _mode = t.getAttribute('data-mode');
+      $('nuNum').style.display = _mode==='num' ? '' : 'none';
+      $('nuNm').style.display = _mode==='name' ? '' : 'none';
+      $('nuHint').innerHTML = _mode==='num'
+        ? '数字命理用毕达哥拉斯体系：把日期或姓名折算成 1–9，遇到 11/22/33 保留为主数（不加到个位）。主数代表更强的能量，也更难驾驭。'
+        : '五格剖象以<b>繁体笔画</b>为准。天格看祖上、人格看自身（最重要）、地格看早年、外格看外缘、总格看后半生。三才＝天人地三格的五行组合。';
+      go();
+    };
+  });
+
+  // ── 数字命理渲染 ──
+  function renderNum(){
+    var d = $('nuDate').value;
+    if (!d) { alert('请选日期'); return; }
+    var p = d.split('-').map(Number);
+    var lp = bzNumerology.lifePath(p[0], p[1], p[2]);
+    var bd = bzNumerology.birthDay(p[2]);
+    var py = bzNumerology.personalYear(p[0], p[1], p[2], new Date().getFullYear());
+    var nm = $('nuName').value.trim();
+    var nn = nm ? bzNumerology.nameNumbers(nm) : null;
+
+    _last = { type:'num', date:d, name:nm, lp:lp.value, py:py };
+
+    var H = [];
+
+    // 主数字
+    H.push('<div class="nu-hero">');
+    H.push('<div class="nu-num'+(bzNumerology.NUM_MEAN[lp.value].master?' master':'')+'">'+
+      (bzNumerology.NUM_MEAN[lp.value].master?'<span class="m">主数</span>':'')+
+      '<div class="k">生命灵数</div><div class="v">'+lp.value+'</div>'+
+      '<div class="kw">'+bzNumerology.NUM_MEAN[lp.value].kw+'</div></div>');
+
+    H.push('<div class="nu-num">'+
+      '<div class="k">生日数</div><div class="v">'+bd+'</div>'+
+      '<div class="kw">'+bzNumerology.NUM_MEAN[bd].kw+'</div></div>');
+
+    H.push('<div class="nu-num">'+
+      '<div class="k">个人年</div><div class="v">'+py+'</div>'+
+      '<div class="kw">'+new Date().getFullYear()+' 年</div></div>');
+
+    if (nn) {
+      H.push('<div class="nu-num'+(bzNumerology.NUM_MEAN[nn.expression].master?' master':'')+'">'+
+        (bzNumerology.NUM_MEAN[nn.expression].master?'<span class="m">主数</span>':'')+
+        '<div class="k">表达数</div><div class="v">'+nn.expression+'</div>'+
+        '<div class="kw">'+bzNumerology.NUM_MEAN[nn.expression].kw+'</div></div>');
+    }
+    H.push('</div>');
+
+    // 一、生命灵数
+    H.push('<div class="nu-sec"><div class="nu-sec-h"><span class="no">壹</span>'+
+      '<h2>生命灵数 '+lp.value+'</h2><span class="note">最核心的数字</span></div>');
+    H.push('<div class="nu-card"><div class="d">'+
+      bzNumerology.NUM_MEAN[lp.value].desc+'</div>');
+    H.push('<div class="d" style="color:var(--ink-3);font-size:.76rem">'+
+      '算法：年份根 '+lp.parts[0]+' + 月份根 '+lp.parts[1]+' + 日期根 '+lp.parts[2]+
+      ' = '+(lp.parts[0]+lp.parts[1]+lp.parts[2])+' → '+lp.value+'</div></div>');
+    H.push('</div>');
+
+    // 二、其他数字
+    H.push('<div class="nu-sec"><div class="nu-sec-h"><span class="no">贰</span>'+
+      '<h2>其他数字</h2><span class="note">各自代表一个面向</span></div>');
+    H.push('<table class="nu-tb"><thead><tr><th>数字</th><th>值</th><th>含义</th><th>算自</th></tr></thead><tbody>');
+
+    H.push('<tr><td>生日数</td><td class="c">'+bd+'</td>'+
+      '<td>'+bzNumerology.NUM_MEAN[bd].kw+'</td>'+
+      '<td style="color:var(--ink-3)">出生的日</td></tr>');
+
+    H.push('<tr><td>个人年</td><td class="c">'+py+'</td>'+
+      '<td>'+bzNumerology.NUM_MEAN[py].kw+'</td>'+
+      '<td style="color:var(--ink-3)">今年对你的主题</td></tr>');
+
+    if (nn) {
+      H.push('<tr><td>表达数</td><td class="c">'+nn.expression+'</td>'+
+        '<td>'+bzNumerology.NUM_MEAN[nn.expression].kw+'</td>'+
+        '<td style="color:var(--ink-3)">姓名全部字母</td></tr>');
+      H.push('<tr><td>灵魂数</td><td class="c">'+nn.soul+'</td>'+
+        '<td>'+bzNumerology.NUM_MEAN[nn.soul].kw+'</td>'+
+        '<td style="color:var(--ink-3)">姓名元音（内心渴望）</td></tr>');
+      H.push('<tr><td>人格数</td><td class="c">'+nn.personality+'</td>'+
+        '<td>'+bzNumerology.NUM_MEAN[nn.personality].kw+'</td>'+
+        '<td style="color:var(--ink-3)">姓名辅音（外在形象）</td></tr>');
+    }
+    H.push('</tbody></table>');
+
+    if (!nn) {
+      H.push('<div class="nu-card" style="margin-top:10px"><div class="d" style="font-size:.78rem">'+
+        '填上英文名可以额外算出表达数、灵魂数、人格数——这三个看的是「你想被看成谁」'+
+        '与「你内心真正想要什么」，和生日数看的「你本来是谁」形成对照。</div></div>');
+    }
+    H.push('</div>');
+
+    // 三、说明
+    H.push('<div class="nu-sec"><div class="nu-sec-h"><span class="no">叁</span>'+
+      '<h2>怎么用这些数字</h2></div>');
+    H.push('<div class="nu-card"><div class="d">'+
+      '生命灵数是主轴——它说的是你这辈子反复要面对的课题。'+
+      '生日数是「你带进来的天赋」，通常是别人觉得你「天生就会」的事。</div>'+
+      '<div class="d">个人年每年变一次，是这一年的节气：'+
+      '第 1 年是开局，第 9 年是收尾，循环往复。'+
+      '知道自己在第几年，就能判断现在是该冲还是该收。</div>'+
+      '<div class="d">如果英文名的表达数和生命灵数差很多，'+
+      '常表示「你表现出来的样子」和「你本来的样子」有落差——这不一定是坏事，'+
+      '但值得想一想。</div></div>');
+    H.push('</div>');
+
+    $('nuOut').innerHTML = H.join('');
+  }
+
+  // ── 姓名五格渲染 ──
+  function renderName(){
+    var sn = $('nuSurname').value.trim();
+    var gn = $('nuGiven').value.trim();
+    if (!sn || !gn) { alert('请填写姓和名'); return; }
+    var r = bzNaming.fiveGrids(sn, gn);
+    if (!r) { alert('无法计算'); return; }
+
+    _last = { type:'name', surname:sn, given:gn, zong:r.zong };
+
+    var H = [];
+    var LUCK_CLASS = { '大吉':'good', '吉':'good', '半吉':'mid', '凶':'bad' };
+
+    H.push('<div class="nu-hero">');
+    H.push('<div class="nu-num'+(LUCK_CLASS[bzNaming.gridLuck(r.ren)]==='good'?'':'')+'">'+
+      '<div class="k">人格</div><div class="v">'+r.ren+'</div>'+
+      '<div class="kw">'+bzNaming.gridLuck(r.ren)+'（最重要）</div></div>');
+    H.push('<div class="nu-num"><div class="k">总格</div><div class="v">'+r.zong+'</div>'+
+      '<div class="kw">'+bzNaming.gridLuck(r.zong)+'（后半生）</div></div>');
+    H.push('<div class="nu-num"><div class="k">三才</div>'+
+      '<div class="v" style="font-size:1.5rem">'+r.tianWx+r.renWx+r.diWx+'</div>'+
+      '<div class="kw">天人地五行</div></div>');
+    H.push('</div>');
+
+    // 五格表
+    H.push('<div class="nu-sec"><div class="nu-sec-h"><span class="no">壹</span>'+
+      '<h2>五格</h2><span class="note">'+esc(sn)+esc(gn)+'（按繁体笔画）</span></div>');
+    H.push('<table class="nu-tb"><thead><tr><th>格</th><th>数</th><th>五行</th><th>吉凶</th><th>含义</th><th>算法</th></tr></thead><tbody>');
+
+    var rows = [
+      ['天格', r.tian, r.tianWx, '祖上、先天', sn.length===1 ? '姓笔画 + 1' : '姓两字笔画和'],
+      ['人格', r.ren, r.renWx, '自身、主运（最重要）', '姓末字 + 名首字'],
+      ['地格', r.di, r.diWx, '早年、基础', gn.length===1 ? '名笔画 + 1' : '名笔画和'],
+      ['外格', r.wai, r.waiWx, '外缘、人际', '总格 − 人格'],
+      ['总格', r.zong, r.zongWx, '后半生、总体', '全部笔画和']
+    ];
+    rows.forEach(function (x) {
+      var luck = bzNaming.gridLuck(x[1]);
+      H.push('<tr><td>'+x[0]+'</td><td class="c">'+x[1]+'</td>'+
+        '<td><span class="nu-wx" style="color:var(--ink-2)">'+x[2]+'</span></td>'+
+        '<td class="'+(LUCK_CLASS[luck]||'')+'">'+luck+'</td>'+
+        '<td style="font-size:.76rem;color:var(--ink-3)">'+x[3]+'</td>'+
+        '<td style="font-size:.72rem;color:var(--ink-4)">'+x[4]+'</td></tr>');
+    });
+    H.push('</tbody></table>');
+    H.push('</div>');
+
+    // 三才
+    H.push('<div class="nu-sec"><div class="nu-sec-h"><span class="no">贰</span>'+
+      '<h2>三才配置</h2><span class="note">'+r.tianWx+' · '+r.renWx+' · '+r.diWx+'</span></div>');
+    H.push('<div class="nu-card"><div class="d">'+
+      '三才是天格、人格、地格的五行组合，即「'+r.tianWx+r.renWx+r.diWx+'」。'+
+      '五行相生为顺（木火土金水相生），相克为逆。</div>');
+    var rel = sanCai(r.tianWx, r.renWx, r.diWx);
+    H.push('<div class="d">'+rel+'</div></div>');
+    H.push('</div>');
+
+    // 笔画明细
+    H.push('<div class="nu-sec"><div class="nu-sec-h"><span class="no">叁</span>'+
+      '<h2>笔画明细</h2></div>');
+    H.push('<div class="nu-card"><div class="d">'+
+      '姓：'+sn.split('').map(function(c,i){ return c+'（'+r.strokes.surname[i]+'）'; }).join(' ')+
+      '<br>名：'+gn.split('').map(function(c,i){ return c+'（'+r.strokes.given[i]+'）'; }).join(' ')+
+      '</div>');
+    if (r.unknown.length) {
+      H.push('<div class="d" style="color:var(--zhu);font-size:.78rem">'+
+        '⚠ 以下字不在内置笔画表中，暂按 10 画估算，结果可能不准：'+
+        r.unknown.join('、')+'</div>');
+    }
+    H.push('</div></div>');
+
+    // 说明
+    H.push('<div class="nu-sec"><div class="nu-sec-h"><span class="no">肆</span>'+
+      '<h2>说明</h2></div>');
+    H.push('<div class="nu-card"><div class="d">'+
+      '五格剖象是 1918 年由日本人熊崎健翁提出、后传入中国的姓名学方法。'+
+      '它用康熙字典的繁体笔画数来算，与简体笔画不同。</div>'+
+      '<div class="d">这套方法在命理圈内有争议——反对者认为它只看笔画、不看字义和八字，'+
+      '过于机械。但它在东亚流传极广，很多人改名时仍会参考。</div>'+
+      '<div class="d">本页的笔画表收录常用字约 230 个。生僻字会提示估算，'+
+      '结果仅供参考。</div></div>');
+    H.push('</div>');
+
+    $('nuOut').innerHTML = H.join('');
+  }
+
+  /** 三才关系判断 */
+  function sanCai(a, b, c) {
+    var SHENG = { '木':'火','火':'土','土':'金','金':'水','水':'木' };
+    var KE = { '木':'土','土':'水','水':'火','火':'金','金':'木' };
+    var parts = [];
+    function rel(x, y, label) {
+      if (x === y) return label + '同气，稳但不活';
+      if (SHENG[x] === y) return label + '相生，顺';
+      if (SHENG[y] === x) return label + '受生，也顺';
+      if (KE[x] === y) return label + '相克，有阻';
+      if (KE[y] === x) return label + '被克，需注意';
+      return label + '平';
+    }
+    parts.push(rel(a, b, '天人'));
+    parts.push(rel(b, c, '人地'));
+    var hasKe = parts.some(function(p){ return p.indexOf('克') >= 0; });
+    return parts.join('；') + '。' +
+      (hasKe ? '三才中有相克，传统认为在健康或运势上可能有些波折，但不代表一定不好。'
+        : '三才之间没有相克，配置算顺畅。');
+  }
+
+  function go(){
+    if (_mode === 'num') renderNum();
+    else renderName();
+  }
+
+  $('nuGo').onclick = go;
+
+  $('nuSave').onclick = function(){
+    if (!_last) { alert('请先计算'); return; }
+    var nm = prompt('起个名字（留空自动命名）：', '');
+    if (nm === null) return;
+    var d = new Date(), p = function(n){ return n<10?'0'+n:n; };
+    var dateStr = _last.type === 'num' ? _last.date
+      : d.getFullYear()+'-'+p(d.getMonth()+1)+'-'+p(d.getDate());
+    if (!nm) nm = _last.type === 'num' ? ('灵数 ' + _last.lp)
+      : (_last.surname + _last.given + ' 总格' + _last.zong);
+    var it = bzCases.add({
+      kind: 'numerology', name: nm,
+      date: dateStr, time: '00:00', sex: 1,
+      note: JSON.stringify(_last)
+    });
+    if (!it) { alert('保存失败'); return; }
+    var b = $('nuSave'), o = b.textContent;
+    b.textContent = '已保存 ✓';
+    setTimeout(function(){ b.textContent = o; }, 1400);
+  };
+
+  go();
+})();
+</script>

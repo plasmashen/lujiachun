@@ -1,0 +1,421 @@
+---
+layout: default
+title: 梅花易数
+description: 在线梅花易数 · 时间卦 · 数字卦 · 字数卦 · 体用生克断卦 · 互卦变卦。离线可用。
+permalink: /meihua/
+---
+
+<style>
+:root{
+  --paper:#f7f4ed; --paper-2:#fdfcf8;
+  --ink:#1c1a17; --ink-2:#544f47; --ink-3:#797367; --ink-4:#a39c8f;
+  --rule:#ded7c8; --rule-soft:#f0ece2;
+  --zhu:#a8352a; --qing:#3f5d52; --jin:#9a7b3f;
+  --serif:"Songti SC","STSong","SimSun","Source Han Serif SC","Noto Serif CJK SC",serif;
+  --sans:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Microsoft YaHei","Source Han Sans SC","Noto Sans CJK SC",sans-serif;
+}
+.mh-wrap{max-width:880px;margin:0 auto;padding:0 20px 70px;
+  font-family:var(--sans);color:var(--ink);background:var(--paper);
+  font-size:.9rem;line-height:1.75}
+.mh-wrap *{box-sizing:border-box}
+
+.mh-tabs{display:flex;gap:6px;margin:22px 0 0;flex-wrap:wrap}
+.mh-tab{font-family:var(--sans);font-size:.82rem;padding:7px 18px;
+  border:1px solid var(--rule);border-radius:5px 5px 0 0;background:#fff;
+  color:var(--ink-3);cursor:pointer;border-bottom:none}
+.mh-tab.on{background:var(--paper-2);color:var(--zhu);font-weight:600;
+  border-color:var(--zhu);position:relative;top:1px}
+
+.mh-form{background:var(--paper-2);border:1px solid var(--zhu);border-radius:0 8px 8px 8px;
+  padding:18px 20px;margin:0 0 24px}
+.mh-row{display:flex;flex-wrap:wrap;gap:10px;align-items:flex-end;margin-bottom:10px}
+.mh-row:last-child{margin-bottom:0}
+.mh-f{display:flex;flex-direction:column;gap:4px}
+.mh-f label{font-size:.7rem;color:var(--ink-4);letter-spacing:.06em}
+.mh-f input,.mh-f select{font-family:var(--sans);font-size:.86rem;padding:7px 10px;
+  border:1px solid var(--rule);border-radius:5px;background:#fff;color:var(--ink);outline:none}
+.mh-f input:focus{border-color:var(--zhu)}
+.mh-f.n input{width:96px}
+.mh-f.txt input{width:260px}
+.mh-btn{font-family:var(--sans);font-size:.86rem;padding:8px 24px;border:none;
+  border-radius:5px;background:var(--zhu);color:#fff;cursor:pointer;letter-spacing:.04em}
+.mh-btn:hover{opacity:.88}
+.mh-btn.ghost{background:none;border:1px solid var(--rule);color:var(--ink-2)}
+.mh-btn.ghost:hover{border-color:var(--zhu);color:var(--zhu)}
+.mh-hint{font-size:.7rem;color:var(--ink-4);margin-top:9px;line-height:1.7}
+
+/* ── 卦盘 ── */
+.mh-gua{display:flex;gap:12px;align-items:center;margin-bottom:8px}
+.mh-gua .nm{font-family:var(--serif);font-size:1.3rem;letter-spacing:.05em}
+.mh-gua .sub{font-size:.72rem;color:var(--ink-3);margin-left:6px}
+.mh-pair{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
+  gap:12px;margin-bottom:22px}
+.mh-box{background:var(--paper-2);border:1px solid var(--rule);border-radius:8px;
+  padding:13px 15px}
+.mh-box .h{font-size:.68rem;color:var(--ink-4);letter-spacing:.08em;margin-bottom:7px;
+  display:flex;align-items:center;gap:6px}
+.mh-box .h .tag{font-size:.62rem;padding:1px 5px;border-radius:3px;
+  border:1px solid currentColor;letter-spacing:.04em}
+.mh-box .h .tag.ti{color:var(--qing)}
+.mh-box .h .tag.yong{color:var(--zhu)}
+.mh-box .n{font-family:var(--serif);font-size:1.05rem;margin-bottom:5px}
+.mh-box .d{font-size:.74rem;color:var(--ink-3);line-height:1.7}
+.mh-box .tri{font-family:monospace;font-size:.9rem;color:var(--ink-2);
+  letter-spacing:2px;margin:5px 0}
+
+/* ── 六爻图 ── */
+.mh-lines{display:flex;flex-direction:column;gap:5px;margin:10px 0}
+.mh-lines .l{height:5px;border-radius:1px;background:var(--ink-2);width:80px}
+.mh-lines .l.yin{background:linear-gradient(90deg,var(--ink-2) 0 36%,
+  transparent 36% 64%,var(--ink-2) 64% 100%)}
+.mh-lines .l.mv{background:var(--zhu)}
+.mh-lines .l.yin.mv{background:linear-gradient(90deg,var(--zhu) 0 36%,
+  transparent 36% 64%,var(--zhu) 64% 100%)}
+
+/* ── 区块 ── */
+.mh-sec{margin:28px 0 0}
+.mh-sec-h{display:flex;align-items:baseline;gap:9px;margin-bottom:12px;
+  padding-bottom:7px;border-bottom:1px solid var(--rule)}
+.mh-sec-h .no{font-family:var(--serif);color:var(--zhu);font-size:.8rem;opacity:.75}
+.mh-sec-h h2{font-family:var(--serif);font-size:1.04rem;margin:0;
+  letter-spacing:.05em;font-weight:600}
+.mh-sec-h .note{font-size:.68rem;color:var(--ink-4);margin-left:auto}
+
+.mh-card{background:var(--paper-2);border:1px solid var(--rule);border-radius:8px;
+  padding:14px 17px;margin-bottom:10px}
+.mh-card .d{font-size:.82rem;color:var(--ink-2);line-height:1.85}
+.mh-card .d+.d{margin-top:7px}
+.mh-card b{color:var(--ink)}
+
+.mh-tb{width:100%;border-collapse:collapse;font-size:.78rem}
+.mh-tb th,.mh-tb td{padding:7px 9px;text-align:left;border-bottom:1px solid var(--rule-soft)}
+.mh-tb th{font-size:.68rem;color:var(--ink-4);font-weight:500;background:var(--rule-soft)}
+
+.mh-empty{text-align:center;padding:44px 20px;color:var(--ink-4);font-size:.85rem}
+
+@media screen and (max-width:700px){
+  .mh-wrap{padding:0 14px 50px}
+  .mh-f.txt input{width:100%}
+  .mh-f.txt{flex:1 1 100%}
+  .mh-f.n{flex:1 1 30%}
+  .mh-f.n input{width:100%}
+  .mh-btn{flex:1 1 auto}
+  .mh-pair{grid-template-columns:1fr}
+}
+</style>
+
+<div class="mh-wrap">
+
+  <div class="mh-tabs">
+    <button class="mh-tab on" data-mode="time">时间卦</button>
+    <button class="mh-tab" data-mode="number">数字卦</button>
+    <button class="mh-tab" data-mode="text">字数卦</button>
+  </div>
+
+  <div class="mh-form">
+    <!-- 时间卦 -->
+    <div id="mhTime">
+      <div class="mh-row">
+        <div class="mh-f"><label>农历年支</label>
+          <select id="mhY"></select></div>
+        <div class="mh-f n"><label>农历月</label>
+          <input type="number" id="mhM" min="1" max="12" value="4"></div>
+        <div class="mh-f n"><label>农历日</label>
+          <input type="number" id="mhD" min="1" max="30" value="21"></div>
+        <div class="mh-f"><label>时辰</label>
+          <select id="mhH"></select></div>
+      </div>
+    </div>
+
+    <!-- 数字卦 -->
+    <div id="mhNumber" style="display:none">
+      <div class="mh-row">
+        <div class="mh-f n"><label>第一个数</label>
+          <input type="number" id="mhA" value="8"></div>
+        <div class="mh-f n"><label>第二个数</label>
+          <input type="number" id="mhB" value="5"></div>
+      </div>
+    </div>
+
+    <!-- 字数卦 -->
+    <div id="mhText" style="display:none">
+      <div class="mh-row">
+        <div class="mh-f txt"><label>心中所想（按字数起卦）</label>
+          <input type="text" id="mhT" placeholder="输入一个词或一句话"></div>
+      </div>
+    </div>
+
+    <div class="mh-row" style="margin-top:12px">
+      <button class="mh-btn" id="mhGo">起卦</button>
+      <button class="mh-btn ghost" id="mhNow">用现在时间</button>
+      <button class="mh-btn ghost" id="mhSave">保存</button>
+    </div>
+    <div class="mh-hint">
+      梅花易数以「体用」断卦：动爻所在的卦为<b>用</b>，另一卦为<b>体</b>（代表自己）。
+      用生体最吉，用克体最凶。互卦看过程，变卦看结果。
+    </div>
+  </div>
+
+  <div id="mhOut"><div class="mh-empty">选择起卦方式后点「起卦」</div></div>
+</div>
+
+<script src="/assets/js/bazi/meihua.js"></script>
+<script src="/assets/js/bazi/cases.js"></script>
+<script src="/assets/js/bazi/qrcode.js"></script>
+<script src="/assets/js/bazi/share.js"></script>
+<script src="/assets/js/bazi/pwa.js"></script>
+<script>
+(function(){
+  'use strict';
+  var $ = function(id){ return document.getElementById(id); };
+  var ZHI = ['子','丑','寅','卯','辰','巳','午','未','申','酉','戌','亥'];
+  var _last = null, _mode = 'time';
+
+  function esc(s){
+    return String(s==null?'':s).replace(/[&<>"]/g, function(m){
+      return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m];
+    });
+  }
+
+  // 填充年月支
+  ZHI.forEach(function(z,i){
+    var o = document.createElement('option');
+    o.value = i+1; o.textContent = z;
+    if (z === '午') o.selected = true;
+    $('mhY').appendChild(o);
+  });
+  ZHI.forEach(function(z,i){
+    var o = document.createElement('option');
+    o.value = i+1; o.textContent = z + '时';
+    if (z === '巳') o.selected = true;
+    $('mhH').appendChild(o);
+  });
+
+  // Tab 切换
+  Array.prototype.forEach.call(document.querySelectorAll('.mh-tab'), function(t){
+    t.onclick = function(){
+      Array.prototype.forEach.call(document.querySelectorAll('.mh-tab'), function(x){
+        x.classList.remove('on');
+      });
+      t.classList.add('on');
+      _mode = t.getAttribute('data-mode');
+      $('mhTime').style.display = _mode==='time' ? '' : 'none';
+      $('mhNumber').style.display = _mode==='number' ? '' : 'none';
+      $('mhText').style.display = _mode==='text' ? '' : 'none';
+    };
+  });
+
+  /**
+   * 画六爻：从上往下显示（上爻在最上），与卦书一致
+   * @param yao 自下而上的阴阳数组
+   * @param moving 动爻位置（1-6），0 表示无
+   */
+  function yaoArt(yao, moving){
+    var s = [];
+    for (var i = yao.length - 1; i >= 0; i--) {
+      var isYin = !yao[i];
+      var isMv = (moving > 0 && i === moving - 1);
+      s.push('<div class="l'+(isYin?' yin':'')+(isMv?' mv':'')+'"></div>');
+    }
+    return '<div class="mh-lines">' + s.join('') + '</div>';
+  }
+
+  function render(g, meta){
+    var H = [];
+    var mi = g.moving - 1;
+
+    // 卦名
+    H.push('<div class="mh-gua"><span class="nm">'+g.name+'</span>'+
+      '<span class="sub">'+g.upper.nature+'上'+g.lower.nature+'下 · 动第'+g.moving+'爻</span></div>');
+
+    // 三卦对比
+    H.push('<div class="mh-pair">');
+
+    // 本卦
+    H.push('<div class="mh-box"><div class="h">本卦<span class="tag">'+
+      (g.tiIsUpper?'体在上':'体在下')+'</span></div>'+
+      '<div class="n">'+g.name+'</div>'+
+      yaoArt(g.yao, g.moving)+
+      '<div class="d">上 '+g.upper.name+'（'+g.upper.sym+'，'+g.upper.wx+'）　'+
+      '下 '+g.lower.name+'（'+g.lower.sym+'，'+g.lower.wx+'）</div></div>');
+
+    // 互卦
+    H.push('<div class="mh-box"><div class="h">互卦<span class="tag">过程</span></div>'+
+      '<div class="n">'+g.hu.name+'</div>'+
+      yaoArt(g.hu.lower.yao.concat(g.hu.upper.yao), 0)+
+      '<div class="d">上 '+g.hu.upper.name+'（'+g.hu.upper.wx+'）　'+
+      '下 '+g.hu.lower.name+'（'+g.hu.lower.wx+'）</div></div>');
+
+    // 变卦
+    H.push('<div class="mh-box"><div class="h">变卦<span class="tag">结果</span></div>'+
+      '<div class="n">'+g.changed.name+'</div>'+
+      yaoArt(g.changed.yao, 0)+
+      '<div class="d">上 '+g.changed.upper.name+'（'+g.changed.upper.wx+'）　'+
+      '下 '+g.changed.lower.name+'（'+g.changed.lower.wx+'）</div></div>');
+
+    H.push('</div>');
+
+    // 一、体用
+    H.push('<div class="mh-sec"><div class="mh-sec-h"><span class="no">壹</span>'+
+      '<h2>体用生克</h2><span class="note">梅花断卦的核心</span></div>');
+    H.push('<div class="mh-card">');
+    H.push('<div class="d">动爻在第 <b>'+g.moving+'</b> 爻，'+
+      (g.tiIsUpper?'在下卦':'在上卦')+'，所以：<br>'+
+      '<b>体卦</b>（自己）= '+g.ti.name+'（'+g.ti.wx+'）　'+
+      '<b>用卦</b>（所问之事/对方）= '+g.yong.name+'（'+g.yong.wx+'）</div>');
+    H.push('<div class="d" style="font-size:.92rem;margin-top:10px">'+
+      '<b style="color:'+(g.relation.level==='凶'?'#a8352a':g.relation.level==='大吉'?'#3f5d52':'#544f47')+'">'+
+      g.relation.key+' · '+g.relation.level+'</b><br>'+g.relation.desc+'</div>');
+    H.push('</div>');
+    H.push('</div>');
+
+    // 二、卦象解读
+    H.push('<div class="mh-sec"><div class="mh-sec-h"><span class="no">贰</span>'+
+      '<h2>卦象</h2><span class="note">上下卦各自的取象</span></div>');
+    H.push('<div class="mh-card">');
+    H.push('<div class="d"><b>上卦 '+g.upper.name+'</b>：'+
+      (window.bzMeihua.GUA_MEAN[g.upper.name]||'')+'</div>');
+    H.push('<div class="d"><b>下卦 '+g.lower.name+'</b>：'+
+      (window.bzMeihua.GUA_MEAN[g.lower.name]||'')+'</div>');
+    H.push('<div class="d">看这一卦时，先看体卦的状态（=自己的处境），'+
+      '再看用卦与体的关系（=事情对你是有利还是不利），'+
+      '最后看互卦（过程）和变卦（结局）。</div>');
+    H.push('</div>');
+    H.push('</div>');
+
+    // 三、变卦与互卦
+    H.push('<div class="mh-sec"><div class="mh-sec-h"><span class="no">叁</span>'+
+      '<h2>过程与结果</h2></div>');
+    H.push('<div class="mh-card">');
+    H.push('<div class="d"><b>互卦 '+g.hu.name+'</b>（过程）：事情推进中的实际样貌。'+
+      '上'+g.hu.upper.name+'下'+g.hu.lower.name+'。</div>');
+    H.push('<div class="d"><b>变卦 '+g.changed.name+'</b>（结果）：事情最终往哪走。'+
+      '动爻一改，整个卦就变了——所以动爻是整个卦最关键的爻。</div>');
+    H.push('<div class="d">'+
+      (g.ti.wx === g.changed.upper.wx || g.ti.wx === g.changed.lower.wx
+        ? '变卦中出现了与体卦同五行之卦，说明结果与自己的立场一致，事情最终能落到自己手里。'
+        : '变卦与体卦五行不同，说明结果可能不完全按自己预期走，需留意后续变化。')+
+      '</div>');
+    H.push('</div>');
+    H.push('</div>');
+
+    // 四、起卦参数
+    H.push('<div class="mh-sec"><div class="mh-sec-h"><span class="no">肆</span>'+
+      '<h2>起卦参数</h2><span class="note">可复核</span></div>');
+    H.push('<table class="mh-tb"><tbody>');
+    H.push('<tr><th>起卦法</th><td>'+g.method+'</td></tr>');
+    if (meta && meta.detail) {
+      meta.detail.forEach(function(d){
+        H.push('<tr><th>'+d[0]+'</th><td>'+esc(d[1])+'</td></tr>');
+      });
+    }
+    H.push('<tr><th>本卦</th><td>'+g.name+'（'+g.upper.name+'上'+g.lower.name+'下）</td></tr>');
+    H.push('<tr><th>动爻</th><td>第 '+g.moving+' 爻</td></tr>');
+    H.push('<tr><th>体用</th><td>体 '+g.ti.name+g.ti.wx+' / 用 '+g.yong.name+g.yong.wx+'</td></tr>');
+    H.push('<tr><th>互卦</th><td>'+g.hu.name+'</td></tr>');
+    H.push('<tr><th>变卦</th><td>'+g.changed.name+'</td></tr>');
+    H.push('</tbody></table>');
+    H.push('</div>');
+
+    // 五、说明
+    H.push('<div class="mh-sec"><div class="mh-sec-h"><span class="no">伍</span>'+
+      '<h2>读卦说明</h2></div>');
+    H.push('<div class="mh-card"><div class="d">'+
+      '梅花易数的特点是「随心起卦」——不必有精确的出生时间，'+
+      '看到什么、听到什么、心里想到什么都可以起卦，讲究的是「机」。</div>'+
+      '<div class="d">正因如此，同一件事反复起卦会失去意义。'+
+      '传统认为一事一卦，起完就不要再问第二遍。</div>'+
+      '<div class="d">这里给出的是体用生克的通行判断，'+
+      '实际断卦还会结合卦气旺衰、时令、外应（起卦时看到的景象）。</div>'+
+      '</div>');
+    H.push('</div>');
+
+    $('mhOut').innerHTML = H.join('');
+  }
+
+  function go(){
+    var g, meta = { detail: [] };
+    try {
+      if (_mode === 'time') {
+        var y = +$('mhY').value, m = +$('mhM').value, d = +$('mhD').value, h = +$('mhH').value;
+        if (!y || !m || !d || !h) { alert('请填完整'); return; }
+        g = window.bzMeihua.byTime(y, m, d, h);
+        meta.detail = [
+          ['年支序', y + '（' + ZHI[y-1] + '）'],
+          ['农历月日', m + ' 月 ' + d + ' 日'],
+          ['时支序', h + '（' + ZHI[h-1] + '时）'],
+          ['上卦算式', '(' + y + '+' + m + '+' + d + ') mod 8 = ' + ((y+m+d)%8)],
+          ['下卦算式', '(' + y + '+' + m + '+' + d + '+' + h + ') mod 8 = ' + ((y+m+d+h)%8)],
+          ['动爻算式', '(' + y + '+' + m + '+' + d + '+' + h + ') mod 6 = ' + ((y+m+d+h)%6)]
+        ];
+      } else if (_mode === 'number') {
+        var a = +$('mhA').value, b = +$('mhB').value;
+        if (!a || !b) { alert('请填两个数'); return; }
+        g = window.bzMeihua.byNumbers(a, b);
+        meta.detail = [
+          ['第一个数', String(a) + ' → 上卦（' + a + ' mod 8 = ' + (a%8) + '）'],
+          ['第二个数', String(b) + ' → 下卦（' + b + ' mod 8 = ' + (b%8) + '）'],
+          ['动爻', '(' + a + '+' + b + ') mod 6 = ' + ((a+b)%6)]
+        ];
+      } else {
+        var t = $('mhT').value.trim();
+        if (!t) { alert('请输入内容'); return; }
+        g = window.bzMeihua.byText(t);
+        if (!g) { alert('无法起卦'); return; }
+        meta.detail = [
+          ['内容', t],
+          ['字数', String(t.replace(/\s/g,'').length)]
+        ];
+      }
+      _last = { gua: g, meta: meta };
+      render(g, meta);
+    } catch (e) {
+      $('mhOut').innerHTML = '<div class="mh-empty">起卦失败：'+esc(e.message)+'</div>';
+    }
+  }
+
+  $('mhGo').onclick = go;
+
+  $('mhNow').onclick = function(){
+    var d = new Date();
+    // 简化：用公历年近似年支，实际应用农历
+    var yz = ((d.getFullYear() - 4) % 12) + 1;   // 近似年支
+    var hz = Math.floor(((d.getHours() + 1) % 24) / 2) + 1;
+    if (_mode === 'time') {
+      $('mhY').value = yz;
+      $('mhM').value = d.getMonth() + 1;
+      $('mhD').value = d.getDate();
+      $('mhH').value = hz;
+    }
+    go();
+  };
+
+  $('mhSave').onclick = function(){
+    if (!_last) { alert('请先起卦'); return; }
+    var g = _last.gua;
+    var nm = prompt('给这一卦起个名字（留空自动命名）：', '');
+    if (nm === null) return;
+    if (!nm) nm = g.name;
+    var d = new Date();
+    var p = function(n){ return n<10?'0'+n:n; };
+    var it = bzCases.add({
+      kind: 'meihua', name: nm,
+      date: d.getFullYear()+'-'+p(d.getMonth()+1)+'-'+p(d.getDate()),
+      time: p(d.getHours())+':'+p(d.getMinutes()),
+      sex: 1,
+      note: JSON.stringify({
+        method: g.method, moving: g.moving,
+        ti: g.ti.name, yong: g.yong.name,
+        hu: g.hu.name, bian: g.changed.name,
+        relation: g.relation.key
+      })
+    });
+    if (!it) { alert('保存失败'); return; }
+    var b = $('mhSave'), o = b.textContent;
+    b.textContent = '已保存 ✓';
+    setTimeout(function(){ b.textContent = o; }, 1400);
+  };
+
+  go();
+})();
+</script>

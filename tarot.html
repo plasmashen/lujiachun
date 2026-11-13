@@ -1,0 +1,279 @@
+---
+layout: default
+title: 塔罗
+description: 在线塔罗抽牌 · 78 张韦特牌 · 单张/三张/五张/凯尔特十字 · 正逆位解读。离线可用。
+permalink: /tarot/
+---
+
+<style>
+:root{
+  --paper:#f7f4ed; --paper-2:#fdfcf8;
+  --ink:#1c1a17; --ink-2:#544f47; --ink-3:#797367; --ink-4:#a39c8f;
+  --rule:#ded7c8; --rule-soft:#f0ece2;
+  --zhu:#a8352a; --qing:#3f5d52; --jin:#9a7b3f;
+  --serif:"Songti SC","STSong","SimSun","Source Han Serif SC","Noto Serif CJK SC",serif;
+  --sans:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Microsoft YaHei","Source Han Sans SC","Noto Sans CJK SC",sans-serif;
+}
+.tr-wrap{max-width:920px;margin:0 auto;padding:0 20px 70px;
+  font-family:var(--sans);color:var(--ink);background:var(--paper);
+  font-size:.9rem;line-height:1.75}
+.tr-wrap *{box-sizing:border-box}
+
+.tr-form{background:var(--paper-2);border:1px solid var(--rule);border-radius:10px;
+  padding:18px 20px;margin:22px 0 24px}
+.tr-row{display:flex;flex-wrap:wrap;gap:10px;align-items:flex-end;margin-bottom:11px}
+.tr-row:last-child{margin-bottom:0}
+.tr-f{display:flex;flex-direction:column;gap:4px}
+.tr-f label{font-size:.7rem;color:var(--ink-4);letter-spacing:.06em}
+.tr-f input,.tr-f select{font-family:var(--sans);font-size:.86rem;padding:7px 10px;
+  border:1px solid var(--rule);border-radius:5px;background:#fff;color:var(--ink);outline:none}
+.tr-f input:focus,.tr-f select:focus{border-color:var(--zhu)}
+.tr-f.q input{width:270px}
+.tr-f.s select{width:170px}
+.tr-btn{font-family:var(--sans);font-size:.86rem;padding:8px 24px;border:none;
+  border-radius:5px;background:var(--zhu);color:#fff;cursor:pointer;letter-spacing:.04em}
+.tr-btn:hover{opacity:.88}
+.tr-btn.ghost{background:none;border:1px solid var(--rule);color:var(--ink-2)}
+.tr-btn.ghost:hover{border-color:var(--zhu);color:var(--zhu)}
+.tr-hint{font-size:.7rem;color:var(--ink-4);margin-top:9px;line-height:1.7}
+
+/* ── 牌面 ── */
+.tr-cards{display:flex;gap:14px;flex-wrap:wrap;margin-bottom:24px;justify-content:center}
+.tr-card{width:132px;flex:0 0 auto;text-align:center}
+.tr-card .pos{font-size:.68rem;color:var(--ink-4);letter-spacing:.05em;margin-bottom:7px;
+  height:2.4em;display:flex;align-items:center;justify-content:center}
+.tr-card .face{
+  width:132px;height:216px;border-radius:7px;
+  background:linear-gradient(160deg,#fdfcf8 0%,#f4efe4 100%);
+  border:1px solid var(--rule);
+  box-shadow:0 2px 10px rgba(28,26,23,.07);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  position:relative;transition:.25s;cursor:default;
+  padding:10px;
+}
+.tr-card:hover .face{box-shadow:0 5px 20px rgba(28,26,23,.13);transform:translateY(-2px)}
+.tr-card .face.rev{transform:rotate(180deg)}
+.tr-card:hover .face.rev{transform:rotate(180deg) translateY(2px)}
+.tr-card .face .glyph{font-size:1.9rem;color:var(--zhu);opacity:.85;margin-bottom:8px}
+.tr-card .face .nm{font-family:var(--serif);font-size:.86rem;letter-spacing:.06em;
+  color:var(--ink);line-height:1.3}
+.tr-card .face .en{font-size:.58rem;color:var(--ink-4);margin-top:5px;letter-spacing:.03em}
+.tr-card .face .flag{position:absolute;top:7px;right:8px;font-size:.58rem;
+  color:var(--zhu);border:1px solid currentColor;border-radius:2px;padding:0 3px}
+.tr-card .pos-flag{margin-top:7px;font-size:.66rem;color:var(--ink-3)}
+
+/* ── 区块 ── */
+.tr-sec{margin:26px 0 0}
+.tr-sec-h{display:flex;align-items:baseline;gap:9px;margin-bottom:12px;
+  padding-bottom:7px;border-bottom:1px solid var(--rule)}
+.tr-sec-h .no{font-family:var(--serif);color:var(--zhu);font-size:.8rem;opacity:.75}
+.tr-sec-h h2{font-family:var(--serif);font-size:1.04rem;margin:0;
+  letter-spacing:.05em;font-weight:600}
+.tr-sec-h .note{font-size:.68rem;color:var(--ink-4);margin-left:auto}
+
+.tr-card-txt{background:var(--paper-2);border:1px solid var(--rule);border-radius:8px;
+  padding:14px 17px;margin-bottom:10px}
+.tr-card-txt .h{display:flex;align-items:baseline;gap:8px;margin-bottom:7px;flex-wrap:wrap}
+.tr-card-txt .h .p{font-size:.7rem;color:var(--zhu);letter-spacing:.05em}
+.tr-card-txt .h .n{font-family:var(--serif);font-size:.95rem;font-weight:600}
+.tr-card-txt .h .k{margin-left:auto;font-size:.7rem;color:var(--ink-3)}
+.tr-card-txt .d{font-size:.81rem;color:var(--ink-2);line-height:1.85}
+.tr-card-txt .d+.d{margin-top:6px}
+.tr-card-txt b{color:var(--ink)}
+
+.tr-tb{width:100%;border-collapse:collapse;font-size:.78rem}
+.tr-tb th,.tr-tb td{padding:7px 9px;text-align:left;border-bottom:1px solid var(--rule-soft)}
+.tr-tb th{font-size:.68rem;color:var(--ink-4);font-weight:500;background:var(--rule-soft)}
+
+.tr-empty{text-align:center;padding:44px 20px;color:var(--ink-4);font-size:.85rem}
+
+@media screen and (max-width:700px){
+  .tr-wrap{padding:0 14px 50px}
+  .tr-f.q input{width:100%}
+  .tr-f.q{flex:1 1 100%}
+  .tr-f.s{flex:1 1 100%}
+  .tr-f.s select{width:100%}
+  .tr-btn{flex:1 1 auto}
+  .tr-cards{gap:9px}
+  .tr-card{width:calc(50% - 5px)}
+  .tr-card .face{width:100%;height:auto;aspect-ratio:132/216}
+}
+</style>
+
+<div class="tr-wrap">
+
+  <div class="tr-form">
+    <div class="tr-row">
+      <div class="tr-f q"><label>想问什么（可留空）</label>
+        <input type="text" id="trQ" placeholder="如：这段关系还要继续吗"></div>
+      <div class="tr-f s"><label>牌阵</label>
+        <select id="trSpread"></select></div>
+    </div>
+    <div class="tr-row">
+      <button class="tr-btn" id="trDraw">抽牌</button>
+      <button class="tr-btn ghost" id="trSave">保存</button>
+      <button class="tr-btn ghost" id="trShare">分享卡片</button>
+    </div>
+    <div class="tr-hint" id="trHint">
+      塔罗不预测注定的命运，它照的是你此刻的状态。牌面提供一个看问题的角度，
+      真正的选择权始终在你自己手里。
+    </div>
+  </div>
+
+  <div id="trOut"><div class="tr-empty">选好牌阵后点「抽牌」</div></div>
+</div>
+
+<script src="/assets/js/bazi/tarot.js"></script>
+<script src="/assets/js/bazi/cases.js"></script>
+<script src="/assets/js/bazi/qrcode.js"></script>
+<script src="/assets/js/bazi/share.js"></script>
+<script src="/assets/js/bazi/pwa.js"></script>
+<script>
+(function(){
+  'use strict';
+  var $ = function(id){ return document.getElementById(id); };
+  var _last = null;
+
+  function esc(s){
+    return String(s==null?'':s).replace(/[&<>"]/g, function(m){
+      return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m];
+    });
+  }
+
+  // 牌阵选项
+  Object.keys(bzTarot.SPREADS).forEach(function(k){
+    var s = bzTarot.SPREADS[k];
+    var o = document.createElement('option');
+    o.value = k;
+    o.textContent = s.name + '（' + s.count + ' 张）';
+    if (k === 'three') o.selected = true;
+    $('trSpread').appendChild(o);
+  });
+
+  function render(r, question){
+    var H = [];
+
+    // 牌面
+    H.push('<div class="tr-cards">');
+    r.cards.forEach(function(c){
+      H.push('<div class="tr-card">');
+      H.push('<div class="pos">'+esc(c.posName)+'</div>');
+      H.push('<div class="face'+(c.reversed?' rev':'')+'">'+
+        (c.reversed?'<span class="flag">逆</span>':'')+
+        '<div class="glyph">'+c.card.glyph+'</div>'+
+        '<div class="nm">'+(c.card.fullName||c.card.name)+'</div>'+
+        '<div class="en">'+esc(c.card.en)+'</div>'+
+        '</div>');
+      H.push('<div class="pos-flag">'+(c.reversed?'逆位':'正位')+'</div>');
+      H.push('</div>');
+    });
+    H.push('</div>');
+
+    // 牌阵说明
+    H.push('<div class="tr-sec"><div class="tr-sec-h"><span class="no">壹</span>'+
+      '<h2>'+esc(r.spread.name)+'</h2><span class="note">'+esc(r.spread.desc)+'</span></div>');
+    if (question) {
+      H.push('<div class="tr-card-txt"><div class="d">你问的是：<b>'+esc(question)+'</b></div></div>');
+    }
+
+    // 逐张解读
+    r.cards.forEach(function(c, i){
+      var card = c.card;
+      H.push('<div class="tr-card-txt">');
+      H.push('<div class="h"><span class="p">'+esc(c.posName)+'</span>'+
+        '<span class="n">'+(card.fullName||card.name)+'</span>'+
+        '<span class="k">'+(c.reversed?'逆位':'正位')+' · '+esc(card.kw)+'</span></div>');
+      H.push('<div class="d">'+esc(c.text)+'</div>');
+      H.push('</div>');
+    });
+    H.push('</div>');
+
+    // 整体观察
+    var sm = bzTarot.summary(r);
+    H.push('<div class="tr-sec"><div class="tr-sec-h"><span class="no">贰</span>'+
+      '<h2>整体观察</h2><span class="note">牌面构成</span></div>');
+    H.push('<table class="tr-tb"><thead><tr><th>类别</th><th>张数</th></tr></thead><tbody>');
+    H.push('<tr><td>大阿卡纳</td><td>'+sm.stat.major+' / '+r.cards.length+'</td></tr>');
+    ['权杖','圣杯','宝剑','星币'].forEach(function(s){
+      if (sm.stat[s]) {
+        H.push('<tr><td>'+s+'（'+bzTarot.SUITS[s].domain+'）</td><td>'+sm.stat[s]+'</td></tr>');
+      }
+    });
+    H.push('<tr><td>逆位</td><td>'+sm.stat.reversed+' / '+r.cards.length+'</td></tr>');
+    H.push('</tbody></table>');
+    if (sm.notes.length) {
+      sm.notes.forEach(function(n){
+        H.push('<div class="tr-card-txt" style="margin-top:10px"><div class="d">'+esc(n)+'</div></div>');
+      });
+    } else {
+      H.push('<div class="tr-card-txt" style="margin-top:10px"><div class="d">'+
+        '牌面分布比较均衡，没有某一类特别突出。这种情况通常说明事情涉及面广，'+
+        '没有单一的决定性因素。</div></div>');
+    }
+    H.push('</div>');
+
+    // 怎么读
+    H.push('<div class="tr-sec"><div class="tr-sec-h"><span class="no">叁</span>'+
+      '<h2>怎么读这组牌</h2></div>');
+    H.push('<div class="tr-card-txt"><div class="d">'+
+      '<b>先看整体调性</b>：大牌多说明是人生课题，小牌多说明是具体事务；'+
+      '逆位多说明能量受阻或在向内。</div>'+
+      '<div class="d"><b>再看每张的位置</b>：同一个牌在不同位置含义不同。'+
+      '「死神」在过去位是已经结束的事，在未来位才是将要到来的转变。</div>'+
+      '<div class="d"><b>最后连起来讲一个故事</b>：不要一张张孤立地读，'+
+      '牌与牌之间的呼应才是塔罗真正在说的事。</div>'+
+      '<div class="d" style="color:var(--ink-3)">塔罗反映的是抽牌这一刻的状态。'+
+      '同一件事反复抽会得到互相矛盾的牌——不是牌不准，是你在反复问同一个问题。</div>'+
+      '</div></div>');
+
+    $('trOut').innerHTML = H.join('');
+  }
+
+  $('trDraw').onclick = function(){
+    var q = $('trQ').value.trim();
+    var sp = $('trSpread').value;
+    try {
+      var r = bzTarot.draw({ spread: sp });
+      _last = { result: r, question: q };
+      render(r, q);
+    } catch (e) {
+      $('trOut').innerHTML = '<div class="tr-empty">抽牌失败：'+esc(e.message)+'</div>';
+    }
+  };
+
+  $('trSave').onclick = function(){
+    if (!_last) { alert('请先抽牌'); return; }
+    var nm = prompt('给这次抽牌起个名字（留空自动命名）：', '');
+    if (nm === null) return;
+    if (!nm) nm = _last.result.spread.name + (_last.question ? ' · ' + _last.question : '');
+    var d = new Date(), p = function(n){ return n<10?'0'+n:n; };
+    var it = bzCases.add({
+      kind: 'tarot', name: nm,
+      date: d.getFullYear()+'-'+p(d.getMonth()+1)+'-'+p(d.getDate()),
+      time: p(d.getHours())+':'+p(d.getMinutes()),
+      sex: 1,
+      note: JSON.stringify({
+        spread: _last.result.spread.key,
+        question: _last.question,
+        cards: _last.result.cards.map(function(c){
+          return (c.card.fullName||c.card.name) + (c.reversed?'(逆)':'(正)');
+        })
+      })
+    });
+    if (!it) { alert('保存失败'); return; }
+    var b = $('trSave'), o = b.textContent;
+    b.textContent = '已保存 ✓';
+    setTimeout(function(){ b.textContent = o; }, 1400);
+  };
+
+  $('trShare').onclick = function(){
+    if (!_last) { alert('请先抽牌'); return; }
+    try {
+      var cv = bzShare.tarotCard(_last.result, _last.question);
+      bzShare.preview(cv, '塔罗');
+    } catch (e) { alert('生成失败：' + e.message); }
+  };
+
+  $('trDraw').click();
+})();
+</script>

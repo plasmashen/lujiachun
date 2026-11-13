@@ -176,8 +176,8 @@ section.bz-hub {
     <span class="tag">离线可用</span>
   </div>
   <p class="bz-hub-sub">
-    五套排盘工具共用同一套历法内核 —— 同一时刻、同一地点算出来的结果不会互相打架。
-    断网也能排盘，可装到手机桌面；另外两部古籍与方法资料供查阅。
+    六套排盘工具共用同一套历法内核 —— 同一时刻、同一地点算出来的结果不会互相打架。
+    再加六种占卜体系，全部断网可用，可装到手机桌面。
   </p>
 
   <div class="bz-hub-grid">
@@ -215,6 +215,13 @@ section.bz-hub {
       <span class="name">西洋占星</span>
       <span class="desc">十大行星 · 十二宫位 · 相位图 · 元素模式 · 上升命主</span>
       <span class="meta"><span>回归黄道 · 中文附英文</span></span>
+    </a>
+
+    <a class="bz-card" href="/divination/">
+      <span class="glyph">卜</span>
+      <span class="name">占卜</span>
+      <span class="desc">六爻 · 梅花易数 · 塔罗 · 卜卦择时 · 数字命理 · 姓名五格</span>
+      <span class="meta"><span>6 种体系<b>全部离线</b></span></span>
     </a>
 
     <a class="bz-card" href="/books/">
