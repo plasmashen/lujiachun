@@ -6,6 +6,8 @@ permalink: /bazi/source/
 
 # 问真八字 · 排盘算法复刻
 
+> 📊 **完整进度报告：[复刻总报告](/bazi/report/)** —— 各模块复刻率、算法原理、未复刻项与原因
+
 问真八字（App / 网页版）排盘能力的本地复刻实现。纯 Python 标准库，无第三方依赖。
 
 > 复刻对象：`https://bzapi4.iwzbz.com/getbasebz8.php`
