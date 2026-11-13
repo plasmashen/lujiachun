@@ -176,7 +176,7 @@ section.bz-hub {
     <span class="tag">离线可用</span>
   </div>
   <p class="bz-hub-sub">
-    四套排盘工具共用同一套历法内核 —— 同一时刻算出来的四柱不会互相打架。
+    五套排盘工具共用同一套历法内核 —— 同一时刻、同一地点算出来的结果不会互相打架。
     断网也能排盘，可装到手机桌面；另外两部古籍与方法资料供查阅。
   </p>
 
@@ -208,6 +208,13 @@ section.bz-hub {
       <span class="name">八字合盘</span>
       <span class="desc">双人四柱对照 · 五行能量雷达 · 夫妻宫与日主互动</span>
       <span class="meta"><span>六种关系视角</span></span>
+    </a>
+
+    <a class="bz-card" href="/astro/">
+      <span class="glyph">星</span>
+      <span class="name">西洋占星</span>
+      <span class="desc">十大行星 · 十二宫位 · 相位图 · 元素模式 · 上升命主</span>
+      <span class="meta"><span>回归黄道 · 中文附英文</span></span>
     </a>
 
     <a class="bz-card" href="/books/">

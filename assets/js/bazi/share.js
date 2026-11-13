@@ -490,6 +490,210 @@
     return b.cv;
   }
 
+
+  /**
+   * 西洋占星本命盘分享卡
+   */
+  function astroCard(chart, meta) {
+    var W = 640, H = 900;
+    var b = baseCanvas(W, H);
+    var ctx = b.ctx;
+    var pad = 40;
+
+    // 标题
+    ctx.fillStyle = C.ink;
+    ctx.font = 'bold 26px ' + SERIF;
+    ctx.fillText('本命盘', pad, 66);
+
+    ctx.fillStyle = C.ink3;
+    ctx.font = '12px ' + SANS;
+    var sub = (meta && meta.date ? meta.date + ' ' + meta.time + '　' : '') +
+      (meta && meta.city ? meta.city : '');
+    ctx.fillText(sub, pad, 88);
+
+    ctx.strokeStyle = C.rule;
+    ctx.beginPath();
+    ctx.moveTo(pad, 104);
+    ctx.lineTo(W - pad, 104);
+    ctx.stroke();
+
+    // 三巨头
+    var trio = [
+      ['太阳', chart.sun], ['月亮', chart.moon], ['上升', chart.asc]
+    ];
+    var tw = (W - pad * 2) / 3;
+    trio.forEach(function (t, i) {
+      var x = pad + i * tw + tw / 2;
+      ctx.textAlign = 'center';
+      ctx.fillStyle = C.ink4;
+      ctx.font = '11px ' + SANS;
+      ctx.fillText(t[0], x, 132);
+      ctx.fillStyle = C.ink;
+      ctx.font = 'bold 22px ' + SERIF;
+      ctx.fillText(t[1].sign.sign.zh, x, 162);
+      ctx.fillStyle = C.ink3;
+      ctx.font = '11px ' + SANS;
+      ctx.fillText(Math.floor(t[1].sign.deg) + '°', x, 180);
+    });
+    ctx.textAlign = 'left';
+
+    // 星盘圆
+    var C2 = W / 2, cy = 400, R = 168;
+    ctx.strokeStyle = C.rule;
+    ctx.lineWidth = 1;
+    [R, R - 34, R - 80].forEach(function (r) {
+      ctx.beginPath();
+      ctx.arc(C2, cy, r, 0, Math.PI * 2);
+      ctx.stroke();
+    });
+
+    var ASC = chart.asc.lon;
+    function toXY(lon, r) {
+      var a = (180 - (lon - ASC)) * Math.PI / 180;
+      return [C2 + r * Math.cos(a), cy - r * Math.sin(a)];
+    }
+
+    // 星座符号
+    var EL = { '火': '#b04a3a', '土': '#8a7440', '风': '#5b7a8c', '水': '#3f5d74' };
+    for (var i = 0; i < 12; i++) {
+      var sg = global.bzAstro ? global.bzAstro.SIGNS[i] : null;
+      if (!sg) continue;
+      var mid = i * 30 + 15;
+      var pp = toXY(mid, R - 17);
+      ctx.fillStyle = EL[sg.el] || C.ink3;
+      ctx.font = '14px ' + SERIF;
+      ctx.textAlign = 'center';
+      ctx.fillText(sg.sym, pp[0], pp[1] + 5);
+      // 分隔线
+      var p1 = toXY(i * 30, R), p2 = toXY(i * 30, R - 34);
+      ctx.strokeStyle = C.rule;
+      ctx.beginPath(); ctx.moveTo(p1[0], p1[1]); ctx.lineTo(p2[0], p2[1]); ctx.stroke();
+    }
+    ctx.textAlign = 'left';
+
+    // 宫位线
+    chart.cusps.forEach(function (cusp, idx) {
+      var p1 = toXY(cusp, R - 80), p2 = toXY(cusp, 26);
+      var isAxis = (idx % 3 === 0);
+      ctx.strokeStyle = isAxis ? C.zhu : '#e8e2d6';
+      ctx.lineWidth = isAxis ? 1.2 : 0.8;
+      ctx.beginPath(); ctx.moveTo(p1[0], p1[1]); ctx.lineTo(p2[0], p2[1]); ctx.stroke();
+    });
+    ctx.lineWidth = 1;
+
+    // 行星
+    var placed = [];
+    chart.points.forEach(function (p) {
+      var r = R - 52;
+      var tries = 0;
+      while (tries < 8) {
+        var conflict = placed.some(function (q) {
+          return Math.abs(((q.lon - p.lon + 540) % 360) - 180) < 11 && q.r === r;
+        });
+        if (!conflict) break;
+        r -= 13; tries++;
+      }
+      placed.push({ lon: p.lon, r: r });
+      var pt = toXY(p.lon, r);
+      var outer = toXY(p.lon, R - 34);
+      ctx.strokeStyle = '#d8d0c0';
+      ctx.setLineDash([2, 3]);
+      ctx.beginPath(); ctx.moveTo(outer[0], outer[1]); ctx.lineTo(pt[0], pt[1]); ctx.stroke();
+      ctx.setLineDash([]);
+
+      ctx.fillStyle = p.retro ? C.zhu : C.ink2;
+      ctx.font = '13px ' + SERIF;
+      ctx.textAlign = 'center';
+      ctx.fillText(p.glyph, pt[0], pt[1] + 4);
+    });
+
+    // 相位线
+    chart.aspects.forEach(function (a) {
+      if (a.orb > 4) return;
+      var pool = chart.points.concat(chart.axes.filter(function (x) {
+        return x.key === 'ASC' || x.key === 'MC';
+      }));
+      var pa = pool.filter(function (p) { return p.key === a.a; })[0];
+      var pb = pool.filter(function (p) { return p.key === a.b; })[0];
+      if (!pa || !pb) return;
+      var p1 = toXY(pa.lon, 80), p2 = toXY(pb.lon, 80);
+      ctx.strokeStyle = a.color;
+      ctx.globalAlpha = a.exact ? 0.7 : 0.35;
+      ctx.lineWidth = a.exact ? 1.3 : 0.7;
+      ctx.beginPath(); ctx.moveTo(p1[0], p1[1]); ctx.lineTo(p2[0], p2[1]); ctx.stroke();
+      ctx.globalAlpha = 1;
+      ctx.lineWidth = 1;
+    });
+
+    // 中心
+    ctx.fillStyle = C.paper;
+    ctx.beginPath(); ctx.arc(C2, cy, 26, 0, Math.PI * 2); ctx.fill();
+    ctx.strokeStyle = C.rule; ctx.stroke();
+
+    // ASC/MC
+    var ap = toXY(ASC, R + 8);
+    ctx.fillStyle = C.zhu; ctx.font = '9px ' + SANS; ctx.textAlign = 'center';
+    ctx.fillText('ASC', ap[0], ap[1] + 3);
+
+    // 行星列表（两列，按实测文字宽度定列）
+    var y = 610;
+    var halfW = (W - pad * 2) / 2;
+
+    // 量一次最大宽度，作为列间距基准
+    ctx.font = '12px ' + SANS;
+    var wName = 0;
+    chart.points.forEach(function (p) {
+      var n = p.zh.replace('星', '');
+      var w = ctx.measureText(n).width;
+      if (w > wName) wName = w;
+    });
+    ctx.font = '12px ' + SERIF;
+    var wDeg = ctx.measureText('44°').width;
+    var wSign = ctx.measureText('摩羯').width;
+
+    var cGlyph = 0;
+    var cName = 14;
+    var cDeg = cName + wName + 6;              // 度数右对齐到这点
+    var cSign = cDeg + 4;
+    var cHouse = cSign + wSign + 7;
+
+    chart.points.forEach(function (p, i) {
+      var col = i % 2, row = Math.floor(i / 2);
+      var x = pad + col * halfW;
+      var yy = y + row * 24;
+
+      ctx.textAlign = 'left';
+      ctx.fillStyle = p.retro ? C.zhu : C.ink3;
+      ctx.font = '11px ' + SANS;
+      ctx.fillText(p.glyph, x + cGlyph, yy);
+
+      ctx.fillStyle = C.ink2;
+      ctx.font = '12px ' + SANS;
+      ctx.fillText(p.zh.replace('星', ''), x + cName, yy);
+
+      // 度数右对齐，保证小数点位置一致
+      ctx.fillStyle = C.ink;
+      ctx.font = '12px ' + SERIF;
+      ctx.textAlign = 'right';
+      ctx.fillText(Math.floor(p.sign.deg) + '°', x + cDeg, yy);
+      ctx.textAlign = 'left';
+
+      // 星座固定起点
+      ctx.fillText(p.sign.sign.zh, x + cSign, yy);
+
+      ctx.fillStyle = C.ink4;
+      ctx.font = '10px ' + SANS;
+      ctx.fillText(p.house + '宫', x + cHouse, yy);
+    });
+
+    // 二维码
+    drawQR(ctx, (meta && meta.url) || 'https://lujiachun.top/astro/',
+      W - 40 - 78, H - 128, 78, '扫码排自己的');
+
+    footer(ctx, W, H);
+    return b.cv;
+  }
+
   /** 下载 canvas 为 png */
   function download(cv, name) {
     try {
@@ -554,6 +758,7 @@
     baziCard: baziCard,
     ziweiCard: ziweiCard,
     huangliCard: huangliCard,
+    astroCard: astroCard,
     download: download,
     preview: preview
   };

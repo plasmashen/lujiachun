@@ -1,0 +1,630 @@
+---
+layout: default
+title: 西洋占星
+description: 在线本命盘 · 十大行星 · 十二宫位 · 主要相位 · 元素模式 · 双人合盘。中文界面附英文术语，离线可用。
+permalink: /astro/
+---
+
+<style>
+:root{
+  --paper:#f7f4ed; --paper-2:#fdfcf8;
+  --ink:#1c1a17; --ink-2:#544f47; --ink-3:#797367; --ink-4:#a39c8f;
+  --rule:#ded7c8; --rule-soft:#f0ece2;
+  --zhu:#a8352a; --qing:#3f5d52; --jin:#9a7b3f;
+  --fire:#b04a3a; --earth:#8a7440; --air:#5b7a8c; --water:#3f5d74;
+  --serif:"Songti SC","STSong","SimSun","Source Han Serif SC","Noto Serif CJK SC",serif;
+  --sans:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Microsoft YaHei","Source Han Sans SC","Noto Sans CJK SC",sans-serif;
+}
+.aw-wrap{max-width:920px;margin:0 auto;padding:0 20px 70px;
+  font-family:var(--sans);color:var(--ink);background:var(--paper);
+  font-size:.9rem;line-height:1.75}
+.aw-wrap *{box-sizing:border-box}
+
+/* ── 表单 ── */
+.aw-form{background:var(--paper-2);border:1px solid var(--rule);border-radius:10px;
+  padding:18px 20px;margin:22px 0 26px}
+.aw-row{display:flex;flex-wrap:wrap;gap:10px;align-items:flex-end;margin-bottom:11px}
+.aw-row:last-child{margin-bottom:0}
+.aw-f{display:flex;flex-direction:column;gap:4px}
+.aw-f label{font-size:.7rem;color:var(--ink-4);letter-spacing:.06em}
+.aw-f input,.aw-f select{
+  font-family:var(--sans);font-size:.86rem;padding:7px 10px;
+  border:1px solid var(--rule);border-radius:5px;background:#fff;color:var(--ink);
+  outline:none;transition:border-color .15s}
+.aw-f input:focus,.aw-f select:focus{border-color:var(--zhu)}
+.aw-f.date input{width:145px}
+.aw-f.time input{width:96px}
+.aw-f.sex select{width:76px}
+.aw-f.city input{width:150px}
+.aw-f.lat input,.aw-f.lon input{width:96px}
+.aw-btn{font-family:var(--sans);font-size:.86rem;padding:8px 24px;border:none;
+  border-radius:5px;background:var(--zhu);color:#fff;cursor:pointer;
+  transition:opacity .15s;letter-spacing:.04em}
+.aw-btn:hover{opacity:.88}
+.aw-btn.ghost{background:none;border:1px solid var(--rule);color:var(--ink-2)}
+.aw-btn.ghost:hover{border-color:var(--zhu);color:var(--zhu)}
+.aw-hint{font-size:.7rem;color:var(--ink-4);margin-top:9px;line-height:1.7}
+.aw-presets{display:flex;flex-wrap:wrap;gap:6px;margin-top:9px}
+.aw-presets button{font-family:var(--sans);font-size:.72rem;padding:3px 10px;
+  border:1px solid var(--rule);border-radius:20px;background:#fff;color:var(--ink-3);
+  cursor:pointer}
+.aw-presets button:hover{border-color:var(--zhu);color:var(--zhu)}
+
+/* ── 摘要 ── */
+.aw-big{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:22px}
+.aw-big .b{background:var(--paper-2);border:1px solid var(--rule);border-radius:8px;
+  padding:14px 16px;text-align:center}
+.aw-big .b .k{font-size:.68rem;color:var(--ink-4);letter-spacing:.08em;margin-bottom:5px}
+.aw-big .b .v{font-family:var(--serif);font-size:1.15rem;color:var(--ink);letter-spacing:.02em}
+.aw-big .b .s{font-size:.7rem;color:var(--ink-3);margin-top:3px}
+
+/* ── 区块 ── */
+.aw-sec{margin:30px 0 0}
+.aw-sec-h{display:flex;align-items:baseline;gap:9px;margin-bottom:13px;
+  padding-bottom:7px;border-bottom:1px solid var(--rule)}
+.aw-sec-h .no{font-family:var(--serif);color:var(--zhu);font-size:.8rem;opacity:.75}
+.aw-sec-h h2{font-family:var(--serif);font-size:1.06rem;margin:0;
+  letter-spacing:.05em;font-weight:600}
+.aw-sec-h .note{font-size:.68rem;color:var(--ink-4);margin-left:auto}
+
+/* ── 星盘 ── */
+.aw-chart{display:flex;gap:20px;align-items:flex-start;flex-wrap:wrap}
+.aw-svg{flex:0 0 auto;width:420px;max-width:100%}
+.aw-legend{flex:1 1 260px;min-width:0}
+.aw-pt{display:flex;align-items:baseline;gap:8px;padding:5px 0;
+  border-bottom:1px solid var(--rule-soft);font-size:.8rem}
+.aw-pt:last-child{border-bottom:none}
+.aw-pt .g{font-size:.95rem;width:1.1em;text-align:center;color:var(--ink-2)}
+.aw-pt .n{width:3.2em;color:var(--ink-2);flex-shrink:0}
+.aw-pt .p{font-family:var(--serif);color:var(--ink);flex:1;min-width:0}
+.aw-pt .h{color:var(--ink-4);font-size:.72rem;white-space:nowrap}
+.aw-pt .r{color:var(--zhu);font-size:.68rem;margin-left:2px}
+
+/* ── 表格 ── */
+.aw-tb{width:100%;border-collapse:collapse;font-size:.79rem}
+.aw-tb th,.aw-tb td{padding:7px 10px;text-align:left;border-bottom:1px solid var(--rule-soft)}
+.aw-tb th{font-size:.7rem;color:var(--ink-4);font-weight:500;letter-spacing:.05em;
+  background:var(--rule-soft)}
+.aw-tb tr:last-child td{border-bottom:none}
+.aw-tb td.num{font-variant-numeric:tabular-nums;color:var(--ink-3)}
+
+/* ── 元素条 ── */
+.aw-bars{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:14px}
+.aw-bar .lb{display:flex;justify-content:space-between;font-size:.75rem;
+  color:var(--ink-3);margin-bottom:4px}
+.aw-bar .tr{height:7px;background:var(--rule-soft);border-radius:4px;overflow:hidden}
+.aw-bar .fl{height:100%;border-radius:4px;transition:width .4s}
+
+/* ── 解读卡 ── */
+.aw-card{background:var(--paper-2);border:1px solid var(--rule);border-radius:8px;
+  padding:14px 17px;margin-bottom:11px}
+.aw-card .h{display:flex;align-items:baseline;gap:8px;margin-bottom:7px;flex-wrap:wrap}
+.aw-card .h .t{font-family:var(--serif);font-size:.94rem;font-weight:600}
+.aw-card .h .k{font-size:.69rem;color:var(--zhu);letter-spacing:.05em}
+.aw-card .h .pos{margin-left:auto;font-size:.74rem;color:var(--ink-3);
+  font-family:var(--serif)}
+.aw-card .d{font-size:.8rem;color:var(--ink-2);line-height:1.82}
+.aw-card .d+.d{margin-top:8px}
+
+/* ── 相位列表 ── */
+.aw-asp{display:grid;grid-template-columns:repeat(auto-fill,minmax(215px,1fr));gap:7px}
+.aw-asp .i{display:flex;align-items:center;gap:7px;font-size:.76rem;
+  padding:6px 10px;background:var(--paper-2);border:1px solid var(--rule-soft);
+  border-radius:5px}
+.aw-asp .i .sy{font-size:.9rem;width:1em;text-align:center}
+.aw-asp .i .o{margin-left:auto;color:var(--ink-4);font-size:.68rem;
+  font-variant-numeric:tabular-nums}
+
+/* ── 合盘 ── */
+.aw-tabs{display:flex;gap:6px;margin-bottom:16px;flex-wrap:wrap}
+.aw-tab{font-family:var(--sans);font-size:.8rem;padding:6px 16px;border:1px solid var(--rule);
+  border-radius:5px;background:#fff;color:var(--ink-3);cursor:pointer;transition:.15s}
+.aw-tab.on{background:var(--zhu);border-color:var(--zhu);color:#fff}
+.aw-tab:hover:not(.on){border-color:var(--zhu);color:var(--zhu)}
+
+.aw-empty{text-align:center;padding:50px 20px;color:var(--ink-4);font-size:.85rem}
+
+/* ── 移动端 ── */
+@media screen and (max-width:700px){
+  .aw-wrap{padding:0 14px 50px}
+  .aw-chart{flex-direction:column;gap:16px}
+  .aw-svg{width:100%;max-width:400px;margin:0 auto}
+  .aw-big{grid-template-columns:1fr;gap:8px}
+  .aw-big .b{display:flex;align-items:baseline;gap:10px;text-align:left;padding:11px 14px}
+  .aw-big .b .k{margin-bottom:0;min-width:4.5em}
+  .aw-big .b .v{font-size:1rem}
+  .aw-row{gap:8px}
+  .aw-f.date input{width:132px}
+  .aw-f.city input{width:100%}
+  .aw-f.lat,.aw-f.lon{flex:1 1 40%}
+  .aw-f.lat input,.aw-f.lon input{width:100%}
+  .aw-sec-h h2{font-size:.98rem}
+  .aw-sec-h .note{display:none}
+  .aw-asp{grid-template-columns:1fr}
+  .aw-btn{width:100%}
+  .aw-btn.ghost{width:auto}
+}
+</style>
+
+<div class="aw-wrap">
+
+  <div class="aw-form">
+    <div class="aw-row">
+      <div class="aw-f date"><label>出生日期</label>
+        <input type="date" id="awDate" value="1990-05-15"></div>
+      <div class="aw-f time"><label>出生时间</label>
+        <input type="time" id="awTime" value="10:30"></div>
+      <div class="aw-f sex"><label>性别</label>
+        <select id="awSex"><option value="1">男</option><option value="2">女</option></select></div>
+    </div>
+    <div class="aw-row">
+      <div class="aw-f city"><label>出生地（城市名）</label>
+        <input type="text" id="awCity" value="北京" list="awCityList"></div>
+      <datalist id="awCityList"></datalist>
+      <div class="aw-f lat"><label>纬度</label>
+        <input type="number" id="awLat" value="39.90" step="0.01"></div>
+      <div class="aw-f lon"><label>经度</label>
+        <input type="number" id="awLon" value="116.40" step="0.01"></div>
+    </div>
+    <div class="aw-row">
+      <div class="aw-f"><label>宫位制</label>
+        <select id="awSys">
+          <option value="whole">整宫制 Whole Sign</option>
+          <option value="placidus">Placidus</option>
+        </select></div>
+      <button class="aw-btn" id="awGo">排盘</button>
+      <button class="aw-btn ghost" id="awSave">保存</button>
+      <button class="aw-btn ghost" id="awShare">分享卡片</button>
+    </div>
+    <div class="aw-presets" id="awPresets"></div>
+    <div class="aw-hint">
+      出生地影响上升点与宫位——经度差 1° 约差 4 分钟的地方恒星时，纬度影响宫位切分。
+      不知道精确经纬度时，选最近的城市即可，误差通常在上升点 1° 内。
+    </div>
+  </div>
+
+  <div id="awOut"></div>
+</div>
+
+<script src="/assets/js/bazi/astronomy.min.js"></script>
+<script src="/assets/js/bazi/western.js"></script>
+<script src="/assets/js/bazi/western-text.js"></script>
+<script src="/assets/js/bazi/cases.js"></script>
+<script src="/assets/js/bazi/qrcode.js"></script>
+<script src="/assets/js/bazi/share.js"></script>
+<script src="/assets/js/bazi/pwa.js"></script>
+<script>
+(function(){
+  'use strict';
+  var $ = function(id){ return document.getElementById(id); };
+
+  // ── 常用城市（经度、纬度、时区偏移小时）──
+  var CITIES = [
+    ['北京',116.40,39.90,8],['上海',121.47,31.23,8],['广州',113.26,23.13,8],
+    ['深圳',114.06,22.55,8],['成都',104.07,30.66,8],['杭州',120.16,30.27,8],
+    ['武汉',114.31,30.59,8],['西安',108.94,34.34,8],['南京',118.80,32.06,8],
+    ['重庆',106.55,29.56,8],['天津',117.20,39.13,8],['苏州',120.62,31.32,8],
+    ['长沙',112.94,28.23,8],['青岛',120.38,36.07,8],['沈阳',123.43,41.80,8],
+    ['哈尔滨',126.53,45.80,8],['昆明',102.83,24.88,8],['郑州',113.62,34.75,8],
+    ['福州',119.30,26.08,8],['厦门',118.09,24.48,8],['合肥',117.28,31.86,8],
+    ['南昌',115.89,28.68,8],['太原',112.55,37.87,8],['石家庄',114.51,38.04,8],
+    ['南宁',108.37,22.82,8],['贵阳',106.63,26.65,8],['兰州',103.83,36.06,8],
+    ['乌鲁木齐',87.62,43.79,8],['拉萨',91.14,29.65,8],['海口',110.20,20.04,8],
+    ['台北',121.52,25.03,8],['香港',114.17,22.32,8],['澳门',113.55,22.20,8],
+    ['东京',139.69,35.69,9],['大阪',135.50,34.69,9],['首尔',126.98,37.57,9],
+    ['新加坡',103.82,1.35,8],['曼谷',100.50,13.75,7],['吉隆坡',101.69,3.14,8],
+    ['纽约',-74.01,40.71,-5],['洛杉矶',-118.24,34.05,-8],['芝加哥',-87.63,41.88,-6],
+    ['旧金山',-122.42,37.77,-8],['西雅图',-122.33,47.61,-8],['波士顿',-71.06,42.36,-5],
+    ['多伦多',-79.38,43.65,-5],['温哥华',-123.12,49.28,-8],
+    ['伦敦',-0.13,51.51,0],['巴黎',2.35,48.86,1],['柏林',13.40,52.52,1],
+    ['罗马',12.50,41.90,1],['马德里',-3.70,40.42,1],['阿姆斯特丹',4.90,52.37,1],
+    ['苏黎世',8.54,47.38,1],['斯德哥尔摩',18.07,59.33,1],['莫斯科',37.62,55.75,3],
+    ['迪拜',55.27,25.20,4],['孟买',72.88,19.08,5.5],['新德里',77.21,28.61,5.5],
+    ['悉尼',151.21,-33.87,10],['墨尔本',144.96,-37.81,10],['奥克兰',174.76,-36.85,12],
+    ['圣保罗',-46.63,-23.55,-3],['墨西哥城',-99.13,19.43,-6],['开罗',31.24,30.04,2]
+  ];
+  var cityMap = {};
+  CITIES.forEach(function(c){ cityMap[c[0]] = c; });
+  var dl = $('awCityList');
+  CITIES.forEach(function(c){
+    var o = document.createElement('option'); o.value = c[0]; dl.appendChild(o);
+  });
+
+  // ── 常用案例预设 ──
+  var PRESETS = [
+    ['1990-05-15 10:30 北京', '1990-05-15','10:30','北京',1],
+    ['1985-11-20 06:00 上海', '1985-11-20','06:00','上海',2],
+    ['2000-01-01 23:30 广州', '2000-01-01','23:30','广州',1],
+    ['1995-08-08 14:00 伦敦', '1995-08-08','14:00','伦敦',2]
+  ];
+  var pre = $('awPresets');
+  PRESETS.forEach(function(p){
+    var b = document.createElement('button');
+    b.textContent = p[0];
+    b.onclick = function(){
+      var v = p[0].split(' ');
+      $('awDate').value = p[1]; $('awTime').value = p[2];
+      $('awCity').value = p[3]; $('awSex').value = String(p[4]);
+      syncCity(); $('awGo').click();
+    };
+    pre.appendChild(b);
+  });
+
+  function syncCity(){
+    var c = cityMap[$('awCity').value.trim()];
+    if (c) { $('awLat').value = c[2].toFixed(2); $('awLon').value = c[1].toFixed(2); }
+  }
+  $('awCity').addEventListener('change', syncCity);
+  $('awCity').addEventListener('blur', syncCity);
+
+  var _lastChart = null, _lastMeta = null;
+
+  /** 当地时间 → UTC 毫秒 */
+  function toUTC(dateStr, timeStr, tzOffset){
+    var d = dateStr.split('-').map(Number);
+    var t = timeStr.split(':').map(Number);
+    // 本地时间减去时区偏移
+    return Date.UTC(d[0], d[1]-1, d[2], t[0], t[1], 0) - tzOffset*3600000;
+  }
+
+  function esc(s){
+    return String(s==null?'':s).replace(/[&<>"]/g, function(m){
+      return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m];
+    });
+  }
+
+  // ── 画星盘 ──
+  function drawWheel(chart){
+    var S = 420, C = S/2, R = C - 14;
+    var svg = [];
+    svg.push('<svg viewBox="0 0 '+S+' '+S+'" class="aw-svg" xmlns="http://www.w3.org/2000/svg">');
+    svg.push('<rect width="'+S+'" height="'+S+'" fill="#fdfcf8"/>');
+
+    var ASC = chart.asc.lon;
+    // 屏幕角度：ASC 在左边（180°方向），逆时针增加
+    function toXY(lon, r){
+      var a = (180 - (lon - ASC)) * Math.PI/180;
+      return [C + r*Math.cos(a), C - r*Math.sin(a)];
+    }
+    function arc(lon1, lon2, r){
+      var p1 = toXY(lon1, r), p2 = toXY(lon2, r);
+      var span = ((lon2 - lon1) + 360) % 360;
+      var large = span > 180 ? 1 : 0;
+      // SVG y 轴向下，逆时针需要 sweep=0
+      return 'M'+p1[0].toFixed(1)+','+p1[1].toFixed(1)+
+        ' A'+r+','+r+' 0 '+large+' 0 '+p2[0].toFixed(1)+','+p2[1].toFixed(1);
+    }
+
+    // 外圈
+    svg.push('<circle cx="'+C+'" cy="'+C+'" r="'+R+'" fill="none" stroke="#ded7c8"/>');
+    svg.push('<circle cx="'+C+'" cy="'+C+'" r="'+(R-38)+'" fill="none" stroke="#ded7c8"/>');
+    svg.push('<circle cx="'+C+'" cy="'+C+'" r="'+(R-92)+'" fill="none" stroke="#ded7c8"/>');
+
+    // 十二星座扇区
+    var EL = {火:'#b04a3a', 土:'#8a7440', 风:'#5b7a8c', 水:'#3f5d74'};
+    for (var i=0;i<12;i++){
+      var s0 = i*30, s1 = s0+30;
+      var sg = chart.points[0] ? null : null;
+      var signObj = window.bzAstro.SIGNS[i];
+      // 分隔线
+      var pA = toXY(s0, R), pB = toXY(s0, R-38);
+      svg.push('<line x1="'+pA[0].toFixed(1)+'" y1="'+pA[1].toFixed(1)+
+        '" x2="'+pB[0].toFixed(1)+'" y2="'+pB[1].toFixed(1)+'" stroke="#ded7c8"/>');
+      // 符号
+      var mid = s0 + 15;
+      var pp = toXY(mid, R-19);
+      svg.push('<text x="'+pp[0].toFixed(1)+'" y="'+(pp[1]+5).toFixed(1)+
+        '" font-size="15" fill="'+EL[signObj.el]+'" text-anchor="middle">'+signObj.sym+'</text>');
+    }
+
+    // 宫位线
+    chart.cusps.forEach(function(cusp, idx){
+      var p1 = toXY(cusp, R-92), p2 = toXY(cusp, 30);
+      var isAxis = (idx % 3 === 0);
+      svg.push('<line x1="'+p1[0].toFixed(1)+'" y1="'+p1[1].toFixed(1)+
+        '" x2="'+p2[0].toFixed(1)+'" y2="'+p2[1].toFixed(1)+
+        '" stroke="'+(isAxis?'#a8352a':'#e8e2d6')+'" stroke-width="'+(isAxis?1.2:.8)+'"/>');
+      // 宫号
+      var next = chart.cusps[(idx+1)%12];
+      var span = ((next - cusp)+360)%360;
+      var hmid = cusp + span/2;
+      var hp = toXY(hmid, R-80);
+      svg.push('<text x="'+hp[0].toFixed(1)+'" y="'+(hp[1]+4).toFixed(1)+
+        '" font-size="9" fill="#a39c8f" text-anchor="middle">'+(idx+1)+'</text>');
+    });
+
+    // 行星（简单排布，避免重叠）
+    var placed = [];
+    chart.points.forEach(function(p){
+      var lon = p.lon;
+      var r = R - 55;
+      // 与已放置的避开
+      var tries = 0;
+      while (tries < 8) {
+        var conflict = placed.some(function(q){
+          return Math.abs(((q.lon - lon + 540) % 360) - 180) < 9 && q.r === r;
+        });
+        if (!conflict) break;
+        r -= 15; tries++;
+      }
+      placed.push({lon:lon, r:r});
+      var pt = toXY(lon, r);
+      // 与星座的连线
+      var outer = toXY(lon, R-38);
+      svg.push('<line x1="'+outer[0].toFixed(1)+'" y1="'+outer[1].toFixed(1)+
+        '" x2="'+pt[0].toFixed(1)+'" y2="'+pt[1].toFixed(1)+
+        '" stroke="#d8d0c0" stroke-dasharray="2,3"/>');
+      svg.push('<text x="'+pt[0].toFixed(1)+'" y="'+(pt[1]+4).toFixed(1)+
+        '" font-size="13" fill="'+(p.retro?'#a8352a':'#544f47')+'" text-anchor="middle">'+
+        p.glyph+'</text>');
+      if (p.retro) {
+        svg.push('<text x="'+(pt[0]+9).toFixed(1)+'" y="'+(pt[1]+2).toFixed(1)+
+          '" font-size="7" fill="#a8352a">R</text>');
+      }
+    });
+
+    // 相位线（中心区）
+    chart.aspects.forEach(function(a){
+      if (a.orb > 4) return;
+      var pa = chart.points.concat(chart.axes.filter(function(x){return x.key==='ASC'||x.key==='MC';}))
+        .filter(function(p){return p.key===a.a;})[0];
+      var pb = chart.points.concat(chart.axes.filter(function(x){return x.key==='ASC'||x.key==='MC';}))
+        .filter(function(p){return p.key===a.b;})[0];
+      if (!pa || !pb) return;
+      var p1 = toXY(pa.lon, 92), p2 = toXY(pb.lon, 92);
+      svg.push('<line x1="'+p1[0].toFixed(1)+'" y1="'+p1[1].toFixed(1)+
+        '" x2="'+p2[0].toFixed(1)+'" y2="'+p2[1].toFixed(1)+
+        '" stroke="'+a.color+'" stroke-width="'+(a.exact?1.3:0.7)+
+        '" opacity="'+(a.exact?0.75:0.4)+'"/>');
+    });
+
+    // 中心十字
+    svg.push('<circle cx="'+C+'" cy="'+C+'" r="30" fill="#f7f4ed" stroke="#ded7c8"/>');
+
+    // ASC / MC 标注
+    var ascPt = toXY(ASC, R-4);
+    svg.push('<text x="'+ascPt[0].toFixed(1)+'" y="'+(ascPt[1]+4).toFixed(1)+
+      '" font-size="9" fill="#a8352a" font-weight="600" text-anchor="middle">ASC</text>');
+    var mcPt = toXY(chart.mc.lon, R-4);
+    svg.push('<text x="'+mcPt[0].toFixed(1)+'" y="'+(mcPt[1]+4).toFixed(1)+
+      '" font-size="9" fill="#a8352a" font-weight="600" text-anchor="middle">MC</text>');
+
+    svg.push('</svg>');
+    return svg.join('');
+  }
+
+  // ── 渲染 ──
+  function render(chart, meta){
+    var T = window.bzAstroText;
+    var H = [];
+    var sun = chart.sun, moon = chart.moon, asc = chart.asc;
+
+    // 摘要
+    H.push('<div class="aw-big">');
+    H.push('<div class="b"><div class="k">太阳</div><div class="v">'+sun.sign.sign.zh+
+      '座</div><div class="s">'+bzAstro.dms(sun.sign.deg)+sun.sign.sign.en+'</div></div>');
+    H.push('<div class="b"><div class="k">月亮</div><div class="v">'+moon.sign.sign.zh+
+      '座</div><div class="s">'+bzAstro.dms(moon.sign.deg)+moon.sign.sign.en+'</div></div>');
+    H.push('<div class="b"><div class="k">上升</div><div class="v">'+asc.sign.sign.zh+
+      '座</div><div class="s">'+bzAstro.dms(asc.sign.deg)+asc.sign.sign.en+'</div></div>');
+    H.push('</div>');
+
+    // 一、星盘
+    H.push('<div class="aw-sec"><div class="aw-sec-h"><span class="no">壹</span>'+
+      '<h2>本命盘</h2><span class="note">'+
+      (chart.system==='whole'?'整宫制':'Placidus')+' · 回归黄道</span></div>');
+    H.push('<div class="aw-chart">');
+    H.push(drawWheel(chart));
+    H.push('<div class="aw-legend">');
+    chart.points.forEach(function(p){
+      H.push('<div class="aw-pt"><span class="g">'+p.glyph+'</span>'+
+        '<span class="n">'+p.zh+'</span>'+
+        '<span class="p">'+bzAstro.dms(p.sign.deg)+p.sign.sign.zh+'</span>'+
+        '<span class="h">'+(p.house||'-')+'宫</span>'+
+        (p.retro?'<span class="r">逆</span>':'')+'</div>');
+    });
+    chart.axes.forEach(function(a){
+      H.push('<div class="aw-pt"><span class="g" style="color:#a8352a">'+a.glyph+'</span>'+
+        '<span class="n">'+a.zh+'</span>'+
+        '<span class="p">'+bzAstro.dms(a.sign.deg)+a.sign.sign.zh+'</span>'+
+        '<span class="h">轴点</span></div>');
+    });
+    H.push('</div></div></div>');
+
+    // 二、元素与模式
+    H.push('<div class="aw-sec"><div class="aw-sec-h"><span class="no">贰</span>'+
+      '<h2>元素与模式</h2><span class="note">按行星权重统计</span></div>');
+    var EL_COLOR = {火:'#b04a3a', 土:'#8a7440', 风:'#5b7a8c', 水:'#3f5d74'};
+    var tot = chart.elementTotal || 1;
+    H.push('<div class="aw-bars">');
+    ['火','土','风','水'].forEach(function(k){
+      var v = chart.elements[k]||0, pct = Math.round(v/tot*100);
+      H.push('<div class="aw-bar"><div class="lb"><span>'+k+'</span><span>'+pct+'%</span></div>'+
+        '<div class="tr"><div class="fl" style="width:'+pct+'%;background:'+EL_COLOR[k]+'"></div></div></div>');
+    });
+    ['基本','固定','变动'].forEach(function(k){
+      var v = chart.modes[k]||0, pct = Math.round(v/tot*100);
+      H.push('<div class="aw-bar"><div class="lb"><span>'+k+'宫</span><span>'+pct+'%</span></div>'+
+        '<div class="tr"><div class="fl" style="width:'+pct+'%;background:#9a7b3f"></div></div></div>');
+    });
+    H.push('</div>');
+    // 失衡提示
+    var maxEl = null, maxV = 0;
+    Object.keys(chart.elements).forEach(function(k){
+      if (chart.elements[k] > maxV) { maxV = chart.elements[k]; maxEl = k; }
+    });
+    var minEl = null, minV = 999;
+    Object.keys(chart.elements).forEach(function(k){
+      if (chart.elements[k] < minV) { minV = chart.elements[k]; minEl = k; }
+    });
+    H.push('<div class="aw-card" style="margin-top:14px"><div class="d">'+
+      '最重的是<b>'+maxEl+'</b>（'+Math.round(maxV/tot*100)+'%）：'+T.ELEMENT_NOTE[maxEl]+
+      '</div><div class="d">最轻的是<b>'+minEl+'</b>（'+Math.round(minV/tot*100)+
+      '%）——这一块通常是你需要靠后天有意识补的。</div></div>');
+    H.push('</div>');
+
+    // 三、逐星解读
+    H.push('<div class="aw-sec"><div class="aw-sec-h"><span class="no">叁</span>'+
+      '<h2>逐星解读</h2><span class="note">十大行星落座</span></div>');
+    chart.points.forEach(function(p){
+      var pt = T.PLANETS[p.key];
+      if (!pt) return;
+      var signZh = p.sign.sign.zh;
+      var body = '';
+      if (pt.signs && pt.signs[signZh]) body = pt.signs[signZh];
+      else if (T.MINI[p.key] && T.MINI[p.key][signZh]) body = T.MINI[p.key][signZh];
+      if (!body) body = '落在' + signZh + '座第' + p.house + '宫，' +
+        pt.desc.replace(/<[^>]+>/g,'');
+
+      H.push('<div class="aw-card"><div class="h"><span class="t">'+pt.title+'</span>'+
+        '<span class="k">'+pt.kw+'</span>'+
+        '<span class="pos">'+bzAstro.dms(p.sign.deg)+signZh+' · '+
+        p.house+'宫'+(p.retro?' · 逆行':'')+'</span></div>');
+      H.push('<div class="d">'+body+'</div>');
+      H.push('<div class="d" style="color:var(--ink-3);font-size:.76rem">'+
+        pt.desc+'</div>');
+      H.push('</div>');
+    });
+    H.push('</div>');
+
+    // 四、上升与命宫主星
+    H.push('<div class="aw-sec"><div class="aw-sec-h"><span class="no">肆</span>'+
+      '<h2>上升与命主星</h2><span class="note">他人第一眼看到的你</span></div>');
+    var ascSign = asc.sign.sign.zh;
+    H.push('<div class="aw-card"><div class="h"><span class="t">上升 '+ascSign+'</span>'+
+      '<span class="pos">'+bzAstro.dms(asc.sign.deg)+ascSign+'</span></div>'+
+      '<div class="d">'+(T.ASC[ascSign]||'')+'</div></div>');
+
+    if (chart.chartRuler) {
+      var rulerPt = chart.points.filter(function(p){return p.key===chart.chartRuler;})[0];
+      if (rulerPt) {
+        H.push('<div class="aw-card"><div class="h"><span class="t">命主星 · '+
+          rulerPt.zh+'</span><span class="pos">'+bzAstro.dms(rulerPt.sign.deg)+
+          rulerPt.sign.sign.zh+' · '+rulerPt.house+'宫</span></div>'+
+          '<div class="d">命主星是上升星座的守护星，它落在哪一宫，说明你的人生重心更像落在那个领域。'+
+          '你的命主星在<b>'+rulerPt.house+'宫</b>——'+
+          (window.bzAstro.HOUSES[rulerPt.house-1]||{}).topic+'。</div></div>');
+      }
+    }
+    H.push('</div>');
+
+    // 五、相位
+    H.push('<div class="aw-sec"><div class="aw-sec-h"><span class="no">伍</span>'+
+      '<h2>主要相位</h2><span class="note">共 '+chart.aspects.length+' 个，按紧密度排序</span></div>');
+    if (chart.aspects.length) {
+      H.push('<div class="aw-asp">');
+      chart.aspects.slice(0, 24).forEach(function(a){
+        H.push('<div class="i"><span class="sy" style="color:'+a.color+'">'+a.sym+'</span>'+
+          '<span>'+a.aZh+' '+a.name+' '+a.bZh+'</span>'+
+          '<span class="o">'+a.orb.toFixed(1)+'°</span></div>');
+      });
+      H.push('</div>');
+      // 解读最强的几个
+      var strong = chart.aspects.filter(function(a){ return a.exact; }).slice(0,3);
+      if (strong.length) {
+        H.push('<div class="aw-card" style="margin-top:13px">');
+        strong.forEach(function(a){
+          H.push('<div class="d"><b>'+a.aZh+' '+a.name+' '+a.bZh+'</b>（orb '+
+            a.orb.toFixed(1)+'°）：'+(T.ASPECT_NOTE[a.name]||'')+'</div>');
+        });
+        H.push('</div>');
+      }
+      H.push('<div class="aw-card"><div class="d">'+
+        '这张盘和谐相位累计 <b>'+chart.harmony.toFixed(1)+'</b>，'+
+        '紧张相位累计 <b>'+chart.tension.toFixed(1)+'</b>。'+
+        '数字不是好坏，说明的是「顺畅感」和「推动力」哪边更多。'+
+        '紧张相位多的人往往更有动力，和谐相位多的人更容易顺势而为。</div></div>');
+    } else {
+      H.push('<div class="aw-empty">没有落在容差内的主要相位</div>');
+    }
+    H.push('</div>');
+
+    // 六、宫位
+    H.push('<div class="aw-sec"><div class="aw-sec-h"><span class="no">陆</span>'+
+      '<h2>十二宫位</h2><span class="note">'+
+      (chart.system==='whole'?'整宫制':'Placidus')+'</span></div>');
+    H.push('<table class="aw-tb"><thead><tr><th>宫</th><th>宫头</th><th>主题</th><th>落此宫的星</th></tr></thead><tbody>');
+    for (var i=0;i<12;i++){
+      var hs = window.bzAstro.HOUSES[i];
+      var inp = chart.points.filter(function(p){return p.house===i+1;});
+      H.push('<tr><td>'+(i+1)+'宫 '+(hs?hs.zh:'')+'</td>'+
+        '<td class="num">'+bzAstro.dms(chart.cusps[i]%30)+
+        window.bzAstro.SIGNS[Math.floor(chart.cusps[i]/30)].zh+'</td>'+
+        '<td style="color:var(--ink-3);font-size:.75rem">'+(hs?hs.topic:'')+'</td>'+
+        '<td>'+(inp.length?inp.map(function(p){return p.glyph+p.zh;}).join(' '):'—')+'</td></tr>');
+    }
+    H.push('</tbody></table></div>');
+
+    $('awOut').innerHTML = H.join('');
+  }
+
+  // ── 排盘 ──
+  function paipan(){
+    var dateStr = $('awDate').value, timeStr = $('awTime').value;
+    if (!dateStr || !timeStr) { alert('请填写完整出生时间'); return; }
+
+    var city = $('awCity').value.trim();
+    var lat = parseFloat($('awLat').value);
+    var lon = parseFloat($('awLon').value);
+    if (isNaN(lat) || isNaN(lon)) { alert('请填写经纬度'); return; }
+
+    var tz = 8;
+    var c = cityMap[city];
+    if (c) tz = c[3];
+    else {
+      // 未知城市：按经度估时区
+      tz = Math.round(lon / 15);
+    }
+
+    var ms = toUTC(dateStr, timeStr, tz);
+    var sys = $('awSys').value;
+
+    try {
+      var chart = bzAstro.natal({ ms: ms, lat: lat, lon: lon, houseSystem: sys });
+      _lastChart = chart;
+      _lastMeta = {
+        date: dateStr, time: timeStr, city: city, lat: lat, lon: lon,
+        tz: tz, sex: parseInt($('awSex').value, 10), sys: sys
+      };
+      render(chart, _lastMeta);
+    } catch (e) {
+      $('awOut').innerHTML = '<div class="aw-empty">排盘失败：' + esc(e.message) + '</div>';
+    }
+  }
+
+  $('awGo').onclick = paipan;
+
+  // ── 保存 ──
+  if ($('awSave')) $('awSave').onclick = function(){
+    if (!_lastMeta) { alert('请先排盘'); return; }
+    var dup = bzCases.exists({ kind:'astro', date:_lastMeta.date,
+      time:_lastMeta.time, sex:_lastMeta.sex });
+    if (dup) { alert('这张盘已经保存过了：' + dup.name); return; }
+    var nm = prompt('给这张盘起个名字（留空自动命名）：', '');
+    if (nm === null) return;
+    if (!nm) nm = _lastMeta.date + ' ' + _lastMeta.city;
+    var it = bzCases.add({
+      kind: 'astro', name: nm, date: _lastMeta.date, time: _lastMeta.time,
+      sex: _lastMeta.sex,
+      note: JSON.stringify({ city:_lastMeta.city, lat:_lastMeta.lat,
+        lon:_lastMeta.lon, tz:_lastMeta.tz, sys:_lastMeta.sys })
+    });
+    if (!it) { alert('保存失败，浏览器存储可能已满'); return; }
+    var b = $('awSave'), o = b.textContent;
+    b.textContent = '已保存 ✓';
+    setTimeout(function(){ b.textContent = o; }, 1400);
+  };
+
+  // ── 分享卡片 ──
+  if ($('awShare')) $('awShare').onclick = function(){
+    if (!_lastChart) { alert('请先排盘'); return; }
+    try {
+      var cv = bzShare.astroCard(_lastChart, _lastMeta);
+      bzShare.preview(cv, '本命盘');
+    } catch (e) { alert('生成失败：' + e.message); }
+  };
+
+  // ── 首屏 ──
+  paipan();
+})();
+</script>

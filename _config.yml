@@ -147,6 +147,8 @@ navigation_header:
   url: /ziwei/
 - title: 合盘
   url: /hepan/
+- title: 星盘
+  url: /astro/
 - title: 古籍
   url: /books/
 - title: Fork Lujiachun
@@ -202,6 +204,9 @@ pwa_core:
   - /assets/js/bazi/huangli-data.json
   - /assets/js/bazi/guji.js
   - /assets/js/bazi/pwa.js
+  - /assets/js/bazi/astronomy.min.js
+  - /assets/js/bazi/western.js
+  - /assets/js/bazi/western-text.js
 
 pwa_heavy:
   - /assets/js/bazi/guji-index.js
