@@ -644,6 +644,19 @@ title: 八字排盘
 <script src="/assets/js/bazi/guji-index.js"></script>
 <script src="/assets/js/bazi/guji.js"></script>
 <script>
+  // 第二套古籍索引（神峰通考/滴天髓阐微/五行精纪/李虚中命书）
+  (function(){
+    var x = new XMLHttpRequest();
+    x.open('GET', '/assets/js/bazi/guji-index2.json', true);
+    x.onload = function(){
+      if (x.status === 200) {
+        try { window.BZ_GUJI2 = JSON.parse(x.responseText); } catch(e){}
+      }
+    };
+    x.send();
+  })();
+</script>
+<script>
 (function () {
   'use strict';
 
@@ -1476,6 +1489,22 @@ title: 八字排盘
       if (typeof gujiRecommend === 'function') recs = gujiRecommend(c) || [];
     } catch (e) { recs = []; }
 
+    // 第二套索引可能还没加载完，加载后自动补一轮
+    if (!window.BZ_GUJI2 && !window._guji2Tried) {
+      window._guji2Tried = true;
+      var xhr = new XMLHttpRequest();
+      xhr.open('GET', '/assets/js/bazi/guji-index2.json', true);
+      xhr.onload = function () {
+        if (xhr.status === 200) {
+          try {
+            window.BZ_GUJI2 = JSON.parse(xhr.responseText);
+            if (_lastC) renderGuji(_lastC);
+          } catch (e) {}
+        }
+      };
+      xhr.send();
+    }
+
     var m = $('mGj');
     var intro = $('pGjIntro');
     if (!recs.length) {
@@ -1485,7 +1514,11 @@ title: 八字排盘
       return;
     }
 
-    if (m) m.textContent = recs.length + ' 部古籍对应章节';
+    if (m) {
+      var nb = {};
+      recs.forEach(function (x) { nb[x.book] = 1; });
+      m.textContent = Object.keys(nb).length + ' 部 · ' + recs.length + ' 条';
+    }
     if (intro) {
       intro.textContent = '按命盘的年月日时与格局，在古籍原文中定位到对应的章节。'
         + '这是传统命理「查书」的方式：日干、月令、时柱各有专论。';

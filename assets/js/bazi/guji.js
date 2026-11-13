@@ -91,9 +91,18 @@
 
     function chapter(bid, num) {
       var b = G.books[bid];
-      if (!b) return null;
-      for (var i = 0; i < b.ch.length; i++) {
-        if (b.ch[i].n === num) return b.ch[i];
+      if (b) {
+        for (var i = 0; i < b.ch.length; i++) {
+          if (b.ch[i].n === num) return b.ch[i];
+        }
+      }
+      // 第二套索引（神峰通考/滴天髓阐微/五行精纪/李虚中命书）
+      var G2i = global.BZ_GUJI2;
+      if (G2i && G2i.books && G2i.books[bid]) {
+        var b2 = G2i.books[bid];
+        for (var j = 0; j < b2.ch.length; j++) {
+          if (b2.ch[j].n === num) return b2.ch[j];
+        }
       }
       return null;
     }
@@ -164,6 +173,71 @@
           }
           break;
         }
+      }
+    }
+
+    // ── ⑤ 神峰通考：格局（另一套立论）──
+    var G2 = global.BZ_GUJI2;
+    if (G2 && geju) {
+      var sf = G2.shenfeng;
+      var sfNums = null;
+      for (var sk in sf.map) {
+        if (geju.indexOf(sk.replace('格', '')) >= 0) { sfNums = sf.map[sk]; break; }
+      }
+      if (sfNums) {
+        sfNums.forEach(function (nn) {
+          var c6 = chapter(sf.id, nn);
+          if (c6) out.push({
+            bookId: sf.id, book: sf.book, author: '张楠',
+            num: c6.n, chapter: c6.t, volume: c6.v, preview: c6.p,
+            reason: '格局：' + geju + '（神峰通考立论）'
+          });
+        });
+      }
+    }
+
+    // ── ⑥ 滴天髓阐微：日干 ──
+    if (G2 && G2.ditian) {
+      var dt = G2.ditian;
+      var dtNum = dt.map[dg];
+      if (dtNum) {
+        dtNum.forEach(function (nn) {
+          var c7 = chapter(dt.id, nn);
+          if (c7) out.push({
+            bookId: dt.id, book: dt.book, author: '任铁樵',
+            num: c7.n, chapter: c7.t, volume: c7.v, preview: c7.p,
+            reason: '日干' + dg + '论'
+          });
+        });
+      }
+    }
+
+    // ── ⑦ 五行精纪：纳音 ──
+    if (G2 && G2.wuxing && m.nayin && m.nayin[2]) {
+      var ny = m.nayin[2];
+      (G2.wuxing.map['纳音'] || []).forEach(function (nn) {
+        var c8 = chapter(G2.wuxing.id, nn);
+        if (c8) out.push({
+          bookId: G2.wuxing.id, book: G2.wuxing.book, author: '廖中',
+          num: c8.n, chapter: c8.t, volume: c8.v, preview: c8.p,
+          reason: '日柱纳音：' + ny
+        });
+      });
+    }
+
+    // ── ⑧ 李虚中命书：日干 ──
+    if (G2 && G2.lixuzhong) {
+      var lx = G2.lixuzhong;
+      var lxNum = (lx.map[dg] || lx.map['__all__']);
+      if (lxNum) {
+        lxNum.forEach(function (nn) {
+          var c9 = chapter(lx.id, nn);
+          if (c9) out.push({
+            bookId: lx.id, book: lx.book, author: '李虚中',
+            num: c9.n, chapter: c9.t, volume: c9.v, preview: c9.p,
+            reason: '日干' + dg + '（李虚中命书）'
+          });
+        });
       }
     }
 
