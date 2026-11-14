@@ -1178,6 +1178,170 @@
     };
   }
 
+  // ── 维度十二：相处建议（不计分，纯输出）──
+  function dimAdvice(a, b, dims) {
+    var lines = [];
+    var byKey = {};
+    dims.forEach(function (d) { byKey[d.key] = d; });
+
+    var fq = byKey.fuqi, rz = byKey.rizhu, wx = byKey.wuxing,
+        ss = byKey.shishen, yy = byKey.yinyang, sn = byKey.shensha;
+
+    if (fq) {
+      if (fq.level === 'good') {
+        lines.push('夫妻宫本身就合得来——不要因为「本来就好」就减少投入。合的关系最怕把顺畅当成理所当然。');
+      } else if (fq.level === 'warn') {
+        lines.push('夫妻宫的冲刑是「结构性的摩擦」，不是谁做错了什么。把分歧归因于「我们节奏不同」而不是「你不在乎我」，能省掉一半争吵。');
+      } else {
+        lines.push('夫妻宫没有明显的合冲——关系走向更大程度取决于你们怎么经营，命盘的约束小，自由度反而高。');
+      }
+    }
+
+    if (rz) {
+      if (rz.score >= 24) {
+        lines.push('日主层面吸引力强，容易「不用解释就懂」。但太懂也可能坏事：容易替对方做决定。');
+      } else if (rz.score <= 12) {
+        lines.push('日主的互动偏紧张或偏淡。建议把重要分歧写成文字再讨论——当面说容易激起反应，写下来更容易看清对方在讲什么。');
+      }
+    }
+
+    if (wx) {
+      var lack = wx.lack || {};
+      var la = (lack.a || []), lb = (lack.b || []);
+      var both = la.filter(function (w) { return lb.indexOf(w) >= 0; });
+      if (both.length) {
+        var ADVICE_WX = {
+          木: '木对应「规划与生发」——你们可能都不太擅长主动做长期计划，建议固定一个季度一次的「对齐会议」',
+          火: '火对应「表达与热度」——你们可能都容易把情绪压着不说，建议设置一个固定的「吐槽时间」',
+          土: '土对应「稳定与落实」——你们可能都不爱落地细节，建议把家务与开销明确列出来，别靠默契',
+          金: '金对应「边界与决断」——你们可能都不好意思说「不」，建议明确各自不可让的底线',
+          水: '水对应「沟通与流动」——你们可能都在等对方先开口，建议轮流做「先说话的人」'
+        };
+        both.forEach(function (w) {
+          if (ADVICE_WX[w]) lines.push(ADVICE_WX[w]);
+        });
+      }
+      var pct = wx.pct || {};
+      if (pct.a && pct.b) {
+        var bothRich = [];
+        ['木', '火', '土', '金', '水'].forEach(function (w) {
+          if ((pct.a[w] || 0) >= 25 && (pct.b[w] || 0) >= 25) bothRich.push(w);
+        });
+        if (bothRich.length) {
+          lines.push('双方都旺的 ' + bothRich.join('、') + ' 是共同优势，也是共同盲区：顺的时候互相加成，卡的时候一起卡在同一个点上。找一个不在你们五行里的人做外部参谋会很管用。');
+        }
+      }
+    }
+
+    if (ss) {
+      var ab = ss.abbr || '';
+      if (ab.indexOf('劫财') >= 0 && ab.split('／').length === 2 &&
+          ab.split('／')[0] === ab.split('／')[1]) {
+        lines.push('双方互看都是劫财——亲近但带竞争。最容易出问题的场景是「资源与注意力分配」，比如钱怎么花、时间给谁。提前把规则说清楚，比事后讲感情有用。');
+      } else if (ab.indexOf('伤官') >= 0) {
+        lines.push('一方以伤官看另一方——容易想挑刺、想改造对方。提醒自己：你当初喜欢的可能正是这些「看不顺眼」的部分。');
+      } else if (ab.indexOf('正官') >= 0 && ab.indexOf('正财') >= 0) {
+        lines.push('互为财官——传统里最被认可的组合，分工天然清楚。但要注意别把角色固化成「谁管谁」。');
+      }
+    }
+
+    if (yy) {
+      var pcts = (yy.abbr || '').split('·').map(function (x) { return parseInt(x, 10); });
+      if (pcts.length === 2 && !isNaN(pcts[0]) && !isNaN(pcts[1])) {
+        if (pcts[0] >= 60 && pcts[1] >= 60) {
+          lines.push('两人都偏阳：默认模式都是「先说先做」。冲突时最有效的不是讲理，而是约定一个暂停信号，谁说出来谁就先停 10 分钟。');
+        } else if (pcts[0] <= 40 && pcts[1] <= 40) {
+          lines.push('两人都偏阴：默认模式都是「先观察、先忍」。风险是问题被拖到爆发，可以约定「每周必须提一个不满」，把暗流摆到桌面。');
+        } else if (Math.abs(pcts[0] - pcts[1]) >= 35) {
+          lines.push('阴阳落差大：一个人的「想清楚要三天」会被另一个人读成「敷衍」。把各自的决策习惯讲明白，比催对方快一点更有效。');
+        }
+      }
+    }
+
+    if (sn) {
+      var hasGu = (sn.lines || []).some(function (l) {
+        return l.indexOf('孤辰') >= 0 || l.indexOf('寡宿') >= 0;
+      });
+      if (hasGu) {
+        lines.push('带孤辰或寡宿的人，独处是刚需而不是冷淡。给彼此留出不被打扰的时间，反而能让相处质量更高——别把「想一个人待着」理解成关系出问题。');
+      }
+    }
+
+    if (!lines.length) {
+      lines.push('这张盘没有特别突出的张力点，也没有特别强的加持。这类组合的成败几乎完全取决于两个人怎么相处——命盘给的信息越少，人的主动性越大。');
+    }
+    lines.push('以上是「结构上的倾向」，不是「必然发生的事」。命盘说的是一段关系的默认设置，改不改得动，取决于你们愿不愿意改。');
+
+    return {
+      key: 'advice', name: '相处建议', weight: 0, score: 0, full: 0,
+      level: 'info',
+      abbr: lines.length + ' 条',
+      lines: lines,
+      role: '把前面的分析翻译成「可以怎么做」。不打分，只给具体动作。'
+    };
+  }
+
+  // ── 维度十三：婚期窗口（未来 3 年）──
+  function dimMarriageWindow(a, b) {
+    var lines = [];
+    var startY = new Date().getFullYear();
+
+    var CHONG2 = { 子:'午', 丑:'未', 寅:'申', 卯:'酉', 辰:'戌', 巳:'亥',
+                   午:'子', 未:'丑', 申:'寅', 酉:'卯', 戌:'辰', 亥:'巳' };
+    var LIUHE2 = { 子:'丑', 丑:'子', 寅:'亥', 亥:'寅', 卯:'戌', 戌:'卯',
+                   辰:'酉', 酉:'辰', 巳:'申', 申:'巳', 午:'未', 未:'午' };
+    var HONGLUAN = { 子:'卯', 丑:'寅', 寅:'丑', 卯:'子', 辰:'亥', 巳:'戌',
+                     午:'酉', 未:'申', 申:'未', 酉:'午', 戌:'巳', 亥:'辰' };
+
+    function yearZhi(y) {
+      var ZHI = ['子','丑','寅','卯','辰','巳','午','未','申','酉','戌','亥'];
+      return ZHI[((y - 4) % 12 + 12) % 12];
+    }
+
+    var az = (a.pillars.day || '')[1];
+    var bz = (b.pillars.day || '')[1];
+    var ay = (a.pillars.year || '')[1];
+    var by = (b.pillars.year || '')[1];
+
+    var windows = [];
+    for (var y = startY; y < startY + 3; y++) {
+      var yz = yearZhi(y);
+      var sc = 0, notes = [];
+
+      if (az && LIUHE2[yz] === az) { sc += 2; notes.push('合甲夫妻宫' + az); }
+      if (bz && LIUHE2[yz] === bz) { sc += 2; notes.push('合乙夫妻宫' + bz); }
+      if (az && CHONG2[yz] === az) { sc -= 2; notes.push('冲甲夫妻宫' + az); }
+      if (bz && CHONG2[yz] === bz) { sc -= 2; notes.push('冲乙夫妻宫' + bz); }
+      if (ay && HONGLUAN[ay] === yz) { sc += 2; notes.push('甲红鸾到位'); }
+      if (by && HONGLUAN[by] === yz) { sc += 2; notes.push('乙红鸾到位'); }
+      if (az && yz === az) { sc += 1; notes.push('伏吟甲夫妻宫'); }
+
+      if (sc !== 0) windows.push({ year: y, zhi: yz, score: sc, notes: notes });
+    }
+
+    if (!windows.length) {
+      lines.push('未来三年内没有明显的婚期引动——这不代表不婚，只代表没有「到点推一把」的流年信号');
+      lines.push('这类年份适合把关系质量做厚，等引动年来临时更有底气');
+    } else {
+      windows.sort(function (x, y2) { return y2.score - x.score; });
+      lines.push('未来三年内与夫妻宫发生互动的年份：');
+      windows.forEach(function (w) {
+        var tag = w.score >= 4 ? '强信号' : w.score >= 2 ? '中等' : w.score <= -2 ? '需留意' : '轻微';
+        lines.push('　' + w.year + '（' + w.zhi + '年，' + tag + '）：' + w.notes.join('、'));
+      });
+      lines.push('引动年只是「更容易发生」，不是「必须在这一年」。真正的婚期取决于两个人的决定，命盘只提供时间窗口。');
+    }
+    lines.push('这一项基于流年地支对夫妻宫与红鸾的作用，是简化的择时参考，没有结合大运的完整推演。');
+
+    return {
+      key: 'window', name: '婚期窗口', weight: 0, score: 0, full: 0,
+      level: 'info',
+      abbr: windows.length ? windows[0].year + ' 年' : '无强信号',
+      lines: lines,
+      role: '未来三年的流年引动。属于择时参考，不打分。'
+    };
+  }
+
   // ── 主函数 ──
   /**
    * @param a 甲方 paipan 结果
@@ -1196,8 +1360,13 @@
       dimShensha(a, b),     // 15  婚恋神煞
       dimYinYang(a, b),     // 12  阴阳配置
       dimYear(a, b),        // 10  年柱根基
-      dimSpouseStar(a, b)   // 参考，不计分
+      dimSpouseStar(a, b),  // 参考：配偶星
+      dimMarriageWindow(a, b)  // 参考：婚期窗口
     ].filter(Boolean);
+
+    // 相处建议要吃前面各项的结论，最后生成
+    var adv = dimAdvice(a, b, dims);
+    if (adv) dims.push(adv);
 
     // 计分：夫妻宫 30 + 日主 30 + 五行 25 + 十神 15 = 100，跨盘 ±15，年柱 10
     var scored = dims.filter(function (d) { return d.weight > 0; });
