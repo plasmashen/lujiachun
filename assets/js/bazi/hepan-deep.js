@@ -824,7 +824,327 @@
     };
   }
 
-  // ── 评分与结论 ──
+  // ── 维度八：阴阳配置 ──
+  // 阴阳失衡是合盘里被忽略但很实际的一项：一方纯阳、另一方纯阴，
+  // 或双方都偏阳，相处模式会明显不同。
+  function dimYinYang(a, b) {
+    var GAN_YANG = '甲丙戊庚壬', ZHI_YANG = '子寅辰午申戌';
+
+    function count(p) {
+      var gz = p.pillars || {}, yang = 0, yin = 0;
+      ['year', 'month', 'day', 'hour'].forEach(function (k) {
+        var s = gz[k] || '';
+        if (s.length < 2) return;
+        if (GAN_YANG.indexOf(s[0]) >= 0) yang++; else yin++;
+        if (ZHI_YANG.indexOf(s[1]) >= 0) yang++; else yin++;
+      });
+      return { yang: yang, yin: yin, total: yang + yin };
+    }
+
+    var ca = count(a), cb = count(b);
+    if (!ca.total || !cb.total) return null;
+
+    var lines = [];
+    var pctA = Math.round(ca.yang / ca.total * 100);
+    var pctB = Math.round(cb.yang / cb.total * 100);
+    lines.push('甲方阳干支 ' + ca.yang + '／阴干支 ' + ca.yin + '（阳气 ' + pctA + '%）');
+    lines.push('乙方阳干支 ' + cb.yang + '／阴干支 ' + cb.yin + '（阳气 ' + pctB + '%）');
+
+    function label(p) {
+      if (p >= 75) return '纯阳偏重';
+      if (p >= 60) return '偏阳';
+      if (p >= 40) return '阴阳均衡';
+      if (p >= 25) return '偏阴';
+      return '纯阴偏重';
+    }
+    var la = label(pctA), lb = label(pctB);
+    lines.push('甲' + la + '，乙' + lb);
+
+    var score = 8;
+    var diff = Math.abs(pctA - pctB);
+
+    if (diff <= 15) {
+      score = 12;
+      lines.push('两人阴阳比例接近——对「节奏快慢」「主动被动」的默认设定一致，不易互相误判');
+      if (pctA >= 60 && pctB >= 60) {
+        lines.push('但双方都偏阳：都倾向主动出击、都不太愿意先低头，冲突时容易僵住');
+        lines.push('建议约定一个「谁先停」的机制，比讲道理有效');
+      } else if (pctA <= 40 && pctB <= 40) {
+        lines.push('双方都偏阴：都倾向回避和等待，问题容易被搁置而不是解决');
+        lines.push('需要有人主动开口，否则不满会一层层累积');
+      }
+    } else if (diff <= 35) {
+      score = 9;
+      lines.push('阴阳有落差（' + diff + ' 个百分点）——一方更主动、一方更随和');
+      lines.push('这种搭配本身很常见也很好用，前提是双方都认这个分工、不觉得委屈');
+    } else {
+      score = 6;
+      lines.push('阴阳落差大（' + diff + ' 个百分点）——' +
+        (pctA > pctB ? '甲明显偏阳、乙明显偏阴' : '乙明显偏阳、甲明显偏阴'));
+      lines.push('一方习惯快速决断，一方习惯先观察，节奏差容易被认为是「不在乎」或「太急躁」');
+      lines.push('这类组合最需要的是把「我需要多久想清楚」讲明白，而不是互相催');
+    }
+
+    return {
+      key: 'yinyang', name: '阴阳配置', weight: 12, score: score, full: 12,
+      level: score >= 11 ? 'good' : score >= 8 ? 'info' : 'warn',
+      abbr: pctA + '% · ' + pctB + '%',
+      lines: lines,
+      role: '四柱八字里阳干支与阴干支的比例，反映主动性与节奏感的底层设定。'
+    };
+  }
+
+  // ── 维度九：命理三垣（胎元 / 命宫 / 身宫）──
+  // 《三命通会》论胎元：胎是受形之始，月是成气之时。三垣与四柱合称「七柱」。
+  function dimSantai(a, b) {
+    var lines = [];
+    var items = [];
+
+    function getSan(p, label) {
+      var out = {};
+      if (p.taiyuan) out.taiyuan = p.taiyuan;
+      if (p.minggong) out.minggong = p.minggong;
+      if (p.shengong) out.shengong = p.shengong;
+      return out;
+    }
+
+    var sa = getSan(a), sb = getSan(b);
+    if (!sa.taiyuan && !sa.minggong && !sa.shengong) return null;
+
+    var NAMES = { taiyuan: '胎元', minggong: '命宫', shengong: '身宫' };
+    var KEYS = ['taiyuan', 'minggong', 'shengong'];
+
+    KEYS.forEach(function (k) {
+      var va = sa[k], vb = sb[k];
+      if (!va || !vb) return;
+      var za = va[1], zb = vb[1];
+      var rels = zhiRelation(za, zb);
+      var txt = NAMES[k] + '：甲' + va + ' · 乙' + vb;
+      items.push({ k: k, va: va, vb: vb, rels: rels, txt: txt });
+    });
+
+    if (!items.length) return null;
+
+    var score = 6;
+    items.forEach(function (it) {
+      var desc = it.txt;
+      if (it.rels.length) {
+        desc += ' → ' + it.rels.map(function (r) { return r.name; }).join('、');
+        it.rels.forEach(function (r) {
+          if (r.type === 'liuhe') score += 3;
+          else if (r.type === 'sanhe') score += 2;
+          else if (r.type === 'chong') score -= 2;
+          else if (r.type === 'xing') score -= 1;
+          else if (r.type === 'hai') score -= 1;
+          else if (r.type === 'same') score += 1;
+        });
+      } else if (wxOfZhi(it.va[1]) === wxOfZhi(it.vb[1])) {
+        desc += ' → 同属' + wxOfZhi(it.va[1]);
+        score += 1;
+      }
+      lines.push(desc);
+    });
+
+    // 命宫的解释只在双方都有时才说
+    var mg = items.filter(function (i) { return i.k === 'minggong'; })[0];
+    if (mg) {
+      var rel = mg.rels.filter(function (r) { return r.level === 'good'; })[0];
+      var bad = mg.rels.filter(function (r) { return r.level === 'warn'; })[0];
+      if (rel) {
+        lines.push('命宫相合（' + rel.name + '）—— 两人对「人生该往哪走」的直觉比较接近，长期目标容易谈得拢');
+      } else if (bad) {
+        lines.push('命宫见' + bad.name + '—— 人生取向的底层设定不同，短期看是互补，长期需要各自留出空间');
+      }
+    }
+    var ty = items.filter(function (i) { return i.k === 'taiyuan'; })[0];
+    if (ty && ty.rels.length === 0 && wxOfZhi(ty.va[1]) !== wxOfZhi(ty.vb[1])) {
+      lines.push('胎元无直接关系——胎元看的是先天禀赋与身体底子，这一项对关系影响较轻');
+    }
+
+    score = Math.max(0, Math.min(15, score));
+    return {
+      key: 'santai', name: '命理三垣', weight: 15, score: score, full: 15,
+      level: score >= 13 ? 'good' : score >= 9 ? 'info' : 'warn',
+      abbr: (items[0] ? items[0].va[1] + '·' + items[0].vb[1] : '—'),
+      lines: lines,
+      role: '胎元、命宫、身宫合称三垣，与四柱并称「七柱」。这一层看先天禀赋与人生取向。'
+    };
+  }
+
+  // ── 维度十：婚恋神煞 ──
+  function dimShensha(a, b) {
+    var lines = [];
+
+    // 常用婚恋神煞的查法
+    // 红鸾：从年支起，子年卯、丑年寅…（逆数）
+    // 天喜：红鸾对冲
+    // 孤辰寡宿：按年支三会查
+    var HONGLUAN = {
+      子: '卯', 丑: '寅', 寅: '丑', 卯: '子', 辰: '亥', 巳: '戌',
+      午: '酉', 未: '申', 申: '未', 酉: '午', 戌: '巳', 亥: '辰'
+    };
+    var CHONG = {
+      子: '午', 丑: '未', 寅: '申', 卯: '酉', 辰: '戌', 巳: '亥',
+      午: '子', 未: '丑', 申: '寅', 酉: '卯', 戌: '辰', 亥: '巳'
+    };
+    // 孤辰寡宿：寅卯辰年 → 孤巳 寡丑；巳午未 → 孤申 寡辰；
+    //            申酉戌 → 孤亥 寡未；亥子丑 → 孤寅 寡戌
+    var GU_GUA = {
+      寅: ['巳', '丑'], 卯: ['巳', '丑'], 辰: ['巳', '丑'],
+      巳: ['申', '辰'], 午: ['申', '辰'], 未: ['申', '辰'],
+      申: ['亥', '未'], 酉: ['亥', '未'], 戌: ['亥', '未'],
+      亥: ['寅', '戌'], 子: ['寅', '戌'], 丑: ['寅', '戌']
+    };
+
+    function scan(p, label) {
+      var gz = p.pillars || {};
+      var zhis = ['year', 'month', 'day', 'hour'].map(function (k) { return (gz[k] || '')[1]; });
+      var yz = zhis[0];
+      if (!yz) return null;
+
+      var hl = HONGLUAN[yz];
+      var tx = hl ? CHONG[hl] : null;
+      var gg = GU_GUA[yz] || [];
+
+      var hasHL = zhis.indexOf(hl) >= 0;
+      var hasTX = tx && zhis.indexOf(tx) >= 0;
+      var hasGu = zhis.indexOf(gg[0]) >= 0;
+      var hasGua = zhis.indexOf(gg[1]) >= 0;
+
+      // 阴差阳错日（12 个日柱）
+      var YINCHA = ['丙子', '丁丑', '戊寅', '辛卯', '壬辰', '癸巳',
+                    '丙午', '丁未', '戊申', '辛酉', '壬戌', '癸亥'];
+      var day = gz.day || '';
+      var hasYC = YINCHA.indexOf(day) >= 0;
+
+      return {
+        label: label, yz: yz, zhis: zhis,
+        hongluan: hasHL ? hl : null,
+        tianxi: hasTX ? tx : null,
+        gu: hasGu ? gg[0] : null,
+        gua: hasGua ? gg[1] : null,
+        yincha: hasYC
+      };
+    }
+
+    var sa = scan(a, '甲方'), sb = scan(b, '乙方');
+    if (!sa || !sb) return null;
+
+    var score = 8;
+    var found = 0;
+
+    [sa, sb].forEach(function (s) {
+      var bits = [];
+      if (s.hongluan) { bits.push('红鸾在' + s.hongluan); score += 2; found++; }
+      if (s.tianxi) { bits.push('天喜在' + s.tianxi); score += 1; found++; }
+      if (s.gu) { bits.push('孤辰在' + s.gu); score -= 1; found++; }
+      if (s.gua) { bits.push('寡宿在' + s.gua); score -= 1; found++; }
+      if (s.yincha) { bits.push('阴差阳错日'); score -= 1; found++; }
+      if (bits.length) {
+        lines.push(s.label + '（年支' + s.yz + '）：' + bits.join('、'));
+      } else {
+        lines.push(s.label + '（年支' + s.yz + '）：无婚恋类神煞');
+      }
+    });
+
+    // 双方都有红鸾/天喜
+    if (sa.hongluan && sb.hongluan) {
+      lines.push('双方都带红鸾——两人都属于「感情机会不少」的类型，吸引力是双向的');
+      score += 2;
+    }
+    if (sa.yincha && sb.yincha) {
+      lines.push('双方都是阴差阳错日——传统上认为婚姻多波折，但也意味着两人对「不顺」有共同经验，反而容易互相理解');
+    }
+    if (score >= 12) {
+      lines.push('神煞层面整体偏吉：姻缘信号明显，相处中的「缘分感」会比较强');
+    } else if (score <= 4) {
+      lines.push('神煞层面偏弱：孤辰寡宿或阴差阳错会带来「明明在一起却各想各的」的疏离感');
+      lines.push('神煞是加分项而非判决项——它描述的是倾向，不是结果');
+    } else {
+      lines.push('神煞层面中性：没有特别强的姻缘信号，也没有明显的阻碍');
+    }
+    lines.push('这一项权重最低。神煞在传统合婚里常被单独拿出来吓人，实际上它只是众多参考之一');
+
+    score = Math.max(0, Math.min(15, score));
+    return {
+      key: 'shensha', name: '婚恋神煞', weight: 15, score: score, full: 15,
+      level: score >= 11 ? 'good' : score >= 6 ? 'info' : 'warn',
+      abbr: found ? found + ' 项' : '无',
+      lines: lines,
+      role: '红鸾、天喜、孤辰、寡宿、阴差阳错。传统上最被滥用的一层，这里只作参考。'
+    };
+  }
+
+  // ── 维度十一：大运节奏 ──
+  function dimDayun(a, b) {
+    var lines = [];
+    var da = a.dayun || [], db = b.dayun || [];
+    if (!da.length || !db.length) return null;
+
+    var ageA = a.qiyun && a.qiyun.age != null ? a.qiyun.age : null;
+    var ageB = b.qiyun && b.qiyun.age != null ? b.qiyun.age : null;
+
+    if (ageA != null && ageB != null) {
+      lines.push('起运年龄：甲 ' + ageA.toFixed(1) + ' 岁，乙 ' + ageB.toFixed(1) + ' 岁');
+      var dq = Math.abs(ageA - ageB);
+      if (dq < 1) {
+        lines.push('起运几乎同步——两人的人生节奏天生对齐，重要转折容易落在同一时段');
+        lines.push('好处是能互相理解「怎么突然变了」，坏处是低谷期可能同时来');
+      } else if (dq < 4) {
+        lines.push('起运相差 ' + dq.toFixed(1) + ' 年——节奏接近，大致能同步');
+      } else {
+        lines.push('起运相差 ' + dq.toFixed(1) + ' 年——人生阶段错开，一方在换轨时另一方可能正稳定');
+        lines.push('这种错位不一定是坏事：一方动荡时另一方正好能托底');
+      }
+    }
+
+    // 找出两人大运里天干相合 / 地支相合的步
+    var GOOD = [], BAD = [];
+    var n = Math.min(da.length, db.length, 8);
+    for (var i = 0; i < n; i++) {
+      var ga = da[i] && (da[i].gz || da[i].ganzhi || '');
+      var gb = db[i] && (db[i].gz || db[i].ganzhi || '');
+      if (!ga || !gb || ga.length < 2 || gb.length < 2) continue;
+      var rels = zhiRelation(ga[1], gb[1]);
+      var ganHe = GANHE[ga[0]] === gb[0];
+      var idx = (i + 1) + ' 步';
+      if (ganHe) GOOD.push(idx + '（' + ga[0] + gb[0] + '合）');
+      rels.forEach(function (r) {
+        if (r.type === 'liuhe' || r.type === 'sanhe') GOOD.push(idx + '（' + r.name + '）');
+        else if (r.type === 'chong') BAD.push(idx + '（' + r.name + '）');
+        else if (r.type === 'xing') BAD.push(idx + '（' + r.name + '）');
+      });
+    }
+
+    if (GOOD.length) lines.push('同步大运见合：' + GOOD.slice(0, 5).join('、') +
+      (GOOD.length > 5 ? ' 等 ' + GOOD.length + ' 处' : ''));
+    if (BAD.length) lines.push('同步大运见冲刑：' + BAD.slice(0, 5).join('、') +
+      (BAD.length > 5 ? ' 等 ' + BAD.length + ' 处' : ''));
+
+    if (!GOOD.length && !BAD.length) {
+      lines.push('两人前八步大运之间没有明显的合冲——各自走各自的路，互相干扰小');
+    } else if (GOOD.length > BAD.length) {
+      lines.push('整体节奏偏顺：多数阶段能互相借力，适合一起推进长期目标');
+    } else if (BAD.length > GOOD.length) {
+      lines.push('冲刑多于相合：某些阶段会同时感到压力，需要有意识地错开重大决定');
+    }
+
+    lines.push('大运同步是「时间维度」的合盘——八字的静态互动说明你们是什么样的人，大运说明什么时候会碰上什么');
+
+    var score = 7;
+    score += Math.min(4, GOOD.length) - Math.min(4, BAD.length);
+    score = Math.max(0, Math.min(15, score));
+
+    return {
+      key: 'dayun', name: '大运节奏', weight: 15, score: score, full: 15,
+      level: score >= 11 ? 'good' : score >= 6 ? 'info' : 'warn',
+      abbr: GOOD.length + '合 ' + BAD.length + '冲',
+      lines: lines,
+      role: '两人大运的时间轴对不对得上。这一层回答「什么时候」，不是「合不合」。'
+    };
+  }
+
+
   function conclude(dims, total) {
     var pct = Math.round(total / 100 * 100);
     var tier, head, tail;
@@ -866,13 +1186,17 @@
    */
   function hepanDeep(a, b, rel) {
     var dims = [
-      dimFuqi(a, b),
-      dimRizhu(a, b),
-      dimWuxing(a, b),
-      dimShishen(a, b),
-      dimCross(a, b),
-      dimYear(a, b),
-      dimSpouseStar(a, b)
+      dimFuqi(a, b),        // 30  夫妻宫
+      dimRizhu(a, b),       // 30  日主关系
+      dimWuxing(a, b),      // 25  五行互补
+      dimShishen(a, b),     // 15  十神互看
+      dimCross(a, b),       // 15  跨盘地支
+      dimSantai(a, b),      // 15  命理三垣
+      dimDayun(a, b),       // 15  大运节奏
+      dimShensha(a, b),     // 15  婚恋神煞
+      dimYinYang(a, b),     // 12  阴阳配置
+      dimYear(a, b),        // 10  年柱根基
+      dimSpouseStar(a, b)   // 参考，不计分
     ].filter(Boolean);
 
     // 计分：夫妻宫 30 + 日主 30 + 五行 25 + 十神 15 = 100，跨盘 ±15，年柱 10

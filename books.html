@@ -62,6 +62,30 @@ permalink: /books/
 .bk-body p{margin:0 0 1em;text-indent:2em}
 .bk-body p.na{text-indent:0}
 .bk-hl{background:rgba(178,149,93,.28);border-radius:2px}
+
+/* ── 译文对照 ── */
+.bk-trbar{display:flex;align-items:center;gap:6px;margin:0 0 20px;
+  padding:9px 12px;background:var(--card,#fbf9f4);border:1px solid var(--line,#e5e0d5);
+  border-radius:6px;flex-wrap:wrap}
+.bk-trbar .lb{font-size:.7rem;color:var(--ink-3);letter-spacing:.06em;margin-right:4px}
+.bk-trbar button{font-family:inherit;font-size:.76rem;padding:4px 12px;cursor:pointer;
+  border:1px solid #e5e0d5;background:#fff;border-radius:4px;color:var(--ink-2,#4a463f)}
+.bk-trbar button:hover{border-color:#b2955d}
+.bk-trbar button.on{background:#8b6f3a;border-color:#8b6f3a;color:#fff}
+
+.bk-dual{display:grid;grid-template-columns:1fr 1fr;gap:26px}
+.bk-dual .bk-col{min-width:0}
+.bk-dual .col-h{font-size:.66rem;letter-spacing:.14em;color:var(--ink-4,#9c968a);
+  padding-bottom:7px;margin-bottom:12px;border-bottom:1px solid #e5e0d5}
+.bk-dual .bk-col.src p{font-size:.98rem;line-height:2.05;color:var(--ink-2,#4a463f)}
+.bk-dual .bk-col.dst p{font-size:.94rem;line-height:1.95;color:var(--ink,#1c1a17)}
+.bk-dst-full p{font-size:1rem;line-height:2}
+
+@media screen and (max-width:820px){
+  .bk-dual{grid-template-columns:1fr;gap:0}
+  .bk-dual .bk-col.dst{margin-top:22px;padding-top:18px;border-top:1px dashed #e5e0d5}
+  .bk-dual .bk-col.dst .col-h{margin-top:0}
+}
 .bk-hit{position:absolute;right:20px;bottom:20px;background:var(--zhu);color:#fff;
   padding:8px 14px;border-radius:20px;font-size:.8rem;display:none}
 .bk-hit.on{display:block}
@@ -108,6 +132,7 @@ permalink: /books/
   var IDX_URL = '/assets/js/bazi/books-index.json';
   var BODY_URL = '/assets/js/bazi/books/';
   var idx = [], cur = null, curCh = 0, cache = {}, q = '', filter = 'all';
+  var dstCache = {}, dstLoading = {}, trMode = 'both', dstIdx = null;
 
   function el(id){ return document.getElementById(id); }
   function esc(s){ return (s||'').replace(/[&<>"]/g, function(c){
@@ -159,6 +184,50 @@ permalink: /books/
     }).join('');
   }
 
+  // 渲染某一章（原文 + 译文，按 trMode 切换）
+  function paintCh(ch){
+    if (!cur || !ch) return;
+    var body = ch.text || '';
+    if(ch.images && ch.images.length){
+      body += '\n' + ch.images.map(function(im){
+        return '![图]('+im+')'; }).join('\n');
+    }
+    // 译文键是字符串（JSON 对象键），ch.n 是数字，必须转换
+    var dmap = dstCache[cur.id] || {};
+    var dst = dmap[ch.n] || dmap[String(ch.n)] || '';
+    var mode = trMode;
+    var hasTr = !!dst;
+
+    var head = '<h2>'+esc(ch.t || ('第'+ch.n+'章'))+'</h2>'
+      + '<div class="meta">'+esc(cur.name)+'　'+esc(ch.v||'')+'　'+esc(ch.w||'')+'</div>';
+
+    var bar = '';
+    if (hasTr) {
+      bar = '<div class="bk-trbar"><span class="lb">译文</span>'
+        + '<button data-m="both" class="'+(mode==='both'?'on':'')+'">对照</button>'
+        + '<button data-m="src" class="'+(mode==='src'?'on':'')+'">原文</button>'
+        + '<button data-m="dst" class="'+(mode==='dst'?'on':'')+'">译文</button>'
+        + '</div>';
+    }
+
+    var html = head + bar;
+
+    if (!hasTr) {
+      html += renderText(body, q.trim());
+    } else if (mode === 'dst') {
+      html += '<div class="bk-dst-full">' + renderText(dst, q.trim()) + '</div>';
+    } else if (mode === 'src') {
+      html += renderText(body, q.trim());
+    } else {
+      html += '<div class="bk-dual">'
+        + '<div class="bk-col src"><div class="col-h">原文</div>' + renderText(body, q.trim()) + '</div>'
+        + '<div class="bk-col dst"><div class="col-h">译文</div>' + renderText(dst, q.trim()) + '</div>'
+        + '</div>';
+    }
+
+    el('bkBody').innerHTML = html;
+  }
+
   function openCh(i, keepScroll){
     if(!cur || i < 0 || i >= cur.toc.length) return;
     curCh = i;
@@ -172,25 +241,37 @@ permalink: /books/
     for(var j=0;j<as.length;j++) as[j].classList.toggle('on', j===i);
 
     function paint(ch){
-      var body = ch.text || '';
-      if(ch.images && ch.images.length){
-        body += '\n' + ch.images.map(function(im){
-          return '![图]('+im+')'; }).join('\n');
-      }
-      el('bkBody').innerHTML =
-        '<h2>'+esc(ch.t || ('第'+ch.n+'章'))+'</h2>'
-        + '<div class="meta">'+esc(cur.name)+'　'+esc(ch.v||'')+'　'+esc(ch.w||'')+'</div>'
-        + renderText(body, q.trim());
+      paintCh(ch);
       if(!keepScroll) window.scrollTo({top:0, behavior:'smooth'});
     }
 
     var cached = cache[cur.id];
-    if(cached){ paint(cached.chapters[i]); return; }
+    if(cached){
+      paint(cached.chapters[i]);
+      // 有译文就异步补上，先显示原文不阻塞
+      if (dstIdx && dstIdx[cur.id]) {
+        fetch('/assets/js/bazi/books-dst/' + cur.id + '.json')
+          .then(function(r){ return r.ok ? r.json() : null; })
+          .then(function(d){
+            dstCache[cur.id] = (d && d.ch) ? d.ch : {};
+            if (cur && curCh === i) paint(cached.chapters[i]);
+          }).catch(function(){ dstCache[cur.id] = {}; });
+      }
+      return;
+    }
     el('bkBody').innerHTML = '<p class="na" style="color:var(--ink-3)">载入中…</p>';
     fetch(BODY_URL + cur.id + '.json').then(function(r){ return r.json(); })
       .then(function(d){
         cache[cur.id] = d;
         paint(d.chapters[i]);
+        if (dstIdx && dstIdx[cur.id]) {
+          fetch('/assets/js/bazi/books-dst/' + cur.id + '.json')
+            .then(function(r){ return r.ok ? r.json() : null; })
+            .then(function(x){
+              dstCache[cur.id] = (x && x.ch) ? x.ch : {};
+              if (cur && curCh === i) paint(d.chapters[i]);
+            }).catch(function(){ dstCache[cur.id] = {}; });
+        }
       }).catch(function(){
         el('bkBody').innerHTML = '<p class="na">载入失败</p>';
       });
@@ -224,6 +305,22 @@ permalink: /books/
   el('bkBack').onclick = back;
   el('bkPrev').onclick = function(){ openCh(curCh-1); };
   el('bkNext').onclick = function(){ openCh(curCh+1); };
+
+  // 重绘当前章（译文异步到达 / 模式切换时调用）
+  function repaintCurrent(){
+    if (!cur) return;
+    var d = cache[cur.id];
+    if (d && d.chapters[curCh]) paintCh(d.chapters[curCh]);
+  }
+
+  // 译文模式切换（document 级委托，避免节点替换后丢监听）
+  document.addEventListener('click', function(e){
+    var b = e.target && e.target.closest ? e.target.closest('.bk-trbar button') : null;
+    if(!b) return;
+    e.preventDefault();
+    trMode = b.dataset.m || 'both';
+    repaintCurrent();
+  });
   var lastQ = '';
   el('bkQ').addEventListener('input', function(e){
     q = e.target.value;
@@ -377,6 +474,19 @@ permalink: /books/
     var cs = d.reduce(function(s,b){ return s + b.chars; }, 0);
     el('bkStat').textContent = d.length+' 部 · '+ch+' 章 · '+fmt(cs)+' 字';
     render();
+
+    // 译文索引（可选，没有就不显示译文按钮）
+    fetch('/assets/js/bazi/books-dst/index.json')
+      .then(function(r){ return r.ok ? r.json() : null; })
+      .then(function(x){
+        if (!x) return;
+        dstIdx = x;
+        var n = Object.keys(x).length;
+        var tc = Object.keys(x).reduce(function(s,k){ return s + x[k].chars; }, 0);
+        var st = el('bkStat');
+        if (st) st.textContent += '　译文 ' + n + ' 部 ' + fmt(tc) + ' 字';
+      }).catch(function(){});
+
     // 深链跳转
     var t = parseHash();
     if(t){ openBookById(t.b, t.n); }
