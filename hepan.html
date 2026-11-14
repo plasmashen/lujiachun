@@ -87,6 +87,62 @@ body{background:var(--paper)}
 .hp-caveat{margin-top:18px;padding:12px 14px;background:var(--rule-soft);
   border-radius:6px;font-size:.8rem;color:var(--ink-3);line-height:1.8}
 
+/* ── 合盘总评 ── */
+.hp-verdict{display:flex;gap:16px;align-items:center;
+  background:var(--paper-2);border:1px solid var(--rule);
+  border-left:4px solid var(--ink-4);border-radius:8px;padding:16px 18px}
+.hp-verdict.A{border-left-color:#4a7c59}
+.hp-verdict.B{border-left-color:#9a7b3f}
+.hp-verdict.C{border-left-color:#b07d3f}
+.hp-verdict.D{border-left-color:var(--zhu)}
+.hp-v-score{font-family:var(--serif);font-size:2.3rem;line-height:1;
+  color:var(--ink);flex:0 0 auto;font-weight:600}
+.hp-v-score span{font-size:.72rem;color:var(--ink-4);font-weight:400;margin-left:2px}
+.hp-v-body{flex:1 1 auto;min-width:0}
+.hp-v-head{font-size:.95rem;font-weight:600;color:var(--ink);margin-bottom:6px}
+.hp-v-tier{font-size:.66rem;font-weight:400;color:var(--ink-4);
+  border:1px solid var(--rule);border-radius:2px;padding:1px 6px;margin-left:4px}
+.hp-v-text{font-size:.82rem;color:var(--ink-2);line-height:1.85}
+
+/* ── 维度条形 ── */
+.hp-bars{margin-top:14px;display:grid;gap:7px}
+.hp-bar-row{display:grid;grid-template-columns:78px 1fr 56px;
+  gap:10px;align-items:center;font-size:.76rem}
+.hp-bar-n{color:var(--ink-2)}
+.hp-bar-t{height:7px;background:var(--rule-soft);border-radius:4px;overflow:hidden}
+.hp-bar-t i{display:block;height:100%;border-radius:4px;
+  background:var(--ink-4);transition:width .4s ease}
+.hp-bar-row.good .hp-bar-t i{background:#4a7c59}
+.hp-bar-row.warn .hp-bar-t i{background:var(--zhu)}
+.hp-bar-row.info .hp-bar-t i{background:#9a7b3f}
+.hp-bar-v{text-align:right;color:var(--ink);font-variant-numeric:tabular-nums}
+.hp-bar-v span{color:var(--ink-4);font-size:.68rem}
+
+/* ── 逐项拆解 ── */
+.hp-dim{background:var(--paper-2);border:1px solid var(--rule);
+  border-radius:8px;padding:14px 16px;margin-bottom:11px;
+  border-top:3px solid var(--rule)}
+.hp-dim.good{border-top-color:#4a7c59}
+.hp-dim.warn{border-top-color:var(--zhu)}
+.hp-dim.info{border-top-color:#9a7b3f}
+.hp-dim-h{display:flex;align-items:baseline;gap:9px;margin-bottom:5px;
+  padding-bottom:8px;border-bottom:1px dashed var(--rule-soft);flex-wrap:wrap}
+.hp-dim-idx{font-family:var(--serif);font-size:.72rem;color:#fff;
+  background:var(--ink-3);width:17px;height:17px;line-height:17px;
+  text-align:center;border-radius:50%;flex:0 0 auto}
+.hp-dim-nm{font-family:var(--serif);font-size:1rem;font-weight:600;color:var(--ink)}
+.hp-dim-ab{font-size:.72rem;color:var(--ink-3);background:var(--rule-soft);
+  border-radius:3px;padding:1px 7px}
+.hp-dim-sc{margin-left:auto;font-size:.78rem;color:var(--ink-2);
+  font-variant-numeric:tabular-nums}
+.hp-dim-sc.ref{font-size:.68rem;color:var(--ink-4)}
+.hp-dim-role{font-size:.73rem;color:var(--ink-4);line-height:1.7;margin-bottom:9px}
+.hp-dim-lines{list-style:none;padding:0;margin:0}
+.hp-dim-lines li{position:relative;padding:4px 0 4px 14px;
+  font-size:.84rem;color:var(--ink-2);line-height:1.8}
+.hp-dim-lines li:before{content:'';position:absolute;left:2px;top:13px;
+  width:4px;height:4px;border-radius:50%;background:var(--rule)}
+
 /* 案例库 */
 .set-mask{position:fixed;inset:0;background:rgba(28,26,23,.42);z-index:200;
   display:flex;align-items:center;justify-content:center;padding:20px}
@@ -168,6 +224,7 @@ body{background:var(--paper)}
 <script src="/assets/js/bazi/interpret.js"></script>
 <script src="/assets/js/bazi/cases.js"></script>
 <script src="/assets/js/bazi/hepan.js"></script>
+<script src="/assets/js/bazi/hepan-deep.js"></script>
 <script>
 (function(){
   'use strict';
@@ -199,7 +256,7 @@ body{background:var(--paper)}
 
   function fmtGz(p){ return p || '--'; }
 
-  function render(r){
+  function render(r, rawA, rawB){
     var box = $('hpResult');
     box.innerHTML = '';
     box.classList.add('on');
@@ -263,27 +320,90 @@ body{background:var(--paper)}
     s3.appendChild(rw);
     box.appendChild(s3);
 
-    // ④ 关系分析
-    var s4 = document.createElement('div'); s4.className = 'hp-sec';
-    s4.innerHTML = '<h2><span class="n">肆</span>' + r.relLabel + '分析</h2>';
-    var ul = document.createElement('ul'); ul.className = 'hp-points';
-    if(r.points.length){
-      r.points.forEach(function(p){
-        var li = document.createElement('li');
-        li.className = p.level;
-        li.textContent = p.text;
-        ul.appendChild(li);
-      });
-    } else {
-      ul.innerHTML = '<li class="info">双方日柱之间无明显合冲关系，属平和相处型。</li>';
+    // ④ 七维深度分析
+    var deep = null;
+    try {
+      deep = bzHepanDeep.hepan(rawA, rawB, r.rel);
+    } catch (e) {
+      if (window.console) console.warn('合盘深度分析失败:', e);
+      deep = null;
     }
-    s4.appendChild(ul);
-    var cv = document.createElement('div'); cv.className = 'hp-caveat';
-    cv.textContent = '合盘看的是两人气场的互动倾向，不是关系成败的判决。'
-      + '同日支相冲的搭档也常有互补成就，同日支相合也可能缺张力。'
-      + '把它当沟通时的参考语言，比当结论更有用。';
-    s4.appendChild(cv);
-    box.appendChild(s4);
+
+    if (deep) {
+      // 总评卡
+      var s0 = document.createElement('div'); s0.className = 'hp-sec';
+      s0.innerHTML = '<h2><span class="n">肆</span>合盘总评</h2>';
+      var vc = document.createElement('div'); vc.className = 'hp-verdict ' + (deep.verdict.tier || 'C');
+      vc.innerHTML = '<div class="hp-v-score">' + deep.total + '<span>/100</span></div>' +
+        '<div class="hp-v-body">' +
+          '<div class="hp-v-head">' + esc(deep.verdict.head) + '　<span class="hp-v-tier">' + deep.verdict.tier + ' 档</span></div>' +
+          '<div class="hp-v-text">' + esc(deep.verdict.tail) + '</div>' +
+        '</div>';
+      s0.appendChild(vc);
+
+      // 维度条形
+      var bars = document.createElement('div'); bars.className = 'hp-bars';
+      deep.dims.forEach(function(d){
+        if (!d.full) return;
+        var pct = Math.round(d.score / d.full * 100);
+        pct = Math.max(0, Math.min(100, pct));
+        var row = document.createElement('div'); row.className = 'hp-bar-row ' + d.level;
+        row.innerHTML =
+          '<div class="hp-bar-n">' + esc(d.name) + '</div>' +
+          '<div class="hp-bar-t"><i style="width:' + pct + '%"></i></div>' +
+          '<div class="hp-bar-v">' + d.score + '<span>/' + d.full + '</span></div>';
+        bars.appendChild(row);
+      });
+      s0.appendChild(bars);
+      box.appendChild(s0);
+
+      // 各维度详解
+      var s5 = document.createElement('div'); s5.className = 'hp-sec';
+      s5.innerHTML = '<h2><span class="n">伍</span>逐项拆解</h2>';
+      deep.dims.forEach(function(d, idx){
+        var card = document.createElement('div');
+        card.className = 'hp-dim ' + d.level;
+        var head = '<div class="hp-dim-h">' +
+          '<span class="hp-dim-idx">' + (idx+1) + '</span>' +
+          '<span class="hp-dim-nm">' + esc(d.name) + '</span>' +
+          (d.abbr ? '<span class="hp-dim-ab">' + esc(d.abbr) + '</span>' : '') +
+          (d.full ? '<span class="hp-dim-sc">' + d.score + '/' + d.full + '</span>' : '<span class="hp-dim-sc ref">参考</span>') +
+          '</div>';
+        var role = '<div class="hp-dim-role">' + esc(d.role) + '</div>';
+        var body = '<ul class="hp-dim-lines">';
+        d.lines.forEach(function(ln){
+          body += '<li>' + esc(ln) + '</li>';
+        });
+        body += '</ul>';
+        card.innerHTML = head + role + body;
+        s5.appendChild(card);
+      });
+
+      var cv = document.createElement('div'); cv.className = 'hp-caveat';
+      cv.textContent = '合盘看的是两人气场的互动倾向，不是关系成败的判决。'
+        + '同日支相冲的搭档也常有互补成就，同日支相合也可能缺张力。'
+        + '把它当沟通时的参考语言，比当结论更有用。';
+      s5.appendChild(cv);
+      box.appendChild(s5);
+
+    } else {
+      // 退化：旧版分析
+      var s4 = document.createElement('div'); s4.className = 'hp-sec';
+      s4.innerHTML = '<h2><span class="n">肆</span>' + r.relLabel + '分析</h2>';
+      var ul = document.createElement('ul'); ul.className = 'hp-points';
+      if(r.points.length){
+        r.points.forEach(function(p){
+          var li = document.createElement('li');
+          li.className = p.level;
+          li.textContent = p.text;
+          ul.appendChild(li);
+        });
+      } else {
+        ul.innerHTML = '<li class="info">双方日柱之间无明显合冲关系，属平和相处型。</li>';
+      }
+      s4.appendChild(ul);
+      box.appendChild(s4);
+    }
   }
 
   // 五行雷达（SVG 五边形）
@@ -360,7 +480,7 @@ body{background:var(--paper)}
       $('hpResult').classList.add('on');
       return;
     }
-    render(bzHepan.compute(a, b, rel));
+    render(bzHepan.compute(a, b, rel), a, b);
   };
 
   // ───────────── 合盘案例库 ─────────────
