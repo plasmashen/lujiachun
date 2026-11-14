@@ -8,6 +8,7 @@ pwa_core:
 - /assets/js/bazi/ganzhi.js
 - /assets/js/bazi/guji.js
 - /assets/js/bazi/hepan.js
+- /assets/js/bazi/hepan-deep.js
 - /assets/js/bazi/horary.js
 - /assets/js/bazi/huangli.js
 - /assets/js/bazi/interpret.js
